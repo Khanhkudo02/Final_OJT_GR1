@@ -47,7 +47,7 @@ function LoginForm() {
         } else {
             setEmailError('');
         }
-        
+
         if (password.trim() === '') {
             setPasswordError('Please enter password.');
             valid = false;
@@ -71,7 +71,7 @@ function LoginForm() {
                 <h1>Login</h1>
                 <div className="input-box">
                     <input
-                        type="email" 
+                        type="email"
                         placeholder="Email"
                         value={email}
                         onChange={handleEmailChange}
@@ -79,7 +79,7 @@ function LoginForm() {
                         className={emailError ? 'error' : ''}
                         required
                     />
-                    <FaEnvelope className='icon'/> 
+                    <FaEnvelope className='icon' />
                 </div>
                 {emailError && <div className="error-msg">{emailError}</div>}
                 <div className="input-box">
@@ -92,7 +92,7 @@ function LoginForm() {
                         className={passwordError ? 'error' : ''}
                         required
                     />
-                    <FaLock className='icon'/>
+                    <FaLock className='icon' />
                 </div>
                 {passwordError && <div className="error-msg">{passwordError}</div>}
                 <div className="remember-forgot">
