@@ -1,9 +1,10 @@
+import { Menu } from "antd";
 import React from "react";
 
 function Admin() {
   return (
     <div>
-      <h1>Page Admin</h1>
+      <h1>This is Admin page</h1>
       <Menu
         item={[
           { lable: "Home" },
@@ -13,7 +14,6 @@ function Admin() {
           { lable: "Home" },
         ]}
       ></Menu>
-      <div>hihihi</div>
     </div>
   );
 }

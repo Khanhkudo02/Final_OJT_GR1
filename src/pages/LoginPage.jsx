@@ -1,86 +1,74 @@
-import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
-// import { signUp, logIn } from "./service/authService";
-// import LoginLoginAccount from "./pages/LoginAccount";
-// import LoginAccount from "./LoginAccount";
+import React, { useState } from "react";
+import { ref, get, child } from "firebase/database";
+import { auth, database } from "../../firebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
-const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("admin");
-  const [user, setUser] = useState(null);
-  const [userData, setUserData] = useState(null);
-  const [userRole, setUserRole] = useState("");
-  const [error, setError] = useState("");
+function LoginPage() {
+  const [error, setError] = useState(null);
+  const nav = useNavigate();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
 
-  const handleSignUp = async () => {
+    // signInWithEmailAndPassword(auth,email,password).then(data=>{
+    //     if (user.isAuthenticated) {
+    //         nav('/admin')
+    //     }
+
+    // })
+
     try {
-      const user = await signUp(email, password, role);
-      setUser(user);
-      setUserRole(role);
-      console.log("User signed up:", user);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Lấy dữ liệu người dùng từ Firebase Realtime Database
+      const userRef = ref(database, `users/${user.uid}`);
+      const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        if (userData.email === "admin@gmail.com") {
+          nav("/admin");
+        } else {
+          nav("/employee");
+        }
+      } else {
+        setError("User data not found");
+      }
     } catch (error) {
-      setError("Error signing up: " + error.message);
-      console.error("Error signing up:", error);
+      console.error("Error logging in:", error.message);
+      setError(error.message);
     }
   };
-
-  const handleLogIn = async () => {
-    try {
-      const { user, userData } = await logIn(email, password);
-      setUser(user);
-      setUserData(userData);
-      console.log("User logged in:", user);
-      console.log("User data:", userData);
-    } catch (error) {
-      setError("Error logging in: " + error.message);
-      console.error("Error logging in:", error);
-    }
-  };
-
-  useEffect(() => {
-    console.log("data", userData);
-  }, [userData]);
 
   return (
-    <Router>
-      <div>
-        <h1>Firebase Role-Based Authentication</h1>
-        <div>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="admin">Admin</option>
-            <option value="moderator">Moderator</option>
-          </select>
-          <button onClick={handleSignUp}>Sign Up</button>
-          <button onClick={handleLogIn}>Log In</button>
-        </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {user && (
-          <div>
-            <h2>Welcome, {user.email}</h2>
-            <p>Your role is: {userRole}</p>
-          </div>
-        )}
-      </div>
-    </Router>
+    <div>
+      <h1>Sign in </h1>
+      <form onSubmit={(e) => handleLogin(e)}>
+        <input
+          name="email"
+          type="email"
+          placeholder="Enter your email"
+          required
+        />
+        <br />
+        <input
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          required
+        />
+        <br />
+        <button>Sign In</button>
+        {error && <p>{error}</p>}
+      </form>
+    </div>
   );
-};
+}
 
 export default LoginPage;

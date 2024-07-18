@@ -5,8 +5,8 @@ import Users from "./Users";
 function Users() {
   return (
     <div>
-      <h1>This is User page</h1>
-      {/* <Menu
+      <h1>This is employee page</h1>
+      <Menu
         item={[
           { lable: "Home" },
           { lable: "Home" },
@@ -14,7 +14,7 @@ function Users() {
           { lable: "Home" },
           { lable: "Home" },
         ]}
-      ></Menu> */}
+      ></Menu>
     </div>
   );
 }
