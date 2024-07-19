@@ -4,7 +4,7 @@ import { Menu } from "antd";
 function Users() {
   return (
     <div>
-      <h1>Hello</h1>
+      <h1>This is employee page</h1>
       <Menu
         item={[
           { lable: "Home" },
@@ -14,7 +14,6 @@ function Users() {
           { lable: "Home" },
         ]}
       ></Menu>
-      <div>hihihi</div>
     </div>
   );
 }
