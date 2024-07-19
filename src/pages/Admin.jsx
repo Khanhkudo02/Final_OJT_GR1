@@ -1,18 +1,19 @@
 import React from "react";
+import { Menu } from "antd";
 
 function Admin() {
   return (
     <div>
       <Menu
         item={[
-          { lable: "Home" },
-          { lable: "Home" },
-          { lable: "Home" },
-          { lable: "Home" },
-          { lable: "Home" },
+          { lable: "Account" },
+          { lable: "Project" },
+          { lable: "Technology" },
+          { lable: "Position" },
+          { lable: "Language" },
+          { lable: "Employee" },
         ]}
       ></Menu>
-      <div>hihihi</div>
     </div>
   );
 }
