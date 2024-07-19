@@ -4,6 +4,9 @@ import LoginPage from "./pages/LoginPage";
 import Admin from "./pages/Admin";
 import Users from "./pages/Users";
 import ForgetPassword from "./pages/ForgetPassword";
+import Sidebar from './Components/Sidebar';
+
+
 
 const App = () => {
   return (

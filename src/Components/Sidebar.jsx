@@ -1,0 +1,69 @@
+import React, { useEffect, useState } from "react";
+import '../assets/style/Pages/Sidebar.scss';
+
+
+const SidebarItem = ({ title, children }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+  
+    const toggleExpand = () => {
+      setIsExpanded(!isExpanded);
+
+      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+      const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+      };
+    };
+  
+    return (
+      <div className="sidebar-item">
+        <div className="sidebar-item-title" onClick={toggleExpand}>
+          {title}
+        </div>
+        <div className={`sidebar-sub-items ${isExpanded ? 'expanded' : ''}`}>
+          {children}
+        </div>
+      </div>
+    );
+  };
+
+const Sidebar = ({ isOpen, toggleSidebar }) => {
+  return (
+    <>
+    <div className='sidebar-desktop'>
+    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+      <button className="close-btn" onClick={toggleSidebar}>
+        &times;
+      </button>
+      <h2>Get IT</h2>
+      <ul>
+        <SidebarItem title="Manage Accounts">
+          <li>Account Info</li>
+          <li>Reset Password</li>
+        </SidebarItem>
+        <SidebarItem title="Project Management">
+          <li>Project Info</li>
+          <li>Assign Employees</li>
+          <li>Project Tracking</li>
+        </SidebarItem>
+        <SidebarItem title="Position Management">
+        </SidebarItem>
+        <SidebarItem title="Technology">
+        </SidebarItem>
+        <SidebarItem title="Employee">
+          <li>Employee Profile</li>
+          <li>Assign Project</li>
+        </SidebarItem>
+        <SidebarItem title="Languages">
+          <li>Programming Language Info</li>
+        </SidebarItem>
+        <SidebarItem title="CV">
+        </SidebarItem>
+      </ul>
+    </div>
+    <h1>day la sidebar</h1></div>
+    </>
+  )
+}
+
+export default Sidebar
