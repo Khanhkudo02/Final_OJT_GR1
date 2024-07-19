@@ -1,5 +1,5 @@
 import React from 'react'
-import './assets/style/Components/Project.scss'
+import '../assets/style/Pages/Project.scss'
 
 const ProjectManagement = () => {
   return (

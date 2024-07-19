@@ -1,69 +1,105 @@
-import React, { useEffect, useState } from "react";
-import '../assets/style/Pages/Sidebar.scss';
+import React from 'react';
+import { Layout, Menu } from 'antd';
+import { UserOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, CodeOutlined, FileTextOutlined } from '@ant-design/icons';
+import { NavLink } from 'react-router-dom';
 
+const { Sider } = Layout;
 
-const SidebarItem = ({ title, children }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-  
-    const toggleExpand = () => {
-      setIsExpanded(!isExpanded);
+const Sidebar = () => {
+  const menuItems = [
+    {
+      key: '1',
+      icon: <UserOutlined />,
+      label: <NavLink to="/account-management">Manage Accounts</NavLink>,
+      children: [
+        {
+          key: '1-1',
+          label: <NavLink to="/account-info">Account Info</NavLink>,
+        },
+        {
+          key: '1-2',
+          label: <NavLink to="/reset-password">Reset Password</NavLink>,
+        },
+      ],
+    },
+    {
+      key: '2',
+      icon: <ProjectOutlined />,
+      label: <NavLink to="/project-management">Project Management</NavLink>,
+      children: [
+        {
+          key: '2-1',
+          label: <NavLink to="/project-info">Project Info</NavLink>,
+        },
+        {
+          key: '2-2',
+          label: <NavLink to="/assign-employees">Assign Employees</NavLink>,
+        },
+        {
+          key: '2-3',
+          label: <NavLink to="/project-tracking">Project Tracking</NavLink>,
+        },
+      ],
+    },
+    {
+      key: '3',
+      icon: <TeamOutlined />,
+      label: <NavLink to="/position-management">Position Management</NavLink>,
+    },
+    {
+      key: '4',
+      icon: <ToolOutlined />,
+      label: <NavLink to="/technology-management">Technology</NavLink>,
+    },
+    {
+      key: '5',
+      icon: <TeamOutlined />,
+      label: <NavLink to="/employee-management">Employee</NavLink>,
+      children: [
+        {
+          key: '5-1',
+          label: <NavLink to="/employee-profile">Employee Profile</NavLink>,
+        },
+        {
+          key: '5-2',
+          label: <NavLink to="/assign-project">Assign Project</NavLink>,
+        },
+      ],
+    },
+    {
+      key: '6',
+      icon: <CodeOutlined />,
+      label: <NavLink to="/programing-language">Languages</NavLink>,
+      children: [
+        {
+          key: '6-1',
+          label: <NavLink to="/programming-language-info">Programming Language Info</NavLink>,
+        },
+      ],
+    },
+    {
+      key: '7',
+      icon: <FileTextOutlined />,
+      label: <NavLink to="/cv">CV</NavLink>,
+    },
+  ];
 
-      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-      const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-      };
-    };
-  
-    return (
-      <div className="sidebar-item">
-        <div className="sidebar-item-title" onClick={toggleExpand}>
-          {title}
-        </div>
-        <div className={`sidebar-sub-items ${isExpanded ? 'expanded' : ''}`}>
-          {children}
-        </div>
-      </div>
-    );
-  };
-
-const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
-    <>
-    <div className='sidebar-desktop'>
-    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
-      <button className="close-btn" onClick={toggleSidebar}>
-        &times;
-      </button>
-      <h2>Get IT</h2>
-      <ul>
-        <SidebarItem title="Manage Accounts">
-          <li>Account Info</li>
-          <li>Reset Password</li>
-        </SidebarItem>
-        <SidebarItem title="Project Management">
-          <li>Project Info</li>
-          <li>Assign Employees</li>
-          <li>Project Tracking</li>
-        </SidebarItem>
-        <SidebarItem title="Position Management">
-        </SidebarItem>
-        <SidebarItem title="Technology">
-        </SidebarItem>
-        <SidebarItem title="Employee">
-          <li>Employee Profile</li>
-          <li>Assign Project</li>
-        </SidebarItem>
-        <SidebarItem title="Languages">
-          <li>Programming Language Info</li>
-        </SidebarItem>
-        <SidebarItem title="CV">
-        </SidebarItem>
-      </ul>
-    </div>
-    <h1>day la sidebar</h1></div>
-    </>
-  )
-}
+    <Sider
+      width={200}
+      style={{
+        overflow: 'auto',
+        height: '100vh',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
+      }}
+    >
+      <div className="logo" />
+      <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={menuItems} />
+    </Sider>
+  );
+};
 
-export default Sidebar
+export default Sidebar;
