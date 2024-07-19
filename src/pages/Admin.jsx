@@ -1,4 +1,5 @@
 import React from "react";
+import Sidebar from "../Components/Sidebar";
 
 function Admin() {
   return (
@@ -12,7 +13,7 @@ function Admin() {
           { lable: "Home" },
         ]}
       ></Menu>
-      <div>hihihi</div>
+      <Sidebar />
     </div>
   );
 }

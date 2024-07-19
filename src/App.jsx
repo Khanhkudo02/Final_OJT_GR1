@@ -9,6 +9,7 @@ import { signUp, logIn } from "./service/authService";
 import Admin from "./pages/Admin";
 import Users from "./pages/Users";
 
+
 const App = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -1,0 +1,23 @@
+
+.demo-logo-vertical {
+    height: 32px;
+    margin: 16px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .content {
+    padding: 24px;
+    min-height: 360px;
+    background: var(--color-bg-container);
+    border-radius: var(--border-radius-lg);
+  }
+  
+  .header {
+    padding: 0;
+    background: var(--color-bg-container);
+  }
+  
+  .footer {
+    text-align: center;
+  }
+  
