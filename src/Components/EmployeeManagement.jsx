@@ -3,6 +3,10 @@ import React from 'react'
 const EmployeeManagement = () => {
   return (
     <main>
+      <div>
+      <h2>lalalallala</h2>
+      <p>This is the account info page.</p>
+    </div>
       <section className='employee-profile'>
         <div className="employee-view"></div>
         <div className="employee-create"></div>
