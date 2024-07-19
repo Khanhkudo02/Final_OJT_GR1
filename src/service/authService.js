@@ -1,52 +1,87 @@
+// src/services/authService.js
 
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { get, ref, set, update } from "firebase/database";
-import { auth, database } from "../../firebaseConfig";
+import { getDatabase, ref, query, orderByChild, equalTo, get, set } from 'firebase/database';
 
-export const signUp = async (email, password, role) => {
+// Hàm đăng nhập người dùng
+export const loginUser = async (e, email, password, setUser, setError, navigate) => {
+  e.preventDefault();
+  
   try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential.user;
-    await set(ref(database, "users/" + user.uid), {
-      email: email,
-      role: role,
-    });
-    return user;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const logIn = async (email, password) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential.user;
-    const snapshot = await get(ref(database, "users/" + user.uid));
+    const db = getDatabase();
+    const userRef = ref(db, 'users');
+    const userQuery = query(userRef, orderByChild('email'), equalTo(email));
+    const snapshot = await get(userQuery);
     const userData = snapshot.val();
-    console.log("user", user);
-    console.log("userData", userData);
-    return { user, userData };
+    
+    console.log("User Data from DB:", userData); // Console log user data
+
+    if (userData) {
+      const userId = Object.keys(userData)[0];
+      const user = userData[userId];
+
+
+      if (user.password === password) {
+        localStorage.setItem("userId", JSON.stringify(user)); // Lưu toàn bộ đối tượng người dùng
+        setUser(user);
+        
+        // Điều hướng dựa trên vai trò người dùng
+        navigate(user.role === 'admin' ? '/admin' : '/employee');
+        return { user, error: null };
+      } else {
+        return { user: null, error: "Invalid password" };
+      }
+    } else {
+      return { user: null, error: "User not found" };
+    }
   } catch (error) {
-    throw error;
+    console.error("Error fetching data: ", error);
+    return { user: null, error: "An error occurred" };
   }
 };
 
-export const updateUserRole = async (uid, role) => {
+// Hàm đăng ký người dùng
+export const signUpUser = async (e, email, password, setSuccessMessage, setError) => {
+  e.preventDefault();
+  
   try {
-    await update(ref(database, "users/" + uid), { role: role });
-    console.log(`User ${uid} role updated to ${role}`);
+    const db = getDatabase();
+    const userRef = ref(db, 'users');
+    const userQuery = query(userRef, orderByChild('email'), equalTo(email));
+    const snapshot = await get(userQuery);
+    
+    console.log("Snapshot for Sign Up Check:", snapshot.val()); // Console log snapshot for sign up
+
+    if (snapshot.val()) {
+      setError("Email already in use");
+      return { success: false, error: "Email already in use" };
+    }
+
+    const newUserRef = ref(db, `users/${email.replace('.', ',')}`);
+    const newUser = {
+      email,
+      password,
+      contact: '',
+      cv_list: [{
+        title: "",
+        description: '',
+        file: '',
+        updatedAt: new Date().toISOString()
+      }],
+      role: email === "admin@gmail.com" ? "admin" : "employee",
+      createdAt: new Date().toISOString(),
+      projetcIds: '',
+      skill: '',
+      Status: ''
+    };
+    await set(newUserRef, newUser);
+    
+    console.log("New User Object:", newUser); // Console log the new user object
+
+    setSuccessMessage("Account created successfully! Please log in.");
+    return { success: true, error: "" };
   } catch (error) {
-    throw error;
+    console.error("Error signing up: ", error);
+    setError("An error occurred during sign up");
+    return { success: false, error: "An error occurred during sign up" };
   }
 };
