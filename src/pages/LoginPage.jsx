@@ -12,13 +12,6 @@ function LoginPage() {
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    // signInWithEmailAndPassword(auth,email,password).then(data=>{
-    //     if (user.isAuthenticated) {
-    //         nav('/admin')
-    //     }
-
-    // })
-
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -27,7 +20,6 @@ function LoginPage() {
       );
       const user = userCredential.user;
 
-      // Lấy dữ liệu người dùng từ Firebase Realtime Database
       const userRef = ref(database, `users/${user.uid}`);
       const snapshot = await get(userRef);
       if (snapshot.exists()) {

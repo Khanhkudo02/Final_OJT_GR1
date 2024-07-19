@@ -1,9 +1,7 @@
 import React from "react";
 
-const PageCV = () => {
-  <main>
-    <section className="cv"></section>
-  </main>;
-};
+function PageCV() {
+  return <div>This is CV page</div>;
+}
 
 export default PageCV;
