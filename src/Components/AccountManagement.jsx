@@ -5,6 +5,10 @@ import axios from "axios";
 const AccountManagement = () => {
   return (
     <main>
+      <div>
+      <h2>Account Info</h2>
+      <p>This is the account info page.</p>
+    </div>
       <section className="account">
         <div className="account-view"></div>
         <div className="account-create"></div>
