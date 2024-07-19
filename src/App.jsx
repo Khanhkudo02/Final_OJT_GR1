@@ -12,6 +12,7 @@ import ProjectManagement from "./Components/ProjectManagement";
 import PositionManagement from "./Components/PositionManagement";
 import TechnologyManagement from "./Components/TechnologyManagement";
 import ProgramingLanguage from "./Components/ProgramingLanguage";
+import PageCV from "./pages/PageCV";
 
 const { Header, Content, Footer } = Layout;
 
@@ -36,6 +37,7 @@ const App = () => {
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/cv" element={<PageCV />} />
                 <Route path="/employee" element={<Users />} />
                 <Route path="/forget-password" element={<ForgetPassword />} />
                 <Route
@@ -65,9 +67,9 @@ const App = () => {
               </Routes>
             </div>
           </Content>
-          <Footer style={{ textAlign: "center" }}>
+          {/* <Footer style={{ textAlign: "center" }}>
             Ant Design ©{new Date().getFullYear()} Created by Ant UED
-          </Footer>
+          </Footer> */}
         </Layout>
       </Layout>
     </Router>
