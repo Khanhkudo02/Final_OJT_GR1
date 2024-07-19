@@ -1,66 +1,78 @@
-import { useState } from "react";
-import { Modal, Button } from "bootstrap";
-import { putUpdateTechnology } from "../service/TechnologyServices.js";
+import React, { useState, useEffect } from "react";
+import { Modal, Button, Input } from "antd";
+import { putUpdateTechnology } from "../service/TechnologyServices";
 import { toast } from 'react-toastify';
 
-const ModalEditTechnology = () => {
-    const { show, handleClose, dataUserTechnology } = props;
+const ModalEditTechnology = (props) => {
+    const { visible, handleClose, dataTechnologyEdit } = props;
     const [name, setName] = useState("");
-    const [description, setDecription] = useState("");
+    const [description, setDescription] = useState("");
     const [status, setStatus] = useState("");
 
-    const handleEditTechnology = () => {
-        let res = await putUpdateTechnology(name, description, status);
-        if (res && res.updateAt) {
-            handleEditUserFromModal({
-                name: name,
-                id: dataTechnologyEdit.id
-            })
-        }
-        console.log(res)
-    }
-
     useEffect(() => {
-        if (show) {
-            setName(dataTechnologyEdit.name);
-            setDecription(dataTechnologyEdit.description);
-            setStatus(dataTechnologyEdit.status)
+        if (dataTechnologyEdit) {
+            setName(dataTechnologyEdit.title || "");
+            setDescription(dataTechnologyEdit.information || "");
+            setStatus(dataTechnologyEdit.company || "");
         }
-    }, [dataTechnologyEdit])
+    }, [dataTechnologyEdit]);
 
-    console.log(">>> check props: ", dataTechnologyEdit)
+    const handleEditTechnology = async () => {
+        try {
+            let res = await putUpdateTechnology(dataTechnologyEdit.key, name, description, status);
+            if (res) {
+                handleClose(); // Close modal after success
+                toast.success("Technology updated successfully!");
+            } else {
+                toast.error("Failed to update technology.");
+            }
+        } catch (error) {
+            toast.error("An error occurred.");
+        }
+    };
 
     return (
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Edit Technology</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <div className="body-edit">
-                    <div className="mb-3">
-                        <label className="form-label">Name</label>
-                        <input type="text" className="form-control" value={name} onChange={(event) => setName(event.target.value)} />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Decription</label>
-                        <input type="text" className="form-control" value={description} onChange={(event) => setDescription(event.target.value)} />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Status</label>
-                        <input type="text" className="form-control" value={status} onChange={(event) => setStatus(event.target.value)} />
-                    </div>
-                </div>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
+        <Modal
+            title="Edit Technology"
+            visible={visible}
+            onCancel={handleClose}
+            footer={[
+                <Button key="back" onClick={handleClose}>
                     Close
-                </Button>
-                <Button variant="primary" onClick={() => handleEditTechnology()}>
+                </Button>,
+                <Button key="submit" type="primary" onClick={handleEditTechnology}>
                     Save Changes
-                </Button>
-            </Modal.Footer>
+                </Button>,
+            ]}
+        >
+            <div className="body-edit">
+                <div className="mb-3">
+                    <label className="form-label">Name</label>
+                    <Input
+                        type="text"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label">Description</label>
+                    <Input
+                        type="text"
+                        value={description}
+                        onChange={(event) => setDescription(event.target.value)}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label">Status</label>
+                    <Input
+                        type="text"
+                        value={status}
+                        onChange={(event) => setStatus(event.target.value)}
+                    />
+                </div>
+            </div>
         </Modal>
-    )
-}
+    );
+};
 
 export default ModalEditTechnology;

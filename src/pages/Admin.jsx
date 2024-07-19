@@ -1,19 +1,15 @@
-import React from "react";
 import { Menu } from "antd";
+import React from "react";
+import TechnologyManagement from "../Components/TechnologyManagement";
+import "antd/dist/reset.css";
+import Sidebar from "../Components/Sidebar";
 
 function Admin() {
   return (
-    <div>
-      <Menu
-        item={[
-          { lable: "Account" },
-          { lable: "Project" },
-          { lable: "Technology" },
-          { lable: "Position" },
-          { lable: "Language" },
-          { lable: "Employee" },
-        ]}
-      ></Menu>
+    <div style={{ padding: 20 }}>
+      <TechnologyManagement />
+
+      <Sidebar />
     </div>
   );
 }
