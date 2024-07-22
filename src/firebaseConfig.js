@@ -1,7 +1,7 @@
-
-
-import { initializeApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAwAWQ93FKS0AT7i0otQ0zOTnw88bwbf7E",
@@ -14,36 +14,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const database = getDatabase(app);
-const addItem = () => {
-  const newItem = {
-    title: "New Item",
-    information: "Information about new item",
-    price: 100,
-    company: "New Company",
-    image: "/images/new_image.jpg"
-  };
+const storage = getStorage(app);
 
-  database.ref('/your-data-path').push(newItem).then(() => {
-    // Cập nhật lại dữ liệu sau khi thêm
-    fetchData();
-  });
-};
-
-// Sử dụng addItem khi nhấn nút
-
-
-const deleteItem = (key) => {
-  database.ref(`/your-data-path/${key}`).remove().then(() => {
-    // Cập nhật lại dữ liệu sau khi xóa
-    fetchData();
-  });
-};
-
-// Sử dụng deleteItem trong render của Column Actions
-
-
-
-export { database };
-export default app;
-
+export { auth, database, storage };

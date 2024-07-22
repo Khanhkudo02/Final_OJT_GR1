@@ -1,62 +1,118 @@
-import React, { useEffect, useState } from "react";
-import { Button, Table } from "antd";
-import { database } from "/src/firebaseConfig"; // Đảm bảo bạn đã tạo và xuất database từ firebaseConfig.js
+import React, { useState, useEffect } from 'react';
+import { Button, Table } from 'antd';
+import ModalAddTechnology from './ModalAddTechnology';
+import ModalEditTechnology from './ModalEditTechnology';
+import ModalDeleteTechnology from './ModalDeleteTechnology';
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
 
 const TechnologyManagement = () => {
-  const [data, setData] = useState([]);
+  const [technologies, setTechnologies] = useState([]);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
+  const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
+
+  const loadTechnologies = async () => {
+    try {
+      const data = await fetchAllTechnology();
+      setTechnologies(data);
+    } catch (error) {
+      console.error("Failed to fetch technologies:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const snapshot = await database.ref('/your-data-path').once('value');
-      const data = snapshot.val();
-      const formattedData = Object.keys(data).map(key => ({
-        key: key,
-        ...data[key]
-      }));
-      setData(formattedData);
-    };
-
-    fetchData();
+    loadTechnologies();
   }, []);
+
+  const showEditModal = (record) => {
+    setDataTechnologyEdit(record);
+    setIsEditModalVisible(true);
+  };
+
+  const showAddModal = () => {
+    setIsAddModalVisible(true);
+  };
+
+  const showDeleteModal = (id) => {
+    setTechnologyIdToDelete(id);
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalVisible(false);
+    setDataTechnologyEdit(null);
+    setTimeout(() => loadTechnologies(), 100);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalVisible(false);
+    setTimeout(() => loadTechnologies(), 100);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalVisible(false);
+    setTechnologyIdToDelete(null);
+    setTimeout(() => loadTechnologies(), 100);
+  };
 
   return (
     <div>
-      <Button type="primary" style={{ marginBottom: 16 }}>
-        Add New Row
+      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
+        Add New Technology
       </Button>
-      
-      <Table dataSource={data} pagination={false}>
+      <Table dataSource={technologies} pagination={false}>
         <Column
           title="Image"
-          dataIndex="image"
-          key="image"
+          dataIndex="imageUrl"
+          key="imageUrl"
           render={(text, record) => (
             <img
-              src={record.image}
-              alt={record.title}
+              src={record.imageUrl}
+              alt={record.name}
               style={{ width: 50, height: 50 }}
             />
           )}
         />
-        <Column title="Title" dataIndex="title" key="title" />
-        <Column title="Information" dataIndex="information" key="information" />
-        <Column title="Price" dataIndex="price" key="price" />
-        <Column title="Company" dataIndex="company" key="company" />
+        <Column title="Name" dataIndex="name" key="name" />
+        <Column title="Description" dataIndex="description" key="description" />
+        <Column title="Status" dataIndex="status" key="status" />
         <Column
           title="Actions"
           key="actions"
           render={(text, record) => (
             <span>
-              <Button type="primary" style={{ marginRight: 8 }}>
+              <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
-              <Button type="danger">Delete</Button>
+              <Button type="danger" onClick={() => showDeleteModal(record.key)}>
+                Delete
+              </Button>
             </span>
           )}
         />
       </Table>
+      {dataTechnologyEdit && (
+        <ModalEditTechnology
+          open={isEditModalVisible}
+          handleClose={handleCloseEditModal}
+          dataTechnologyEdit={dataTechnologyEdit}
+        />
+      )}
+      <ModalAddTechnology
+        open={isAddModalVisible}
+        handleClose={handleCloseAddModal}
+      />
+      {technologyIdToDelete && (
+        <ModalDeleteTechnology
+          open={isDeleteModalVisible}
+          handleClose={handleCloseDeleteModal}
+          technologyId={technologyIdToDelete}
+        />
+      )}
     </div>
   );
 };
