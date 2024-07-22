@@ -12,6 +12,7 @@ import {
 } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 import "../assets/style/Pages/Sidebar.scss";
+import LogoutButton from "./LogoutButton";
 
 const { Sider } = Layout;
 
@@ -81,6 +82,10 @@ const Sidebar = () => {
       key: "7",
       icon: <FileTextOutlined />,
       label: <NavLink to="/cv">CV</NavLink>,
+    },
+    {
+      key: "8",
+      icon: <LogoutButton />,
     },
   ];
 

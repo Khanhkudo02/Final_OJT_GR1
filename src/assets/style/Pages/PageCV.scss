@@ -1,3 +1,8 @@
+.cv-page {
+    display: flex;
+    flex-direction: row;
+}
+
 .container {
     display: flex;
     flex-direction: row;
@@ -12,12 +17,14 @@
     background-color: #3940D0;
     padding: 10px;
     color: #fff;
+    width: calc(100% / 3);
   }
 
   .right {
     background-color: #fff;
     padding: 10px;
     color: #6A6A6F;
+    width: calc(100% - (100% / 3));
   }
   
   .header {
@@ -104,5 +111,28 @@
   .bottom-left {
     padding-bottom: 10px;
     border-bottom: 1px solid #fff;
+  }
+
+  .PDF-button {
+    max-width: 800px;
+    display: flex;
+    justify-content: right;
+    margin: auto;
+  }
+
+  .download-btn {
+    margin: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .download-btn:hover {
+    background-color: #0056b3;
   }
   
