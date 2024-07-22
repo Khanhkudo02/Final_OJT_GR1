@@ -1,11 +1,7 @@
-// src/services/authService.js
-
 import { getDatabase, ref, query, orderByChild, equalTo, get, set } from 'firebase/database';
 
 // Hàm đăng nhập người dùng
-export const loginUser = async (e, email, password, setUser, setError, navigate) => {
-  e.preventDefault();
-  
+export const loginUser = async (email, password, setUser, setError, navigate) => {
   try {
     const db = getDatabase();
     const userRef = ref(db, 'users');
@@ -18,7 +14,6 @@ export const loginUser = async (e, email, password, setUser, setError, navigate)
     if (userData) {
       const userId = Object.keys(userData)[0];
       const user = userData[userId];
-
 
       if (user.password === password) {
         localStorage.setItem("userId", JSON.stringify(user)); // Lưu toàn bộ đối tượng người dùng
@@ -40,9 +35,7 @@ export const loginUser = async (e, email, password, setUser, setError, navigate)
 };
 
 // Hàm đăng ký người dùng
-export const signUpUser = async (e, email, password, setSuccessMessage, setError) => {
-  e.preventDefault();
-  
+export const signUpUser = async (email, password, setSuccessMessage, setError) => {
   try {
     const db = getDatabase();
     const userRef = ref(db, 'users');

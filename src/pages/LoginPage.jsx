@@ -1,28 +1,28 @@
-// src/components/Login.js
 import { database } from "../firebaseConfig";
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { Form, Input, Button, Typography, Alert } from "antd";
 import { loginUser, signUpUser } from '../service/authService.js';
+import styles from "../assets/style/Pages/Login.module.scss"; // Import SCSS file
+
+const { Title } = Typography;
 
 function Login({ setUser }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (values) => {
+    const { email, password } = values;
     if (isSignUp) {
-      const { success, error } = await signUpUser(e, email, password, setSuccessMessage, setError);
-      
+      const { success, error } = await signUpUser(email, password, setSuccessMessage, setError);
       if (!success) {
         setError(error);
       }
     } else {
-      const { user, error } = await loginUser(e, email, password, setUser, setError, navigate);
-      
+      const { user, error } = await loginUser(email, password, setUser, setError, navigate);
       if (!user) {
         setError(error);
       }
@@ -30,39 +30,43 @@ function Login({ setUser }) {
   };
 
   return (
-    <div>
-      <h1>{isSignUp ? "Sign Up" : "Login"}</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {successMessage && (
-          <div>
-            <p style={{ color: "green" }}>{successMessage}</p>
-            <button type="button" onClick={() => setIsSignUp(false)}>
-              Back to Login
-            </button>
-          </div>
-        )}
-        <button type="submit">{isSignUp ? "Sign Up" : "Login"}</button>
-        <button type="button" onClick={() => setIsSignUp(!isSignUp)}>
+    <div className={styles["login-container"]}>
+      <div className={styles["login-form"]}>
+        <Title level={2}>{isSignUp ? "Sign Up" : "Login"}</Title>
+        <Form onFinish={handleSubmit}>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, message: "Please input your email!" }]}
+          >
+            <Input type="email" />
+          </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password />
+          </Form.Item>
+          {error && <Alert message={error} type="error" showIcon />}
+          {successMessage && (
+            <div>
+              <Alert message={successMessage} type="success" showIcon />
+              <Button type="link" className={styles["link-button"]} onClick={() => setIsSignUp(false)}>
+                Back to Login
+              </Button>
+            </div>
+          )}
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              {isSignUp ? "Sign Up" : "Login"}
+            </Button>
+          </Form.Item>
+        </Form>
+        <Button type="link" className={styles["link-button"]} onClick={() => setIsSignUp(!isSignUp)} block>
           {isSignUp ? "Already have an account? Login" : "Need an account? Sign Up"}
-        </button>
-      </form>
+        </Button>
+      </div>
     </div>
   );
 }
