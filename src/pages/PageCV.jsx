@@ -1,108 +1,64 @@
 import React from "react";
 import '../assets/style/Pages/PageCV.scss';
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell } from "docx";
+import { PDFDocument, rgb, PageSizes } from 'pdf-lib';
 import { saveAs } from "file-saver";
-// import html2canvas from "html2canvas";
+import html2canvas from "html2canvas";
 // import jsPDF from "jspdf";
 
 function PageCV() {
-  // const printDocument = () => {
-  //   const input = document.getElementById('cv-page');
-  //   html2canvas(input).then((canvas) => {
-  //     const imgData = canvas.toDataURL('image/png');
-  //     const pdf = new jsPDF();
-  //     const imgWidth = 210; // A4 width in mm
-  //     const pageHeight = 295; // A4 height in mm
-  //     const imgHeight = canvas.height * imgWidth / canvas.width;
-  //     let heightLeft = imgHeight;
-
-  //     let position = 0;
-
-  //     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-  //     heightLeft -= pageHeight;
-
-  //     while (heightLeft >= 0) {
-  //       position = heightLeft - imgHeight;
-  //       pdf.addPage();
-  //       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-  //       heightLeft -= pageHeight;
-  //     }
-  //     pdf.save('cv.pdf');
-  //   });
-  // };
-
-  const createWordDocument = () => {
-    const doc = new Document({
-      sections: [
-        {
-          properties: {},
-          children: [
-            new Paragraph({
-              text: "Michelle Robinson",
-              heading: HeadingLevel.HEADING_1,
-            }),
-            new Paragraph({
-              text: "Graphic Designer",
-              heading: HeadingLevel.HEADING_2,
-            }),
-            new Paragraph({
-              text: "14585 10th Ave, Whitestone, NY",
-            }),
-            new Paragraph({
-              text: "+1 212-941-7824",
-            }),
-            new Paragraph({
-              text: "info@urmailaddress.com",
-            }),
-            new Paragraph({
-              text: "Work Experience",
-              heading: HeadingLevel.HEADING_2,
-            }),
-            new Paragraph({
-              text: "Senior Graphic Designer at GlowPixel Ltd, Orlando (2015 - 2016)",
-            }),
-            // Add more content here
-            new Table({
-              rows: [
-                new TableRow({
-                  children: [
-                    new TableCell({ children: [new Paragraph("Skill")]}),
-                    new TableCell({ children: [new Paragraph("Level")]}),
-                  ],
-                }),
-                new TableRow({
-                  children: [
-                    new TableCell({ children: [new Paragraph("Adobe Photoshop")]}),
-                    new TableCell({ children: [new Paragraph("80%")]}),
-                  ],
-                }),
-                // Add more rows as needed
-              ],
-            }),
-            // Add more sections
-          ],
-        },
-      ],
+  const createPDF = async () => {
+    const leftSection = document.querySelector('.left');
+    const rightSection = document.querySelector('.right');
+  
+    // Chụp ảnh các phần nội dung HTML
+    const leftCanvas = await html2canvas(leftSection, { scale: 2 }); // Tăng chất lượng ảnh
+    const rightCanvas = await html2canvas(rightSection, { scale: 2 });
+  
+    const leftImgData = leftCanvas.toDataURL('image/png');
+    const rightImgData = rightCanvas.toDataURL('image/png');
+  
+    // Tạo tài liệu PDF
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage(PageSizes.A4);
+  
+    const { width, height } = page.getSize();
+  
+    // Thêm ảnh vào tài liệu PDF
+    const leftImg = await pdfDoc.embedPng(leftImgData);
+    const rightImg = await pdfDoc.embedPng(rightImgData);
+  
+    const leftImgDims = leftImg.scale(1);
+    const rightImgDims = rightImg.scale(1);
+  
+    const leftWidth = width / 2; // Đặt chiều rộng của phần trái
+    const rightWidth = width / 2; // Đặt chiều rộng của phần phải
+  
+    // Thêm phần trái vào trang PDF
+    page.drawImage(leftImg, {
+      x: 0,
+      y: 0,
+      width: leftWidth,
+      height: height,
     });
-
-    Packer.toBlob(doc).then((blob) => {
-      saveAs(blob, "cv.docx");
+  
+    // Thêm phần phải vào trang PDF
+    page.drawImage(rightImg, {
+      x: leftWidth,
+      y: 0,
+      width: rightWidth,
+      height: height,
     });
-  };
-
-  const convertWordToPdf = () => {
-    // Gọi hàm tạo tài liệu Word
-    createWordDocument();
-
-    // Chuyển đổi DOCX thành PDF
-    // Việc chuyển đổi trực tiếp từ trình duyệt có thể không khả dụng và yêu cầu dịch vụ bên ngoài
+  
+    // Lưu tệp PDF
+    const pdfBytes = await pdfDoc.save();
+    saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), 'cv.pdf');
   };
 
   return (
     <>
       {/* Button to change file from JSX to PDF */}
       <div className="PDF-Button">
-        <button onClick={convertWordToPdf} className="download-btn">Download PDF</button>
+        <button onClick={createPDF} className="download-btn">Download PDF</button>
       </div>
      
       <div className="container" id="cv-page">

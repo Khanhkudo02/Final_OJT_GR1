@@ -11,6 +11,7 @@ import {
   MenuFoldOutlined,
 } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
+import LogoutButton from "./LogoutButton";
 
 const { Sider } = Layout;
 
@@ -81,6 +82,12 @@ const Sidebar = () => {
       icon: <FileTextOutlined />,
       label: <NavLink to="/cv">CV</NavLink>,
     },
+    {
+      key: "8",
+      icon: <LogoutButton />, // Sử dụng LogoutButton như một icon
+      // Hiển thị tên cho mục này
+      style: { marginTop: 'auto' } // Đẩy mục Logout xuống dưới cùng
+    }
   ];
 
   return (
@@ -110,6 +117,7 @@ const Sidebar = () => {
         defaultSelectedKeys={["1"]}
         items={menuItems}
       />
+    
     </Sider>
   );
 };

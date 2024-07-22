@@ -6,7 +6,7 @@ function Employee() {
     <div>
       <h1>This is employee page</h1>
       <LogoutButton></LogoutButton>
-      <Sidebar />
+    
     </div>
   );
 }
