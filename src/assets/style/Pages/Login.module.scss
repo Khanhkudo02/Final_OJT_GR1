@@ -23,6 +23,23 @@
   .error-message {
     color: red;
   }
+
+  .header-form {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      color: #1E90FF;
+    }
+
+    .logo-header {
+      height: 70px;
+      width: 100px;
+      border-radius: 50%;
+    }
+  }
   
   .link-button {
     display: block;
@@ -39,5 +56,12 @@
     padding: 0;
     font-size: 14px;
     font-weight: 450;
+  }
+
+  .btn-login {
+    background: #1E90FF;
+    color: #fff;
+    font-weight: 500;
+    text-transform: uppercase;
   }
   
