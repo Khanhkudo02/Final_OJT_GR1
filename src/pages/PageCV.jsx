@@ -1,9 +1,111 @@
 import React from "react";
-import '../assets/style/Pages/PageCV.scss'
+import '../assets/style/Pages/PageCV.scss';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell } from "docx";
+import { saveAs } from "file-saver";
+// import html2canvas from "html2canvas";
+// import jsPDF from "jspdf";
 
 function PageCV() {
+  // const printDocument = () => {
+  //   const input = document.getElementById('cv-page');
+  //   html2canvas(input).then((canvas) => {
+  //     const imgData = canvas.toDataURL('image/png');
+  //     const pdf = new jsPDF();
+  //     const imgWidth = 210; // A4 width in mm
+  //     const pageHeight = 295; // A4 height in mm
+  //     const imgHeight = canvas.height * imgWidth / canvas.width;
+  //     let heightLeft = imgHeight;
+
+  //     let position = 0;
+
+  //     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  //     heightLeft -= pageHeight;
+
+  //     while (heightLeft >= 0) {
+  //       position = heightLeft - imgHeight;
+  //       pdf.addPage();
+  //       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  //       heightLeft -= pageHeight;
+  //     }
+  //     pdf.save('cv.pdf');
+  //   });
+  // };
+
+  const createWordDocument = () => {
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            new Paragraph({
+              text: "Michelle Robinson",
+              heading: HeadingLevel.HEADING_1,
+            }),
+            new Paragraph({
+              text: "Graphic Designer",
+              heading: HeadingLevel.HEADING_2,
+            }),
+            new Paragraph({
+              text: "14585 10th Ave, Whitestone, NY",
+            }),
+            new Paragraph({
+              text: "+1 212-941-7824",
+            }),
+            new Paragraph({
+              text: "info@urmailaddress.com",
+            }),
+            new Paragraph({
+              text: "Work Experience",
+              heading: HeadingLevel.HEADING_2,
+            }),
+            new Paragraph({
+              text: "Senior Graphic Designer at GlowPixel Ltd, Orlando (2015 - 2016)",
+            }),
+            // Add more content here
+            new Table({
+              rows: [
+                new TableRow({
+                  children: [
+                    new TableCell({ children: [new Paragraph("Skill")]}),
+                    new TableCell({ children: [new Paragraph("Level")]}),
+                  ],
+                }),
+                new TableRow({
+                  children: [
+                    new TableCell({ children: [new Paragraph("Adobe Photoshop")]}),
+                    new TableCell({ children: [new Paragraph("80%")]}),
+                  ],
+                }),
+                // Add more rows as needed
+              ],
+            }),
+            // Add more sections
+          ],
+        },
+      ],
+    });
+
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, "cv.docx");
+    });
+  };
+
+  const convertWordToPdf = () => {
+    // Gọi hàm tạo tài liệu Word
+    createWordDocument();
+
+    // Chuyển đổi DOCX thành PDF
+    // Việc chuyển đổi trực tiếp từ trình duyệt có thể không khả dụng và yêu cầu dịch vụ bên ngoài
+  };
+
   return (
-    <div className="container">
+    <>
+      {/* Button to change file from JSX to PDF */}
+      <div className="PDF-Button">
+        <button onClick={convertWordToPdf} className="download-btn">Download PDF</button>
+      </div>
+     
+      <div className="container" id="cv-page">
       <div className="left">
         {/* Avatar */}
         <div className="image-container">
@@ -128,6 +230,8 @@ function PageCV() {
         </div>
       </div>
     </div>
+    </>
+    
   )
 }
 
