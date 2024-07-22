@@ -1,66 +1,100 @@
+import { database } from "../firebaseConfig";
 import React, { useState } from "react";
-import { ref, get, child } from "firebase/database";
-import { auth, database } from "../../firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { Form, Input, Button, Typography, Alert } from "antd";
+import { loginUser, signUpUser } from "../service/authService.js";
+import styles from "../assets/style/Pages/Login.module.scss"; // Import SCSS file
 
-function LoginPage() {
-  const [error, setError] = useState(null);
-  const nav = useNavigate();
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+const { Title } = Typography;
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
+function Login({ setUser }) {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (values) => {
+    const { email, password } = values;
+    if (isSignUp) {
+      const { success, error } = await signUpUser(
         email,
-        password
+        password,
+        setSuccessMessage,
+        setError
       );
-      const user = userCredential.user;
-
-      const userRef = ref(database, `users/${user.uid}`);
-      const snapshot = await get(userRef);
-      if (snapshot.exists()) {
-        const userData = snapshot.val();
-        if (userData.email === "admin@gmail.com") {
-          nav("/admin");
-        } else {
-          nav("/employee");
-        }
-      } else {
-        setError("User data not found");
+      if (!success) {
+        setError(error);
       }
-    } catch (error) {
-      console.error("Error logging in:", error.message);
-      setError(error.message);
+    } else {
+      const { user, error } = await loginUser(
+        email,
+        password,
+        setUser,
+        setError,
+        navigate
+      );
+      if (!user) {
+        setError(error);
+      }
     }
   };
 
   return (
-    <div>
-      <h1>Sign in </h1>
-      <form onSubmit={(e) => handleLogin(e)}>
-        <input
-          name="email"
-          type="email"
-          placeholder="Enter your email"
-          required
-        />
-        <br />
-        <input
-          name="password"
-          type="password"
-          placeholder="Enter your password"
-          required
-        />
-        <br />
-        <button>Sign In</button>
-        {error && <p>{error}</p>}
-      </form>
+    <div className={styles["login-container"]}>
+      <div className={styles["login-form"]}>
+        <Title level={2}>{isSignUp ? "Sign Up" : "Login"}</Title>
+        <Form onFinish={handleSubmit}>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, message: "Please input your email!" }]}
+          >
+            <Input type="email" />
+          </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password />
+          </Form.Item>
+          {error && <Alert message={error} type="error" showIcon />}
+          {successMessage && (
+            <div>
+              <Alert message={successMessage} type="success" showIcon />
+              <Button
+                type="link"
+                className={styles["link-button"]}
+                onClick={() => setIsSignUp(false)}
+              >
+                Back to Login
+              </Button>
+            </div>
+          )}
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              {isSignUp ? "Sign Up" : "Login"}
+            </Button>
+          </Form.Item>
+        </Form>
+        <Button
+          type="link"
+          className={styles["link-button"]}
+          onClick={() => setIsSignUp(!isSignUp)}
+          block
+        >
+          {isSignUp
+            ? "Already have an account? Login"
+            : "Need an account? Sign Up"}
+        </Button>
+      </div>
     </div>
   );
 }
 
-export default LoginPage;
+Login.propTypes = {
+  setUser: PropTypes.func.isRequired,
+};
+
+export default Login;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table } from "antd";
-import { database } from "/firebaseConfig.js"; // Đảm bảo bạn đã tạo và xuất database từ firebaseConfig.js
+import { database } from "/src/firebaseConfig"; // Đảm bảo bạn đã tạo và xuất database từ firebaseConfig.js
 
 const { Column } = Table;
 
