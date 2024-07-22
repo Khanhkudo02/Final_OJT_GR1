@@ -15,27 +15,38 @@ const ModalAddTechnology = ({ open, handleClose }) => {
             await postCreateTechnology(name, description, status, imageFile);
             handleClose();
             toast.success("Technology added successfully!");
+            // Clear the form fields and the image file after successfully adding
+            setName("");
+            setDescription("");
+            setStatus("");
+            setImageFile(null); // Reset image file
         } catch (error) {
             toast.error("Failed to add technology.");
         }
     };
 
-    const handleImageChange = (info) => {
-        if (info.file.status === "done") {
-            if (info.file.type === "image/png" || info.file.type === "image/svg+xml") {
-                setImageFile(info.file.originFileObj);
-            } else {
-                toast.error("Only PNG and SVG images are allowed.");
-                setImageFile(null);
-            }
+    const handleImageChange = ({ file }) => {
+        if (file.type === "image/png" || file.type === "image/svg+xml") {
+            setImageFile(file.originFileObj);
+        } else {
+            toast.error("Only PNG and SVG images are allowed.");
         }
+    };
+
+    // Ensure image file input is cleared
+    const beforeUpload = (file) => {
+        handleImageChange({ file });
+        return false; // Prevent automatic upload
     };
 
     return (
         <Modal
             title="Add New Technology"
             open={open}
-            onCancel={handleClose}
+            onCancel={() => {
+                handleClose();
+                setImageFile(null); // Reset image file when modal is closed
+            }}
             footer={[
                 <Button key="back" onClick={handleClose}>
                     Close
@@ -73,8 +84,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
                 <div className="mb-3">
                     <Upload
                         accept=".png,.svg"
-                        beforeUpload={() => false} // Prevent automatic upload
-                        onChange={handleImageChange}
+                        beforeUpload={beforeUpload} // Use beforeUpload to handle image selection
                     >
                         <Button icon={<PlusOutlined />}>Select Image (PNG/SVG only)</Button>
                     </Upload>

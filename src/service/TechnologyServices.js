@@ -1,6 +1,6 @@
-import { ref, set, push, update, get } from "firebase/database";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { database, storage } from '../firebaseConfig'; // Import từ firebaseConfig
+import { ref, set, push, update, get, remove } from "firebase/database";
+import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
+import { database, storage } from '../firebaseConfig';
 
 const db = database;
 const storageInstance = storage;
@@ -71,4 +71,26 @@ const putUpdateTechnology = async (id, name, description, status, imageFile) => 
     }
 };
 
-export { fetchAllTechnology, postCreateTechnology, putUpdateTechnology };
+// Delete technology
+const deleteTechnology = async (id) => {
+    try {
+        const technologyRef = ref(db, `technologies/${id}`);
+        const technologySnapshot = await get(technologyRef);
+
+        // Delete image from Firebase Storage
+        const imageUrl = technologySnapshot.val()?.imageUrl;
+        if (imageUrl) {
+            const imageName = imageUrl.split('/').pop().split('?')[0]; // Extract file name from URL
+            const imageRef = storageRef(storageInstance, `images/${id}/${imageName}`);
+            await deleteObject(imageRef);
+        }
+
+        // Delete technology from Realtime Database
+        await remove(technologyRef);
+    } catch (error) {
+        console.error("Failed to delete technology:", error);
+        throw error;
+    }
+};
+
+export { fetchAllTechnology, postCreateTechnology, putUpdateTechnology, deleteTechnology };

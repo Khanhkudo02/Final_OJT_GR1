@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Table } from 'antd';
 import ModalAddTechnology from './ModalAddTechnology';
 import ModalEditTechnology from './ModalEditTechnology';
+import ModalDeleteTechnology from './ModalDeleteTechnology';
 import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
@@ -10,17 +11,20 @@ const TechnologyManagement = () => {
   const [technologies, setTechnologies] = useState([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
+  const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
+
+  const loadTechnologies = async () => {
+    try {
+      const data = await fetchAllTechnology();
+      setTechnologies(data);
+    } catch (error) {
+      console.error("Failed to fetch technologies:", error);
+    }
+  };
 
   useEffect(() => {
-    const loadTechnologies = async () => {
-      try {
-        const data = await fetchAllTechnology();
-        setTechnologies(data);
-      } catch (error) {
-        console.error("Failed to fetch technologies:", error);
-      }
-    };
     loadTechnologies();
   }, []);
 
@@ -33,13 +37,26 @@ const TechnologyManagement = () => {
     setIsAddModalVisible(true);
   };
 
+  const showDeleteModal = (id) => {
+    setTechnologyIdToDelete(id);
+    setIsDeleteModalVisible(true);
+  };
+
   const handleCloseEditModal = () => {
     setIsEditModalVisible(false);
     setDataTechnologyEdit(null);
+    setTimeout(() => loadTechnologies(), 100);
   };
 
   const handleCloseAddModal = () => {
     setIsAddModalVisible(false);
+    setTimeout(() => loadTechnologies(), 100);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalVisible(false);
+    setTechnologyIdToDelete(null);
+    setTimeout(() => loadTechnologies(), 100);
   };
 
   return (
@@ -71,7 +88,9 @@ const TechnologyManagement = () => {
               <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
-              <Button type="danger">Delete</Button>
+              <Button type="danger" onClick={() => showDeleteModal(record.key)}>
+                Delete
+              </Button>
             </span>
           )}
         />
@@ -87,6 +106,13 @@ const TechnologyManagement = () => {
         open={isAddModalVisible}
         handleClose={handleCloseAddModal}
       />
+      {technologyIdToDelete && (
+        <ModalDeleteTechnology
+          open={isDeleteModalVisible}
+          handleClose={handleCloseDeleteModal}
+          technologyId={technologyIdToDelete}
+        />
+      )}
     </div>
   );
 };

@@ -20,28 +20,29 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
 
     const handleEditTechnology = async () => {
         try {
-            await putUpdateTechnology(
+            const res = await putUpdateTechnology(
                 dataTechnologyEdit.key,
                 name,
                 description,
                 status,
                 imageFile
             );
-            handleClose();
-            toast.success("Technology updated successfully!");
+            if (res) {
+                handleClose();
+                toast.success("Technology updated successfully!");
+            } else {
+                toast.error("Failed to update technology.");
+            }
         } catch (error) {
-            toast.error("Failed to update technology.");
+            toast.error("An error occurred.");
         }
     };
 
-    const handleImageChange = (info) => {
-        if (info.file.status === "done") {
-            if (info.file.type === "image/png" || info.file.type === "image/svg+xml") {
-                setImageFile(info.file.originFileObj);
-            } else {
-                toast.error("Only PNG and SVG images are allowed.");
-                setImageFile(null);
-            }
+    const handleImageChange = ({ file }) => {
+        if (file.type === "image/png" || file.type === "image/svg+xml") {
+            setImageFile(file.originFileObj);
+        } else {
+            toast.error("Only PNG and SVG images are allowed.");
         }
     };
 
