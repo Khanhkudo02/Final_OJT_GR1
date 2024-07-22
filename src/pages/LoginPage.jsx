@@ -40,6 +40,10 @@ function Login({ setUser }) {
     }
   };
 
+  const forgetPassword = () => {
+    navigate("/forget-password");
+  }
+
   return (
     <div className={styles["login-container"]}>
       <div className={styles["login-form"]}>
@@ -75,6 +79,9 @@ function Login({ setUser }) {
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               {isSignUp ? "Sign Up" : "Login"}
+            </Button>
+            <Button type="link" onClick={forgetPassword} className={styles["link-forget"]}>
+                Quên mật khẩu
             </Button>
           </Form.Item>
         </Form>
