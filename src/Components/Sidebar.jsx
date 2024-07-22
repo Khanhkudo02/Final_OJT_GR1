@@ -1,11 +1,14 @@
-import React from 'react';
-import { Layout, Menu } from 'antd';
-import { UserOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, CodeOutlined, FileTextOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Layout, Menu, Button } from 'antd';
+import { UserOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, CodeOutlined, FileTextOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { NavLink } from 'react-router-dom';
+
 
 const { Sider } = Layout;
 
 const Sidebar = () => {
+  const [collapsed, setCollapsed] = useState(false);
+
   const menuItems = [
     {
       key: '1',
@@ -15,10 +18,6 @@ const Sidebar = () => {
         {
           key: '1-1',
           label: <NavLink to="/account-info">Account Info</NavLink>,
-        },
-        {
-          key: '1-2',
-          label: <NavLink to="/reset-password">Reset Password</NavLink>,
         },
       ],
     },
@@ -49,33 +48,19 @@ const Sidebar = () => {
     {
       key: '4',
       icon: <ToolOutlined />,
-      label: <NavLink to="/technology-management">Technology</NavLink>,
+      label: <NavLink to="/technology-management">Technology Management</NavLink>,
     },
     {
       key: '5',
-      icon: <TeamOutlined />,
-      label: <NavLink to="/employee-management">Employee</NavLink>,
-      children: [
-        {
-          key: '5-1',
-          label: <NavLink to="/employee-profile">Employee Profile</NavLink>,
-        },
-        {
-          key: '5-2',
-          label: <NavLink to="/assign-project">Assign Project</NavLink>,
-        },
-      ],
+      icon: <img src="public\images\sidebar-employees.png" alt="Employee Management" style={{ width: '20px', height: '20px' }} />,
+      label: <NavLink to="/employee-management">Employee Management</NavLink>,
+     
     },
     {
       key: '6',
       icon: <CodeOutlined />,
       label: <NavLink to="/programing-language">Languages</NavLink>,
-      children: [
-        {
-          key: '6-1',
-          label: <NavLink to="/programming-language-info">Programming Language Info</NavLink>,
-        },
-      ],
+     
     },
     {
       key: '7',
@@ -86,6 +71,9 @@ const Sidebar = () => {
 
   return (
     <Sider
+      collapsible
+      collapsed={collapsed}
+      onCollapse={(collapsed) => setCollapsed(collapsed)}
       width={200}
       style={{
         overflow: 'auto',
@@ -96,7 +84,12 @@ const Sidebar = () => {
         bottom: 0,
       }}
     >
-      <div className="logo" />
+      <div className="sidebar-header">
+        <img src="#" alt="Get IT" className="logo" />
+        <Button type="text" onClick={() => setCollapsed(!collapsed)}>
+          {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        </Button>
+      </div>
       <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={menuItems} />
     </Sider>
   );
