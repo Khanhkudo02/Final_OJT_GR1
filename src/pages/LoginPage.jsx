@@ -1,70 +1,60 @@
 import React, { useState } from 'react'
-import { ref, get, child } from 'firebase/database';
-import { auth, database } from '../../firebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate  } from 'react-router-dom';
+import { loginUser, signUpUser } from '../service/authService.js';
+import PropTypes from "prop-types";
+import { database } from "../firebaseConfig";
 
-function LoginPage() {
-    const [error, setError] = useState(null);
-    const nav = useNavigate()
-    const handleLogin = async (e) => {
-        e.preventDefault()
-        const email = e.target.email.value
-        const password = e.target.password.value
+function LoginPage({ setUser }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const navigate = useNavigate();
 
-        // signInWithEmailAndPassword(auth,email,password).then(data=>{
-        //     if (user.isAuthenticated) {
-        //         nav('/admin')
-        //     } 
-            
-        // })
-
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            // Lấy dữ liệu người dùng từ Firebase Realtime Database
-            const userRef = ref(database, `users/${user.uid}`);
-            const snapshot = await get(userRef);
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                if (userData.email === "admin@gmail.com") {
-                    nav('/admin');
-                } else {
-                    nav('/employee');
-                }
-            } else {
-                setError('User data not found');
-            }
-        } catch (error) {
-            console.error('Error logging in:', error.message);
-            setError(error.message);
-        }
-    }
+  const handleSubmit = async (e) => {
+    if (isSignUp) {
+      const { success, error } = await signUpUser(e, email, password, setSuccessMessage, setError);
       
-
+      if (!success) {
+        setError(error);
+      }
+    } else {
+      const { user, error } = await loginUser(e, email, password, setUser, setError, navigate);
+      
+      if (!user) {
+        setError(error);
+      }
+    }
+  };
+      
     return (
         <div>
             <h1>Sign in </h1>
-            <form onSubmit={(e)=>handleLogin(e)}>
+            <form onSubmit={handleSubmit}>
             <input
-                name="email"
                 type="email"
                 placeholder="Enter your email"
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
                 required
             /><br/>
             <input
-                name="password"
                 type="password"
                 placeholder="Enter your password"
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
                 required
             />
             <br/>
-            <button>Sign In</button>
-            {error && <p>{error}</p>}
+            <button  type="submit">Sign In</button>
             </form>
         </div>
     )
 }
+
+LoginPage.propTypes = {
+  setUser: PropTypes.func.isRequired,
+};
 
 export default LoginPage
