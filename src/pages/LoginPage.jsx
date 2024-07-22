@@ -1,66 +1,89 @@
+// src/components/Login.js
+import { database } from "../firebaseConfig";
 import React, { useState } from "react";
-import { ref, get, child } from "firebase/database";
-import { auth, database } from "../../firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { loginUser, signUpUser } from "../service/authService.js";
 
-function LoginPage() {
-  const [error, setError] = useState(null);
-  const nav = useNavigate();
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+function Login({ setUser }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const navigate = useNavigate();
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
+  const handleSubmit = async (e) => {
+    if (isSignUp) {
+      const { success, error } = await signUpUser(
+        e,
         email,
-        password
+        password,
+        setSuccessMessage,
+        setError
       );
-      const user = userCredential.user;
 
-      const userRef = ref(database, `users/${user.uid}`);
-      const snapshot = await get(userRef);
-      if (snapshot.exists()) {
-        const userData = snapshot.val();
-        if (userData.email === "admin@gmail.com") {
-          nav("/admin");
-        } else {
-          nav("/employee");
-        }
-      } else {
-        setError("User data not found");
+      if (!success) {
+        setError(error);
       }
-    } catch (error) {
-      console.error("Error logging in:", error.message);
-      setError(error.message);
+    } else {
+      const { user, error } = await loginUser(
+        e,
+        email,
+        password,
+        setUser,
+        setError,
+        navigate
+      );
+
+      if (!user) {
+        setError(error);
+      }
     }
   };
 
   return (
     <div>
-      <h1>Sign in </h1>
-      <form onSubmit={(e) => handleLogin(e)}>
-        <input
-          name="email"
-          type="email"
-          placeholder="Enter your email"
-          required
-        />
-        <br />
-        <input
-          name="password"
-          type="password"
-          placeholder="Enter your password"
-          required
-        />
-        <br />
-        <button>Sign In</button>
-        {error && <p>{error}</p>}
+      <h1>{isSignUp ? "Sign Up" : "Login"}</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {successMessage && (
+          <div>
+            <p style={{ color: "green" }}>{successMessage}</p>
+            <button type="button" onClick={() => setIsSignUp(false)}>
+              Back to Login
+            </button>
+          </div>
+        )}
+        <button type="submit">{isSignUp ? "Sign Up" : "Login"}</button>
+        <button type="button" onClick={() => setIsSignUp(!isSignUp)}>
+          {isSignUp
+            ? "Already have an account? Login"
+            : "Need an account? Sign Up"}
+        </button>
       </form>
     </div>
   );
 }
 
-export default LoginPage;
+Login.propTypes = {
+  setUser: PropTypes.func.isRequired,
+};
+
+export default Login;
