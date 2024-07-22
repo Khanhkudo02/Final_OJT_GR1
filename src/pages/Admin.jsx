@@ -2,6 +2,7 @@ import { get, getDatabase, ref, set, remove, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoutButton from "../Components/LogoutButton";
+import Sidebar from "./../Components/Sidebar";
 
 function AdminPage() {
   const [email, setEmail] = useState("");
