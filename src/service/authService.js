@@ -6,8 +6,40 @@ import {
   equalTo,
   get,
   set,
-
+  update,
 } from "firebase/database";
+import bcrypt from "bcryptjs";
+
+// Hàm cập nhật mật khẩu đã mã hóa cho tất cả người dùng hiện có
+const updateExistingPasswords = async () => {
+  try {
+    const db = getDatabase();
+    const usersRef = ref(db, "users");
+    const snapshot = await get(usersRef);
+    const usersData = snapshot.val();
+
+    if (usersData) {
+      for (const userId in usersData) {
+        const user = usersData[userId];
+
+        // Kiểm tra nếu mật khẩu chưa được mã hóa
+        if (user.password && !user.password.startsWith('$2a$')) {
+          // Mã hóa mật khẩu
+          const hashedPassword = await bcrypt.hash(user.password, 10);
+
+          // Cập nhật mật khẩu đã mã hóa vào cơ sở dữ liệu
+          await update(ref(db, `users/${userId}`), { password: hashedPassword });
+
+          console.log(`Updated password for user: ${userId}`);
+        }
+      }
+    } else {
+      console.log("No users found.");
+    }
+  } catch (error) {
+    console.error("Error updating passwords:", error);
+  }
+};
 
 // Hàm đăng nhập người dùng
 export const loginUser = async (
@@ -30,12 +62,15 @@ export const loginUser = async (
       const userId = Object.keys(userData)[0];
       const user = userData[userId];
 
-      if (user.password === password) {
+      // So sánh mật khẩu đã mã hóa
+      const match = await bcrypt.compare(password, user.password);
+
+      if (match) {
         localStorage.setItem("userId", JSON.stringify(user)); // Lưu toàn bộ đối tượng người dùng
         setUser(user);
 
         // Điều hướng dựa trên vai trò người dùng
-        navigate(user.role === "admin" ? "/admin" : "/employee");
+        navigate(user.role === "admin" ? "/account-management" : "/employee");
         return { user, error: null };
       } else {
         return { user: null, error: "Invalid password" };
@@ -69,10 +104,13 @@ export const signUpUser = async (
       return { success: false, error: "Email already in use" };
     }
 
+    // Mã hóa mật khẩu
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUserRef = ref(db, `users/${email.replace(".", ",")}`);
     const newUser = {
       email,
-      password,
+      password: hashedPassword,
       contact: "",
       cv_list: [
         {
@@ -101,3 +139,5 @@ export const signUpUser = async (
   }
 };
 
+// Gọi hàm để mã hóa mật khẩu hiện có (nên chỉ chạy một lần khi cần)
+updateExistingPasswords();

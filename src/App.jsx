@@ -1,6 +1,3 @@
-
-
-import { Layout, theme } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   Navigate,
@@ -8,6 +5,7 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
+import { Layout, theme } from "antd";
 import AccountManagement from "./Components/AccountManagement";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import PositionManagement from "./Components/PositionManagement";
@@ -57,7 +55,7 @@ const App = () => {
   };
 
   return (
-    <Router>
+    <div>
       <Routes>
         <Route path="/login" element={<Login setUser={handleLogin} />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
@@ -75,13 +73,9 @@ const App = () => {
                   >
                     <div style={{ padding: 24, background: colorBgContainer }}>
                       <Routes>
-                        <Route path="/admin" element={<Admin />} />
                         <Route path="/employee" element={<Employee />} />
                         <Route path="/cv" element={<PageCV />} />
-                        <Route
-                          path="/account-management"
-                          element={<Admin />}
-                        />
+                        <Route path="/account-management" element={<Admin />} />
                         <Route
                           path="/employee-management"
                           element={<EmployeeManagement />}
@@ -112,7 +106,7 @@ const App = () => {
           }
         />
       </Routes>
-    </Router>
+    </div>
   );
 };
 

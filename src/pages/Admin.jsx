@@ -1,9 +1,7 @@
+import { Button, Form, Input, List, message, Modal, Select } from "antd";
+import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
-import { get, getDatabase, ref, set, remove, update } from "firebase/database";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Button, Select, Modal, List, message } from "antd";
-import LogoutButton from "../Components/LogoutButton";
-import Sidebar from "../Components/Sidebar";
 
 
 const { Option } = Select;
@@ -178,7 +176,6 @@ function AdminPage() {
 
   return (
     <div>
-      <Sidebar />
       <h1>Admin Page</h1>
       <Button type="primary" onClick={() => setModalVisible(true)}>
         Add User
@@ -275,7 +272,7 @@ function AdminPage() {
         )}
         
       />
-      <LogoutButton className="logout-button" />
+    
     </div>
   );
 }

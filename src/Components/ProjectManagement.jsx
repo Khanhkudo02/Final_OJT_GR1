@@ -1,4 +1,5 @@
 import React from 'react'
+import '../assets/style/Pages/Project.scss'
 
 const ProjectManagement = () => {
   return (
@@ -17,7 +18,7 @@ const ProjectManagement = () => {
       </section>
 
       <section className="project-tracking">
-        
+
       </section>
     </main>
   );

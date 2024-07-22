@@ -1,7 +1,11 @@
 import React from "react";
 
 function ForgetPassword() {
-  return <div>This is Forget password page</div>;
+  return (
+    <div>
+      <h1>This is Forget password page</h1>
+    </div>
+  );
 }
 
 export default ForgetPassword;

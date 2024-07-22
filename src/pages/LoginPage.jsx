@@ -40,10 +40,23 @@ function Login({ setUser }) {
     }
   };
 
+  const forgetPassword = () => {
+    navigate("/forget-password");
+  };
+
   return (
     <div className={styles["login-container"]}>
       <div className={styles["login-form"]}>
-        <Title level={2}>{isSignUp ? "Sign Up" : "Login"}</Title>
+        <div className={styles["header-form"]}>
+          <Title level={2} className={styles["title"]}>
+            {isSignUp ? "Sign Up" : "Login"}
+          </Title>
+          <img
+            src="/public/images/logo.jpg"
+            alt="logo"
+            className={styles["logo-header"]}
+          />
+        </div>
         <Form onFinish={handleSubmit}>
           <Form.Item
             label="Email"
@@ -63,18 +76,24 @@ function Login({ setUser }) {
           {successMessage && (
             <div>
               <Alert message={successMessage} type="success" showIcon />
-              <Button
-                type="link"
-                className={styles["link-button"]}
-                onClick={() => setIsSignUp(false)}
-              >
-                Back to Login
-              </Button>
+              
             </div>
           )}
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button
+              className={styles["btn-login"]}
+              type="primary"
+              htmlType="submit"
+              block
+            >
               {isSignUp ? "Sign Up" : "Login"}
+            </Button>
+            <Button
+              type="link"
+              onClick={forgetPassword}
+              className={styles["link-forget"]}
+            >
+              Forgot Password
             </Button>
           </Form.Item>
         </Form>
