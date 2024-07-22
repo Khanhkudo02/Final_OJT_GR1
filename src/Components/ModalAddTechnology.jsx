@@ -1,29 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Button, Input } from "antd";
-import { putUpdateTechnology } from "../service/TechnologyServices";
+import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from 'react-toastify';
 
-const ModalEditTechnology = ({ visible, handleClose, dataTechnologyEdit }) => {
+const ModalAddTechnology = ({ visible, handleClose }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState("");
 
-    useEffect(() => {
-        if (dataTechnologyEdit) {
-            setName(dataTechnologyEdit.title || "");
-            setDescription(dataTechnologyEdit.information || "");
-            setStatus(dataTechnologyEdit.company || "");
-        }
-    }, [dataTechnologyEdit]);
-
-    const handleEditTechnology = async () => {
+    const handleAddTechnology = async () => {
         try {
-            let res = await putUpdateTechnology(dataTechnologyEdit.key, name, description, status);
-            if (res.status === 200) {
+            let res = await postCreateTechnology(name, description, status);
+            if (res.status === 201) {
                 handleClose(); // Close modal after success
-                toast.success("Technology updated successfully!");
+                toast.success("Technology added successfully!");
             } else {
-                toast.error("Failed to update technology.");
+                toast.error("Failed to add technology.");
             }
         } catch (error) {
             toast.error("An error occurred.");
@@ -32,19 +24,19 @@ const ModalEditTechnology = ({ visible, handleClose, dataTechnologyEdit }) => {
 
     return (
         <Modal
-            title="Edit Technology"
+            title="Add New Technology"
             visible={visible}
             onCancel={handleClose}
             footer={[
                 <Button key="back" onClick={handleClose}>
                     Close
                 </Button>,
-                <Button key="submit" type="primary" onClick={handleEditTechnology}>
-                    Save Changes
+                <Button key="submit" type="primary" onClick={handleAddTechnology}>
+                    Save
                 </Button>,
             ]}
         >
-            <div className="body-edit">
+            <div className="body-add">
                 <div className="mb-3">
                     <label className="form-label">Name</label>
                     <Input
@@ -74,4 +66,4 @@ const ModalEditTechnology = ({ visible, handleClose, dataTechnologyEdit }) => {
     );
 };
 
-export default ModalEditTechnology;
+export default ModalAddTechnology;

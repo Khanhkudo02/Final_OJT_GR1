@@ -1,82 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Table } from 'antd';
+import ModalAddTechnology from './ModalAddTechnology';
 import ModalEditTechnology from './ModalEditTechnology';
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
 
-const data = [
-  {
-    key: "1",
-    title: "Car",
-    information: "One of the best Car.",
-    price: 10,
-    company: "Toyota",
-    image: "/images/kaffka.jpg",
-  },
-  {
-    key: "2",
-    title: "Bike",
-    information: "Good Bike.",
-    price: 20,
-    company: "Honda",
-  },
-  {
-    key: "3",
-    title: "Book",
-    information: "Nice book to read",
-    price: 50,
-    company: "Book Angencies",
-  },
-  {
-    key: "4",
-    title: "Cycles",
-    information: "Best for health.",
-    price: 60,
-    company: "Frog",
-  },
-  {
-    key: "5",
-    title: "TV",
-    information: "Nice clearity",
-    price: 50,
-    company: "LG",
-  },
-  {
-    key: "6",
-    title: "Computer",
-    information: "Help to do programs.",
-    price: 60,
-    company: "Honda",
-  },
-  {
-    key: "7",
-    title: "Laptop",
-    information: "Good to do multi-tasking",
-    price: 50,
-    company: "Lenovo",
-  },
-];
-
 const TechnologyManagement = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [technologies, setTechnologies] = useState([]);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
 
-  const showModal = (record) => {
+  useEffect(() => {
+    const loadTechnologies = async () => {
+      try {
+        const data = await fetchAllTechnology();
+        setTechnologies(data);
+      } catch (error) {
+        console.error("Failed to fetch technologies:", error);
+      }
+    };
+    loadTechnologies();
+  }, []);
+
+  const showEditModal = (record) => {
     setDataTechnologyEdit(record);
-    setIsModalVisible(true);
+    setIsEditModalVisible(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalVisible(false);
+  const showAddModal = () => {
+    setIsAddModalVisible(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalVisible(false);
     setDataTechnologyEdit(null);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalVisible(false);
   };
 
   return (
     <div>
-      <Button type="primary" style={{ marginBottom: 16 }}>
-        Add New Row
+      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
+        Add New Technology
       </Button>
-      <Table dataSource={data} pagination={false}>
+      <Table dataSource={technologies} pagination={false}>
         <Column
           title="Image"
           dataIndex="image"
@@ -98,7 +69,7 @@ const TechnologyManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
-              <Button type="primary" style={{ marginRight: 8 }} onClick={() => showModal(record)}>
+              <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
               <Button type="danger">Delete</Button>
@@ -108,11 +79,15 @@ const TechnologyManagement = () => {
       </Table>
       {dataTechnologyEdit && (
         <ModalEditTechnology
-          visible={isModalVisible}
-          handleClose={handleCloseModal}
+          visible={isEditModalVisible}
+          handleClose={handleCloseEditModal}
           dataTechnologyEdit={dataTechnologyEdit}
         />
       )}
+      <ModalAddTechnology
+        visible={isAddModalVisible}
+        handleClose={handleCloseAddModal}
+      />
     </div>
   );
 };
