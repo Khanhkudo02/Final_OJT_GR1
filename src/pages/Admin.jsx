@@ -101,6 +101,7 @@ function AdminPage() {
       // }
 
       if (editMode) {
+        // Update existing user
         await update(userRef, userData);
         setSuccessMessage("User updated successfully!");
       } else {

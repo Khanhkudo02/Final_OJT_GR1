@@ -1,7 +1,6 @@
 import React from "react";
 import LogoutButton from "../Components/LogoutButton";
 
-
 function Employee() {
   return (
     <div>
