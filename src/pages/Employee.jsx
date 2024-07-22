@@ -5,8 +5,8 @@ function Employee() {
   return (
     <div>
       <h1>This is employee page</h1>
-      <Sidebar />
       <LogoutButton></LogoutButton>
+      <Sidebar />
     </div>
   );
 }
