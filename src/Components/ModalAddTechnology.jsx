@@ -1,31 +1,40 @@
 import React, { useState } from "react";
-import { Modal, Button, Input } from "antd";
+import { Modal, Button, Input, Upload } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
-const ModalAddTechnology = ({ visible, handleClose }) => {
+const ModalAddTechnology = ({ open, handleClose }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState("");
+    const [imageFile, setImageFile] = useState(null);
 
     const handleAddTechnology = async () => {
         try {
-            let res = await postCreateTechnology(name, description, status);
-            if (res.status === 201) {
-                handleClose(); // Close modal after success
-                toast.success("Technology added successfully!");
-            } else {
-                toast.error("Failed to add technology.");
-            }
+            await postCreateTechnology(name, description, status, imageFile);
+            handleClose();
+            toast.success("Technology added successfully!");
         } catch (error) {
-            toast.error("An error occurred.");
+            toast.error("Failed to add technology.");
+        }
+    };
+
+    const handleImageChange = (info) => {
+        if (info.file.status === "done") {
+            if (info.file.type === "image/png" || info.file.type === "image/svg+xml") {
+                setImageFile(info.file.originFileObj);
+            } else {
+                toast.error("Only PNG and SVG images are allowed.");
+                setImageFile(null);
+            }
         }
     };
 
     return (
         <Modal
             title="Add New Technology"
-            visible={visible}
+            open={open}
             onCancel={handleClose}
             footer={[
                 <Button key="back" onClick={handleClose}>
@@ -60,6 +69,15 @@ const ModalAddTechnology = ({ visible, handleClose }) => {
                         value={status}
                         onChange={(event) => setStatus(event.target.value)}
                     />
+                </div>
+                <div className="mb-3">
+                    <Upload
+                        accept=".png,.svg"
+                        beforeUpload={() => false} // Prevent automatic upload
+                        onChange={handleImageChange}
+                    >
+                        <Button icon={<PlusOutlined />}>Select Image (PNG/SVG only)</Button>
+                    </Upload>
                 </div>
             </div>
         </Modal>

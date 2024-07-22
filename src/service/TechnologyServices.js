@@ -1,57 +1,72 @@
-import { getDatabase, ref, get, set, update } from "firebase/database";
-import { database } from "../../firebaseConfig";
+import { ref, set, push, update, get } from "firebase/database";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { database, storage } from '../firebaseConfig'; // Import từ firebaseConfig
+
+const db = database;
+const storageInstance = storage;
+
+// Create new technology
+const postCreateTechnology = async (name, description, status, imageFile) => {
+    try {
+        const newTechnologyRef = push(ref(db, 'technologies'));
+
+        let imageUrl = null;
+        if (imageFile) {
+            // Upload the image to Firebase Storage
+            const imageRef = storageRef(storageInstance, `images/${newTechnologyRef.key}/${imageFile.name}`);
+            const snapshot = await uploadBytes(imageRef, imageFile);
+            imageUrl = await getDownloadURL(snapshot.ref);
+        }
+
+        await set(newTechnologyRef, {
+            name,
+            description,
+            status,
+            imageUrl,
+        });
+
+        return newTechnologyRef.key;
+    } catch (error) {
+        console.error("Failed to create technology:", error);
+        throw error;
+    }
+};
 
 // Fetch all technologies
 const fetchAllTechnology = async () => {
-    const dbRef = ref(database, 'technologies');
     try {
-        const snapshot = await get(dbRef);
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            return Object.keys(data).map(key => ({ key, ...data[key] }));
-        } else {
-            console.log("No data available");
-            return [];
+        const technologiesRef = ref(db, 'technologies');
+        const snapshot = await get(technologiesRef);
+        const data = snapshot.val();
+        return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
+    } catch (error) {
+        console.error("Failed to fetch technologies:", error);
+        throw error;
+    }
+};
+
+// Update existing technology
+const putUpdateTechnology = async (id, name, description, status, imageFile) => {
+    try {
+        const technologyRef = ref(db, `technologies/${id}`);
+
+        let imageUrl = null;
+        if (imageFile) {
+            const imageRef = storageRef(storageInstance, `images/${id}/${imageFile.name}`);
+            const snapshot = await uploadBytes(imageRef, imageFile);
+            imageUrl = await getDownloadURL(snapshot.ref);
         }
+
+        await update(technologyRef, {
+            name,
+            description,
+            status,
+            imageUrl: imageUrl || null,
+        });
+
+        return id;
     } catch (error) {
-        console.error("Error fetching technologies:", error);
-        throw error;
-    }
-};
-
-// Create a new technology
-const postCreateTechnology = async (name, description, status) => {
-    const dbRef = ref(database, 'technologies');
-    const newTechnologyRef = ref(database, `technologies/${Date.now()}`);
-    const newTechnology = {
-        title: name,
-        information: description,
-        company: status
-    };
-
-    try {
-        await set(newTechnologyRef, newTechnology);
-        return { status: 201, data: newTechnology };
-    } catch (error) {
-        console.error("Error creating technology:", error);
-        throw error;
-    }
-};
-
-// Update an existing technology
-const putUpdateTechnology = async (id, name, description, status) => {
-    const dbRef = ref(database, `technologies/${id}`);
-    const updatedTechnology = {
-        title: name,
-        information: description,
-        company: status
-    };
-
-    try {
-        await update(dbRef, updatedTechnology);
-        return { status: 200, data: updatedTechnology };
-    } catch (error) {
-        console.error("Error updating technology:", error);
+        console.error("Failed to update technology:", error);
         throw error;
     }
 };

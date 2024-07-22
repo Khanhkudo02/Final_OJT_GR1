@@ -50,20 +50,19 @@ const TechnologyManagement = () => {
       <Table dataSource={technologies} pagination={false}>
         <Column
           title="Image"
-          dataIndex="image"
-          key="image"
+          dataIndex="imageUrl"
+          key="imageUrl"
           render={(text, record) => (
             <img
-              src={record.image}
-              alt={record.title}
+              src={record.imageUrl}
+              alt={record.name}
               style={{ width: 50, height: 50 }}
             />
           )}
         />
-        <Column title="Title" dataIndex="title" key="title" />
-        <Column title="Information" dataIndex="information" key="information" />
-        <Column title="Price" dataIndex="price" key="price" />
-        <Column title="Company" dataIndex="company" key="company" />
+        <Column title="Name" dataIndex="name" key="name" />
+        <Column title="Description" dataIndex="description" key="description" />
+        <Column title="Status" dataIndex="status" key="status" />
         <Column
           title="Actions"
           key="actions"
@@ -79,13 +78,13 @@ const TechnologyManagement = () => {
       </Table>
       {dataTechnologyEdit && (
         <ModalEditTechnology
-          visible={isEditModalVisible}
+          open={isEditModalVisible}
           handleClose={handleCloseEditModal}
           dataTechnologyEdit={dataTechnologyEdit}
         />
       )}
       <ModalAddTechnology
-        visible={isAddModalVisible}
+        open={isAddModalVisible}
         handleClose={handleCloseAddModal}
       />
     </div>

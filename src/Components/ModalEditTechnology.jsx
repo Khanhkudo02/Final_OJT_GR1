@@ -1,39 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Input } from "antd";
+import { Modal, Button, Input, Upload } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { putUpdateTechnology } from "../service/TechnologyServices";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
-const ModalEditTechnology = ({ visible, handleClose, dataTechnologyEdit }) => {
+const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState("");
+    const [imageFile, setImageFile] = useState(null);
 
     useEffect(() => {
         if (dataTechnologyEdit) {
-            setName(dataTechnologyEdit.title || "");
-            setDescription(dataTechnologyEdit.information || "");
-            setStatus(dataTechnologyEdit.company || "");
+            setName(dataTechnologyEdit.name || "");
+            setDescription(dataTechnologyEdit.description || "");
+            setStatus(dataTechnologyEdit.status || "");
         }
     }, [dataTechnologyEdit]);
 
     const handleEditTechnology = async () => {
         try {
-            let res = await putUpdateTechnology(dataTechnologyEdit.key, name, description, status);
-            if (res.status === 200) {
-                handleClose(); // Close modal after success
-                toast.success("Technology updated successfully!");
-            } else {
-                toast.error("Failed to update technology.");
-            }
+            await putUpdateTechnology(
+                dataTechnologyEdit.key,
+                name,
+                description,
+                status,
+                imageFile
+            );
+            handleClose();
+            toast.success("Technology updated successfully!");
         } catch (error) {
-            toast.error("An error occurred.");
+            toast.error("Failed to update technology.");
+        }
+    };
+
+    const handleImageChange = (info) => {
+        if (info.file.status === "done") {
+            if (info.file.type === "image/png" || info.file.type === "image/svg+xml") {
+                setImageFile(info.file.originFileObj);
+            } else {
+                toast.error("Only PNG and SVG images are allowed.");
+                setImageFile(null);
+            }
         }
     };
 
     return (
         <Modal
             title="Edit Technology"
-            visible={visible}
+            open={open}
             onCancel={handleClose}
             footer={[
                 <Button key="back" onClick={handleClose}>
@@ -68,6 +83,15 @@ const ModalEditTechnology = ({ visible, handleClose, dataTechnologyEdit }) => {
                         value={status}
                         onChange={(event) => setStatus(event.target.value)}
                     />
+                </div>
+                <div className="mb-3">
+                    <Upload
+                        accept=".png,.svg"
+                        beforeUpload={() => false} // Prevent automatic upload
+                        onChange={handleImageChange}
+                    >
+                        <Button icon={<PlusOutlined />}>Select Image (PNG/SVG only)</Button>
+                    </Upload>
                 </div>
             </div>
         </Modal>
