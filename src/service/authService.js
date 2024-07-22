@@ -1,14 +1,28 @@
-import { getDatabase, ref, query, orderByChild, equalTo, get, set } from 'firebase/database';
+import {
+  getDatabase,
+  ref,
+  query,
+  orderByChild,
+  equalTo,
+  get,
+  set,
+} from "firebase/database";
 
 // Hàm đăng nhập người dùng
-export const loginUser = async (email, password, setUser, setError, navigate) => {
+export const loginUser = async (
+  email,
+  password,
+  setUser,
+  setError,
+  navigate
+) => {
   try {
     const db = getDatabase();
-    const userRef = ref(db, 'users');
-    const userQuery = query(userRef, orderByChild('email'), equalTo(email));
+    const userRef = ref(db, "users");
+    const userQuery = query(userRef, orderByChild("email"), equalTo(email));
     const snapshot = await get(userQuery);
     const userData = snapshot.val();
-    
+
     console.log("User Data from DB:", userData); // Console log user data
 
     if (userData) {
@@ -18,9 +32,9 @@ export const loginUser = async (email, password, setUser, setError, navigate) =>
       if (user.password === password) {
         localStorage.setItem("userId", JSON.stringify(user)); // Lưu toàn bộ đối tượng người dùng
         setUser(user);
-        
+
         // Điều hướng dựa trên vai trò người dùng
-        navigate(user.role === 'admin' ? '/admin' : '/employee');
+        navigate(user.role === "admin" ? "/admin" : "/employee");
         return { user, error: null };
       } else {
         return { user: null, error: "Invalid password" };
@@ -35,13 +49,18 @@ export const loginUser = async (email, password, setUser, setError, navigate) =>
 };
 
 // Hàm đăng ký người dùng
-export const signUpUser = async (email, password, setSuccessMessage, setError) => {
+export const signUpUser = async (
+  email,
+  password,
+  setSuccessMessage,
+  setError
+) => {
   try {
     const db = getDatabase();
-    const userRef = ref(db, 'users');
-    const userQuery = query(userRef, orderByChild('email'), equalTo(email));
+    const userRef = ref(db, "users");
+    const userQuery = query(userRef, orderByChild("email"), equalTo(email));
     const snapshot = await get(userQuery);
-    
+
     console.log("Snapshot for Sign Up Check:", snapshot.val()); // Console log snapshot for sign up
 
     if (snapshot.val()) {
@@ -49,25 +68,27 @@ export const signUpUser = async (email, password, setSuccessMessage, setError) =
       return { success: false, error: "Email already in use" };
     }
 
-    const newUserRef = ref(db, `users/${email.replace('.', ',')}`);
+    const newUserRef = ref(db, `users/${email.replace(".", ",")}`);
     const newUser = {
       email,
       password,
-      contact: '',
-      cv_list: [{
-        title: "",
-        description: '',
-        file: '',
-        updatedAt: new Date().toISOString()
-      }],
+      contact: "",
+      cv_list: [
+        {
+          title: "",
+          description: "",
+          file: "",
+          updatedAt: new Date().toISOString(),
+        },
+      ],
       role: email === "admin@gmail.com" ? "admin" : "employee",
       createdAt: new Date().toISOString(),
-      projetcIds: '',
-      skill: '',
-      Status: ''
+      projetcIds: "",
+      skill: "",
+      Status: "",
     };
     await set(newUserRef, newUser);
-    
+
     console.log("New User Object:", newUser); // Console log the new user object
 
     setSuccessMessage("Account created successfully! Please log in.");
