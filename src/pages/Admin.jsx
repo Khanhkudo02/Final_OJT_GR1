@@ -1,22 +1,27 @@
-import { get, getDatabase, ref, set, remove, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
+import { get, getDatabase, ref, set, remove, update } from "firebase/database";
 import { useNavigate } from "react-router-dom";
+import { Form, Input, Button, Select, Modal, List, message } from "antd";
 import LogoutButton from "../Components/LogoutButton";
 import Sidebar from "../Components/Sidebar";
+
+
+const { Option } = Select;
 
 function AdminPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("employee"); // Default role is employee
+  const [role, setRole] = useState("employee");
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editUserEmail, setEditUserEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); // For modal visibility
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch users when the page loads
     const fetchUsers = async () => {
       try {
         const db = getDatabase();
@@ -27,8 +32,7 @@ function AdminPage() {
           setUsers(Object.values(userData));
         }
       } catch (error) {
-        console.error("Error fetching users: ", error);
-        setError("Error fetching users");
+        message.error("Error fetching users");
       }
     };
 
@@ -38,26 +42,25 @@ function AdminPage() {
   useEffect(() => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (currentUser && currentUser.role !== "admin") {
-      navigate("/employee"); // Redirect if not admin
+      navigate("/employee");
     }
   }, [navigate]);
 
-  const handleAddOrUpdateUser = async (e) => {
-    e.preventDefault();
+  const handleAddOrUpdateUser = async (values) => {
+    const { email, password, role } = values;
 
-    // Validate input fields
     if (!email || !password) {
-      setError("Please fill in all fields");
+      message.error("Please fill in all fields");
       return;
     }
 
     if (!validateEmail(email)) {
-      setError("Invalid email format");
+      message.error("Invalid email format");
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+      message.error("Password must be at least 6 characters long");
       return;
     }
 
@@ -84,11 +87,9 @@ function AdminPage() {
       };
 
       if (editMode) {
-        // Update existing user
         await update(userRef, userData);
-        setSuccessMessage("User updated successfully!");
+        message.success("User updated successfully!");
       } else {
-        // Check if it's the first admin user
         const snapshot = await get(ref(db, "users"));
         const usersData = snapshot.val();
         const adminUsers = Object.values(usersData).filter(
@@ -96,30 +97,26 @@ function AdminPage() {
         );
 
         if (role === "admin" && adminUsers.length === 0) {
-          userData.isAdmin = true; // The very first admin has isAdmin = true
+          userData.isAdmin = true;
         }
 
         await set(userRef, userData);
-        setSuccessMessage("User added successfully!");
+        message.success("User added successfully!");
       }
 
-      // Reset form fields
       setEmail("");
       setPassword("");
       setRole("employee");
-      setError("");
       setEditMode(false);
       setEditUserEmail("");
 
-      // Update user list
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
         setUsers(Object.values(updatedUserData));
       }
     } catch (error) {
-      console.error("Error adding or updating user: ", error);
-      setError("Error adding or updating user");
+      message.error("Error adding or updating user");
     }
   };
 
@@ -130,23 +127,21 @@ function AdminPage() {
       const snapshot = await get(userRef);
       const userData = snapshot.val();
 
-      // Prevent deletion of the initial admin user
       const adminUsers = users.filter((user) => user.isAdmin);
 
       if (userData.isAdmin && adminUsers.length === 1) {
-        setError("Cannot delete the only admin user");
+        message.error("Cannot delete the only admin user");
         return;
       }
 
       if (userData.isAdmin) {
-        setError("Cannot delete an admin user");
+        message.error("Cannot delete an admin user");
         return;
       }
 
       await remove(userRef);
-      setSuccessMessage("User deleted successfully!");
+      message.success("User deleted successfully!");
 
-      // Update user list
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
@@ -155,8 +150,7 @@ function AdminPage() {
         setUsers([]);
       }
     } catch (error) {
-      console.error("Error deleting user: ", error);
-      setError("Error deleting user");
+      message.error("Error deleting user");
     }
   };
 
@@ -166,6 +160,15 @@ function AdminPage() {
     setRole(user.role);
     setEditMode(true);
     setEditUserEmail(user.email);
+    setModalVisible(true); // Open modal for editing
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    setEditMode(false);
+    setEmail("");
+    setPassword("");
+    setRole("employee");
   };
 
   const validateEmail = (email) => {
@@ -177,50 +180,102 @@ function AdminPage() {
     <div>
       <Sidebar />
       <h1>Admin Page</h1>
-      <form onSubmit={handleAddOrUpdateUser}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={editMode}
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Role:</label>
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="employee">Employee</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-        <button type="submit">{editMode ? "Update User" : "Add User"}</button>
-        <LogoutButton />
-      </form>
+      <Button type="primary" onClick={() => setModalVisible(true)}>
+        Add User
+      </Button>
+      <Modal
+        title={editMode ? "Edit User" : "Add User"}
+        open={modalVisible} // Updated
+        onCancel={handleModalCancel}
+        footer={null}
+      >
+        <Form
+          onFinish={handleAddOrUpdateUser}
+          initialValues={{ email, password, role }}
+          layout="vertical"
+        >
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, message: "Please input your email!" }]}
+          >
+            <Input
+              disabled={editMode}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              { required: true, message: "Please input your password!" },
+              { min: 6, message: "Password must be at least 6 characters long" },
+            ]}
+          >
+            <Input.Password
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              iconRender={(visible) => (
+                <Button
+                  type="text"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {visible ? "Hide" : "Show"}
+                </Button>
+              )}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Role"
+            name="role"
+          >
+            <Select
+              value={role}
+              onChange={(value) => setRole(value)}
+            >
+              <Option value="employee">Employee</Option>
+              <Option value="admin">Admin</Option>
+            </Select>
+          </Form.Item>
+
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              {editMode ? "Update User" : "Add User"}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
       <h2>Current Users</h2>
-      <ul>
-        {users.map((user) => (
-          <li key={user.email}>
+      <List
+        dataSource={users}
+        renderItem={(user) => (
+          <List.Item
+            actions={[
+              <Button onClick={() => handleEditUser(user)} key="edit">Edit</Button>,
+              !user.isAdmin && (
+                <Button
+                  type="danger"
+                  onClick={() => handleDeleteUser(user.email)}
+                  key="delete"
+                >
+                  Delete
+                </Button>
+              ),
+            ]}
+          >
             {user.email} - {user.role}
-            <button onClick={() => handleEditUser(user)}>Edit</button>
-            {!user.isAdmin && (
-              <button onClick={() => handleDeleteUser(user.email)}>
-                Delete
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+          </List.Item>
+        )}
+        
+      />
+      <LogoutButton className="logout-button" />
     </div>
   );
 }

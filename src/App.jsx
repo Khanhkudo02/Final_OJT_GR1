@@ -80,7 +80,7 @@ const App = () => {
                         <Route path="/cv" element={<PageCV />} />
                         <Route
                           path="/account-management"
-                          element={<AccountManagement />}
+                          element={<Admin />}
                         />
                         <Route
                           path="/employee-management"
@@ -104,6 +104,7 @@ const App = () => {
                         />
                       </Routes>
                     </div>
+                    
                   </Content>
                 </Layout>
               </Layout>
