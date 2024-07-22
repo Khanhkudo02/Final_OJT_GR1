@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Alert } from "antd";
-import { loginUser, signUpUser } from '../service/authService.js';
+import { loginUser, signUpUser } from "../service/authService.js";
 import styles from "../assets/style/Pages/Login.module.scss"; // Import SCSS file
 
 const { Title } = Typography;
@@ -17,12 +17,23 @@ function Login({ setUser }) {
   const handleSubmit = async (values) => {
     const { email, password } = values;
     if (isSignUp) {
-      const { success, error } = await signUpUser(email, password, setSuccessMessage, setError);
+      const { success, error } = await signUpUser(
+        email,
+        password,
+        setSuccessMessage,
+        setError
+      );
       if (!success) {
         setError(error);
       }
     } else {
-      const { user, error } = await loginUser(email, password, setUser, setError, navigate);
+      const { user, error } = await loginUser(
+        email,
+        password,
+        setUser,
+        setError,
+        navigate
+      );
       if (!user) {
         setError(error);
       }
@@ -52,7 +63,11 @@ function Login({ setUser }) {
           {successMessage && (
             <div>
               <Alert message={successMessage} type="success" showIcon />
-              <Button type="link" className={styles["link-button"]} onClick={() => setIsSignUp(false)}>
+              <Button
+                type="link"
+                className={styles["link-button"]}
+                onClick={() => setIsSignUp(false)}
+              >
                 Back to Login
               </Button>
             </div>
@@ -63,8 +78,15 @@ function Login({ setUser }) {
             </Button>
           </Form.Item>
         </Form>
-        <Button type="link" className={styles["link-button"]} onClick={() => setIsSignUp(!isSignUp)} block>
-          {isSignUp ? "Already have an account? Login" : "Need an account? Sign Up"}
+        <Button
+          type="link"
+          className={styles["link-button"]}
+          onClick={() => setIsSignUp(!isSignUp)}
+          block
+        >
+          {isSignUp
+            ? "Already have an account? Login"
+            : "Need an account? Sign Up"}
         </Button>
       </div>
     </div>

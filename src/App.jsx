@@ -1,23 +1,25 @@
+
+
+import { Layout, theme } from "antd";
 import React, { useEffect, useState } from "react";
 import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
   Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
 } from "react-router-dom";
-import { Layout, theme } from "antd";
-import Sidebar from "./Components/Sidebar";
-import Login from "./pages/LoginPage";
-import Admin from "./pages/Admin";
-import ForgetPassword from "./pages/ForgetPassword";
 import AccountManagement from "./Components/AccountManagement";
 import EmployeeManagement from "./Components/EmployeeManagement";
-import ProjectManagement from "./Components/ProjectManagement";
 import PositionManagement from "./Components/PositionManagement";
-import TechnologyManagement from "./Components/TechnologyManagement";
 import ProgramingLanguage from "./Components/ProgramingLanguage";
-import PageCV from "./pages/PageCV";
+import ProjectManagement from "./Components/ProjectManagement";
+import Sidebar from "./Components/Sidebar";
+import TechnologyManagement from "./Components/TechnologyManagement";
+import Admin from "./pages/Admin";
 import Employee from "./pages/Employee";
+import ForgetPassword from "./pages/ForgetPassword";
+import Login from "./pages/LoginPage";
+import PageCV from "./pages/PageCV";
 
 const { Content } = Layout;
 
@@ -33,7 +35,7 @@ const App = () => {
   useEffect(() => {
     // Giả sử fetchUserInfo() là hàm lấy thông tin người dùng
     const fetchUserInfo = async () => {
-      const userInfo = await getUserInfo(); // getUserInfo() trả về thông tin người dùng
+      const userInfo = await setUser(); // getUserInfo() trả về thông tin người dùng
       if (userInfo) {
         setUser(userInfo);
         setRole(userInfo.role); // Giả sử userInfo.role là vai trò của người dùng

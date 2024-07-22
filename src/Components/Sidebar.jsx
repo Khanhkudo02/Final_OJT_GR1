@@ -1,13 +1,13 @@
-import {
-    CodeOutlined,
-    FileTextOutlined,
-    ProjectOutlined,
-    TeamOutlined,
-    ToolOutlined,
-    UserOutlined,
-} from "@ant-design/icons";
-import { Layout, Menu } from "antd";
 import React from "react";
+import { Layout, Menu } from "antd";
+import {
+  UserOutlined,
+  ProjectOutlined,
+  TeamOutlined,
+  ToolOutlined,
+  CodeOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 
 const { Sider } = Layout;
