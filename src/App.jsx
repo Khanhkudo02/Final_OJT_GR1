@@ -73,13 +73,9 @@ const App = () => {
                   >
                     <div style={{ padding: 24, background: colorBgContainer }}>
                       <Routes>
-                        <Route path="/admin" element={<Admin />} />
                         <Route path="/employee" element={<Employee />} />
                         <Route path="/cv" element={<PageCV />} />
-                        <Route
-                          path="/account-management"
-                          element={<AccountManagement />}
-                        />
+                        <Route path="/account-management" element={<Admin />} />
                         <Route
                           path="/employee-management"
                           element={<EmployeeManagement />}

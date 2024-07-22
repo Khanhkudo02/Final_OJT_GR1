@@ -175,7 +175,6 @@ function AdminPage() {
 
   return (
     <div>
-      <Sidebar />
       <h1>Admin Page</h1>
       <form onSubmit={handleAddOrUpdateUser}>
         <div>
