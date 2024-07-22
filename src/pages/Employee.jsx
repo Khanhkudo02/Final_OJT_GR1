@@ -1,6 +1,5 @@
 import React from "react";
 import LogoutButton from "../Components/LogoutButton";
-import Sidebar from "../Components/Sidebar";
 
 function Employee() {
   return (
