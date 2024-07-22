@@ -2,6 +2,7 @@ import { get, getDatabase, ref, set, remove, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoutButton from "../Components/LogoutButton";
+import Sidebar from "../Components/Sidebar";
 
 function AdminPage() {
   const [email, setEmail] = useState("");
@@ -75,69 +76,34 @@ function AdminPage() {
             updatedAt: new Date().toISOString(),
           },
         ],
-        role: email === "admin@gmail.com" ? "admin" : "employee",
+        role,
         createdAt: new Date().toISOString(),
         projetcIds: "",
         skill: "",
         Status: "",
       };
 
-      //Fetch all users to get the data of the initial employee
-      const snapshot = await get(ref(db, "users"));
-      const usersData = snapshot.val();
-      // let defaultEmployeeData = {};
-      // const initialEmployee = Object.values(usersData).find(user => user.role === 'employee');
-
-      // If initial employee exists, copy their data
-      // if (initialEmployee) {
-      //   defaultEmployeeData = {
-      //     ...initialEmployee,
-      //     email: '', // Don't copy the email of the current user
-      //     password: '', // Don't copy the password of the current user
-      //     role: '', // Don't copy the role of the current user
-      //     createdAt: new Date().toISOString()
-      //   };
-      //   // Optionally include more default fields if needed
-      // }
-
       if (editMode) {
+        // Update existing user
         await update(userRef, userData);
         setSuccessMessage("User updated successfully!");
       } else {
-        if (role === "admin") {
-          // Only the initial admin can have isAdmin set to true
-          const adminUsers = Object.values(usersData).filter(
-            (user) => user.role === "admin"
-          );
-          if (adminUsers.length === 0) {
-            userData.isAdmin = true; // The very first admin has isAdmin = true
-          } else {
-            userData.isAdmin = false; // Other admins do not have isAdmin field
-          }
-        } else if (role === "employee") {
-          userData = {
-            email,
-            password,
-            contact: "",
-            cv_list: [
-              {
-                title: "",
-                description: "",
-                file: "",
-                updatedAt: new Date().toISOString(),
-              },
-            ],
-            role: email === "admin@gmail.com" ? "admin" : "employee",
-            createdAt: new Date().toISOString(),
-            projetcIds: "",
-            skill: "",
-            Status: "",
-          };
+        // Check if it's the first admin user
+        const snapshot = await get(ref(db, "users"));
+        const usersData = snapshot.val();
+        const adminUsers = Object.values(usersData).filter(
+          (user) => user.role === "admin"
+        );
+
+        if (role === "admin" && adminUsers.length === 0) {
+          userData.isAdmin = true; // The very first admin has isAdmin = true
         }
 
         await set(userRef, userData);
         setSuccessMessage("User added successfully!");
       }
+
+      // Reset form fields
       setEmail("");
       setPassword("");
       setRole("employee");
@@ -209,6 +175,7 @@ function AdminPage() {
 
   return (
     <div>
+      <Sidebar />
       <h1>Admin Page</h1>
       <form onSubmit={handleAddOrUpdateUser}>
         <div>
