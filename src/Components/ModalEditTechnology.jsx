@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Input, Upload } from "antd";
+import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { putUpdateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
+
+const { Option } = Select;
 
 const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
     const [name, setName] = useState("");
@@ -46,11 +48,25 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
         }
     };
 
+    const beforeUpload = (file) => {
+        handleImageChange({ file });
+        return false; // Prevent automatic upload
+    };
+
+    const formatStatus = (status) => {
+        if (status === "active") return "Active";
+        if (status === "inactive") return "Inactive";
+        return "";
+    };
+
     return (
         <Modal
             title="Edit Technology"
             open={open}
-            onCancel={handleClose}
+            onCancel={() => {
+                handleClose();
+                setImageFile(null); // Reset image file when modal is closed
+            }}
             footer={[
                 <Button key="back" onClick={handleClose}>
                     Close
@@ -79,17 +95,19 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Status</label>
-                    <Input
-                        type="text"
+                    <Select
                         value={status}
-                        onChange={(event) => setStatus(event.target.value)}
-                    />
+                        onChange={(value) => setStatus(value)}
+                        placeholder="Select Status"
+                    >
+                        <Option value="active">Active</Option>
+                        <Option value="inactive">Inactive</Option>
+                    </Select>
                 </div>
                 <div className="mb-3">
                     <Upload
                         accept=".png,.svg"
-                        beforeUpload={() => false} // Prevent automatic upload
-                        onChange={handleImageChange}
+                        beforeUpload={beforeUpload} // Use beforeUpload to handle image selection
                     >
                         <Button icon={<PlusOutlined />}>Select Image (PNG/SVG only)</Button>
                     </Upload>

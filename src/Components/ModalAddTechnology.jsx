@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Modal, Button, Input, Upload } from "antd";
+import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
+
+const { Option } = Select;
 
 const ModalAddTechnology = ({ open, handleClose }) => {
     const [name, setName] = useState("");
@@ -33,10 +35,15 @@ const ModalAddTechnology = ({ open, handleClose }) => {
         }
     };
 
-    // Ensure image file input is cleared
     const beforeUpload = (file) => {
         handleImageChange({ file });
         return false; // Prevent automatic upload
+    };
+
+    const formatStatus = (status) => {
+        if (status === "active") return "Active";
+        if (status === "inactive") return "Inactive";
+        return "";
     };
 
     return (
@@ -75,11 +82,14 @@ const ModalAddTechnology = ({ open, handleClose }) => {
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Status</label>
-                    <Input
-                        type="text"
+                    <Select
                         value={status}
-                        onChange={(event) => setStatus(event.target.value)}
-                    />
+                        onChange={(value) => setStatus(value)}
+                        placeholder="Select Status"
+                    >
+                        <Option value="active">Active</Option>
+                        <Option value="inactive">Inactive</Option>
+                    </Select>
                 </div>
                 <div className="mb-3">
                     <Upload
