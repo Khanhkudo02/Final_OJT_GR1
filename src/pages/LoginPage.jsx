@@ -1,4 +1,3 @@
-import { database } from "../firebaseConfig";
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +11,7 @@ function Login({ setUser }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
@@ -44,6 +44,10 @@ function Login({ setUser }) {
     navigate("/forget-password");
   };
 
+  const handleBlur = (field) => {
+    form.validateFields([field]);
+  };
+
   return (
     <div className={styles["login-container"]}>
       <div className={styles["login-form"]}>
@@ -57,26 +61,33 @@ function Login({ setUser }) {
             className={styles["logo-header"]}
           />
         </div>
-        <Form onFinish={handleSubmit}>
+        <Form
+          form={form}
+          onFinish={handleSubmit}
+        >
           <Form.Item
             label="Email"
             name="email"
             rules={[{ required: true, message: "Please input your email!" }]}
           >
-            <Input type="email" />
+            <Input
+              type="email"
+              onBlur={() => handleBlur('email')}
+            />
           </Form.Item>
           <Form.Item
             label="Password"
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <Input.Password />
+            <Input.Password
+              onBlur={() => handleBlur('password')}
+            />
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
           {successMessage && (
             <div>
               <Alert message={successMessage} type="success" showIcon />
-              
             </div>
           )}
           <Form.Item>

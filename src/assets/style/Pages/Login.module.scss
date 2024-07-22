@@ -63,3 +63,20 @@
   font-weight: 500;
   text-transform: uppercase;
 }
+
+.ant-form-item {
+  position: relative;
+
+  .ant-form-item-control-input {
+    &:focus,
+    &:hover {
+      border-color: red;
+    }
+  }
+
+  .ant-form-item-explain {
+    color: red;
+    font-size: 12px;
+    visibility: visible; // Đảm bảo thông báo lỗi hiển thị khi có lỗi
+  }
+}
