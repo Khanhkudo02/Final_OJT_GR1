@@ -33,7 +33,7 @@ const App = () => {
   useEffect(() => {
     // Giả sử fetchUserInfo() là hàm lấy thông tin người dùng
     const fetchUserInfo = async () => {
-      const userInfo = await getUserInfo(); // getUserInfo() trả về thông tin người dùng
+      const userInfo = await setUser(); // getUserInfo() trả về thông tin người dùng
       if (userInfo) {
         setUser(userInfo);
         setRole(userInfo.role); // Giả sử userInfo.role là vai trò của người dùng
@@ -55,7 +55,7 @@ const App = () => {
   };
 
   return (
-    <Router>
+    <div>
       <Routes>
         <Route path="/login" element={<Login setUser={handleLogin} />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
@@ -105,7 +105,7 @@ const App = () => {
           }
         />
       </Routes>
-    </Router>
+    </div>
   );
 };
 
