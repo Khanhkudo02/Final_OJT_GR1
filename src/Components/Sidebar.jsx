@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Layout, Menu, Button } from 'antd';
 import { UserOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, CodeOutlined, FileTextOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { NavLink } from 'react-router-dom';
-
+import '../assets/style/Pages/Sidebar.scss'
 
 const { Sider } = Layout;
 
@@ -28,7 +28,7 @@ const Sidebar = () => {
       children: [
         {
           key: '2-1',
-          label: <NavLink to="/project-info">Project Info</NavLink>,
+          label: <NavLink to="/new-project">New Project </NavLink>,
         },
         {
           key: '2-2',
@@ -85,10 +85,11 @@ const Sidebar = () => {
       }}
     >
       <div className="sidebar-header">
-        <img src="#" alt="Get IT" className="logo" />
-        <Button type="text" onClick={() => setCollapsed(!collapsed)}>
-          {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        </Button>
+        <img src="public\images\Logo-GetIT.jpg" 
+             alt="Get IT" 
+             className="logo-sidebar" 
+             style={{ width: '50px', height: '60px' }} />
+       
       </div>
       <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={menuItems} />
     </Sider>
