@@ -1,68 +1,106 @@
-import React, { useEffect, useState } from "react";
-import { Button, Table } from "antd";
-import { database } from "/src/firebaseConfig"; // Đảm bảo bạn đã tạo và xuất database từ firebaseConfig.js
+import React, { useState, useEffect } from 'react';
+import { Button, Table } from 'antd';
+import ModalAddPosition from './ModalAddPosition';
+import ModalEditPosition from './ModalEditPosition';
+import ModalDeletePosition from './ModalDeletePosition';
+import { fetchAllPositions, postCreatePosition, putUpdatePosition, deletePosition } from "../service/PositionServices";
 
 const { Column } = Table;
 
 const PositionManagement = () => {
-  const [data, setData] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [dataPositionEdit, setDataPositionEdit] = useState(null);
+  const [positionIdToDelete, setPositionIdToDelete] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const snapshot = await database.ref('/positions').once('value');
-      const data = snapshot.val();
-      const formattedData = Object.keys(data).map(key => ({
-        key: key,
-        ...data[key]
-      }));
-      setData(formattedData);
-    };
-
-    fetchData();
-  }, []);
-
-  const addItem = () => {
-    const newItem = {
-      title: "New Position",
-      description: "Description of new position",
-      department: "New Department",
-      salary: 1000,
-    };
-
-    database.ref('/positions').push(newItem).then(() => {
-      fetchData(); // Cập nhật lại dữ liệu sau khi thêm
-    });
+  const loadPositions = async () => {
+    try {
+      const data = await fetchAllPositions();
+      setPositions(data);
+    } catch (error) {
+      console.error("Failed to fetch positions:", error);
+    }
   };
 
-  const deleteItem = (key) => {
-    database.ref(`/positions/${key}`).remove().then(() => {
-      fetchData(); // Cập nhật lại dữ liệu sau khi xóa
-    });
+  useEffect(() => {
+    loadPositions();
+  }, []);
+
+  const showEditModal = (record) => {
+    setDataPositionEdit(record);
+    setIsEditModalVisible(true);
+  };
+
+  const showAddModal = () => {
+    setIsAddModalVisible(true);
+  };
+
+  const showDeleteModal = (id) => {
+    setPositionIdToDelete(id);
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalVisible(false);
+    setDataPositionEdit(null);
+    setTimeout(() => loadPositions(), 100);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalVisible(false);
+    setTimeout(() => loadPositions(), 100);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalVisible(false);
+    setPositionIdToDelete(null);
+    setTimeout(() => loadPositions(), 100);
   };
 
   return (
     <div>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={addItem}>
+      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
         Add New Position
       </Button>
-      <Table dataSource={data} pagination={false}>
+      <Table dataSource={positions} pagination={false}>
         <Column title="Title" dataIndex="title" key="title" />
         <Column title="Description" dataIndex="description" key="description" />
         <Column title="Department" dataIndex="department" key="department" />
-        <Column title="Salary" dataIndex="salary" key="salary" />
         <Column
           title="Actions"
           key="actions"
           render={(text, record) => (
             <span>
-              <Button type="primary" style={{ marginRight: 8 }}>
+              <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
-              <Button type="danger" onClick={() => deleteItem(record.key)}>Delete</Button>
+              <Button type="danger" onClick={() => showDeleteModal(record.key)}>
+                Delete
+              </Button>
             </span>
           )}
         />
       </Table>
+      {dataPositionEdit && (
+        <ModalEditPosition
+          open={isEditModalVisible}
+          handleClose={handleCloseEditModal}
+          dataPositionEdit={dataPositionEdit}
+        />
+      )}
+      <ModalAddPosition
+        open={isAddModalVisible}
+        handleClose={handleCloseAddModal}
+      />
+      {positionIdToDelete && (
+        <ModalDeletePosition
+          open={isDeleteModalVisible}
+          handleClose={handleCloseDeleteModal}
+          positionId={positionIdToDelete}
+        />
+      )}
     </div>
   );
 };

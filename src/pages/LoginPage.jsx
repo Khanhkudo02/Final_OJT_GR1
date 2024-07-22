@@ -76,13 +76,7 @@ function Login({ setUser }) {
           {successMessage && (
             <div>
               <Alert message={successMessage} type="success" showIcon />
-              <Button
-                type="link"
-                className={styles["link-button"]}
-                onClick={() => setIsSignUp(false)}
-              >
-                Back to Login
-              </Button>
+              
             </div>
           )}
           <Form.Item>
