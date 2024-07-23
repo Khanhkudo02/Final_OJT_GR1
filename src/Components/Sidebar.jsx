@@ -13,17 +13,19 @@ import {
 import { NavLink } from "react-router-dom";
 import "../assets/style/Pages/Sidebar.scss";
 import LogoutButton from "./LogoutButton";
+import { useTranslation } from "react-i18next";
 
 const { Sider } = Layout;
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { t } = useTranslation();
 
   const menuItems = [
     {
       key: "1",
       icon: <UserOutlined />,
-      label: <NavLink to="/account-management">Manage Accounts</NavLink>,
+      label: <NavLink to="/account-management">{t('Manage Accounts')}</NavLink>,
       children: [
         {
           key: "1-1",

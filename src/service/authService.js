@@ -88,6 +88,7 @@ export const loginUser = async (
 export const signUpUser = async (
   email,
   password,
+  name,
   setSuccessMessage,
   setError
 ) => {
@@ -111,6 +112,7 @@ export const signUpUser = async (
     const newUser = {
       email,
       password: hashedPassword,
+      name,
       contact: "",
       cv_list: [
         {
