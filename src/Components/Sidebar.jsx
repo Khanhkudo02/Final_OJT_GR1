@@ -12,6 +12,7 @@ import {
 } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 import "../assets/style/Pages/Sidebar.scss";
+import LogoutButton from "./LogoutButton";
 
 const { Sider } = Layout;
 
@@ -82,6 +83,10 @@ const Sidebar = () => {
       icon: <FileTextOutlined />,
       label: <NavLink to="/cv">CV</NavLink>,
     },
+    {
+      key: "8",
+      icon: <LogoutButton />,
+    },
   ];
 
   return (
@@ -97,15 +102,18 @@ const Sidebar = () => {
         left: 0,
         top: 0,
         bottom: 0,
+        background:
+          "linear-gradient(358.3deg, rgb(255, 82, 168) 12.9%, rgb(177, 118, 240) 134.3%)",
       }}
     >
       <div className="sidebar-header">
         <img
-          src="public\images\Logo-GetIT.jpg"
+          src="/public/images/logo.jpg"
           alt="Get IT"
           className="logo-sidebar"
-          style={{ width: "50px", height: "60px" }}
+          style={{ width: "50px", height: "40px" }}
         />
+        <h2 className="sidebar-title">GETIT COMPANY</h2>
       </div>
       <Menu
         theme="dark"

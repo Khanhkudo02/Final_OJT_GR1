@@ -93,7 +93,7 @@ function AdminPage() {
       } else {
         const hashedPassword = await bcrypt.hash(password, 10);
         userData.password = hashedPassword;
-        
+
         const snapshot = await get(ref(db, "users"));
         const usersData = snapshot.val();
         const adminUsers = Object.values(usersData).filter(
@@ -214,7 +214,10 @@ function AdminPage() {
             name="password"
             rules={[
               { required: true, message: "Please input your password!" },
-              { min: 6, message: "Password must be at least 6 characters long" },
+              {
+                min: 6,
+                message: "Password must be at least 6 characters long",
+              },
             ]}
           >
             <Input.Password
@@ -231,14 +234,8 @@ function AdminPage() {
             />
           </Form.Item>
 
-          <Form.Item
-            label="Role"
-            name="role"
-          >
-            <Select
-              value={role}
-              onChange={(value) => setRole(value)}
-            >
+          <Form.Item label="Role" name="role">
+            <Select value={role} onChange={(value) => setRole(value)}>
               <Option value="employee">Employee</Option>
               <Option value="admin">Admin</Option>
             </Select>
@@ -261,7 +258,9 @@ function AdminPage() {
         renderItem={(user) => (
           <List.Item
             actions={[
-              <Button onClick={() => handleEditUser(user)} key="edit">Edit</Button>,
+              <Button onClick={() => handleEditUser(user)} key="edit">
+                Edit
+              </Button>,
               !user.isAdmin && (
                 <Button
                   type="danger"
