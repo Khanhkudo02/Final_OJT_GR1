@@ -66,8 +66,9 @@ const App = () => {
               <Layout style={{ minHeight: "100vh" }}>
                 {user && role === "admin" && <Sidebar />}
                 <Layout
-                  style={{ marginLeft: user && role === "admin" ? 200 : 0 }}
-                >
+                  style={{ marginLeft: user && role === "admin" ? 0 : 0 }}
+                > 
+                  
                   <Content
                     style={{ margin: "24px 16px 0", overflow: "initial" }}
                   >

@@ -85,35 +85,27 @@ const Sidebar = () => {
     },
     {
       key: "8",
-      icon: <LogoutButton />,
-    },
+      label: <LogoutButton collapsed={collapsed} />,
+    }    
   ];
 
   return (
     <Sider
+      className="sidebar"
       collapsible
       collapsed={collapsed}
       onCollapse={(collapsed) => setCollapsed(collapsed)}
-      width={200}
-      style={{
-        overflow: "auto",
-        height: "100vh",
-        position: "fixed",
-        left: 0,
-        top: 0,
-        bottom: 0,
-        background:
-          "linear-gradient(358.3deg, rgb(255, 82, 168) 12.9%, rgb(177, 118, 240) 134.3%)",
-      }}
+      width={229}
     >
       <div className="sidebar-header">
         <img
           src="/public/images/logo.jpg"
           alt="Get IT"
           className="logo-sidebar"
-          style={{ width: "50px", height: "40px" }}
         />
-        <h2 className="sidebar-title">GETIT COMPANY</h2>
+         {!collapsed && (
+          <h2 className="sidebar-title">GETIT COMPANY</h2>
+        )}
       </div>
       <Menu
         theme="dark"
