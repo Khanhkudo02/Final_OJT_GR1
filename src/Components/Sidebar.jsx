@@ -11,6 +11,7 @@ import {
   MenuFoldOutlined,
 } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
+import "../assets/style/Pages/Sidebar.scss";
 import LogoutButton from "./LogoutButton";
 
 const { Sider } = Layout;
@@ -37,7 +38,7 @@ const Sidebar = () => {
       children: [
         {
           key: "2-1",
-          label: <NavLink to="/project-info">Project Info</NavLink>,
+          label: <NavLink to="/new-project">New Project </NavLink>,
         },
         {
           key: "2-2",
@@ -84,10 +85,8 @@ const Sidebar = () => {
     },
     {
       key: "8",
-      icon: <LogoutButton />, // Sử dụng LogoutButton như một icon
-      // Hiển thị tên cho mục này
-      style: { marginTop: 'auto' } // Đẩy mục Logout xuống dưới cùng
-    }
+      icon: <LogoutButton />,
+    },
   ];
 
   return (
@@ -106,10 +105,12 @@ const Sidebar = () => {
       }}
     >
       <div className="sidebar-header">
-        <img src="#" alt="Get IT" className="logo" />
-        <Button type="text" onClick={() => setCollapsed(!collapsed)}>
-          {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        </Button>
+        <img
+          src="public\images\Logo-GetIT.jpg"
+          alt="Get IT"
+          className="logo-sidebar"
+          style={{ width: "50px", height: "60px" }}
+        />
       </div>
       <Menu
         theme="dark"
@@ -117,7 +118,6 @@ const Sidebar = () => {
         defaultSelectedKeys={["1"]}
         items={menuItems}
       />
-    
     </Sider>
   );
 };

@@ -139,5 +139,8 @@ export const signUpUser = async (
   }
 };
 
+
+
 // Gọi hàm để mã hóa mật khẩu hiện có (nên chỉ chạy một lần khi cần)
 updateExistingPasswords();
+

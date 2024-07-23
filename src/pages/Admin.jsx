@@ -2,7 +2,7 @@ import { Button, Form, Input, List, message, Modal, Select } from "antd";
 import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import bcrypt from "bcryptjs"; // Import bcryptjs
 
 const { Option } = Select;
 
@@ -67,7 +67,6 @@ function AdminPage() {
       const userRef = ref(db, `users/${email.replace(".", ",")}`);
       let userData = {
         email,
-        password,
         contact: "",
         cv_list: [
           {
@@ -85,9 +84,16 @@ function AdminPage() {
       };
 
       if (editMode) {
+        if (password) {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          userData.password = hashedPassword;
+        }
         await update(userRef, userData);
         message.success("User updated successfully!");
       } else {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        userData.password = hashedPassword;
+        
         const snapshot = await get(ref(db, "users"));
         const usersData = snapshot.val();
         const adminUsers = Object.values(usersData).filter(
@@ -154,7 +160,7 @@ function AdminPage() {
 
   const handleEditUser = (user) => {
     setEmail(user.email);
-    setPassword(user.password);
+    setPassword(user.password); // Set password for editing
     setRole(user.role);
     setEditMode(true);
     setEditUserEmail(user.email);
@@ -270,9 +276,7 @@ function AdminPage() {
             {user.email} - {user.role}
           </List.Item>
         )}
-        
       />
-    
     </div>
   );
 }
