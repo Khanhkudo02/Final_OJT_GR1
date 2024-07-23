@@ -102,8 +102,6 @@ const Sidebar = () => {
         left: 0,
         top: 0,
         bottom: 0,
-        background:
-          "background: linear-gradient(-225deg, #FF057C 0%, #8D0B93 50%, #321575 100%);",
       }}
     >
       <div className="sidebar-header">
