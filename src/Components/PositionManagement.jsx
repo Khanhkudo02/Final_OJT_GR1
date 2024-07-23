@@ -37,9 +37,13 @@ const PositionManagement = () => {
     setIsAddModalVisible(true);
   };
 
-  const showDeleteModal = (id) => {
-    setPositionIdToDelete(id);
-    setIsDeleteModalVisible(true);
+  const showDeleteModal = (record) => {
+    if (record.status.toLowerCase() === 'inactive') {
+      setPositionIdToDelete(record.key);
+      setIsDeleteModalVisible(true);
+    } else {
+      message.error('Only inactive position can be deleted.');
+    }
   };
 
   const handleCloseEditModal = () => {
