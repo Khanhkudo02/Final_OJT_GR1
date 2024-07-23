@@ -102,6 +102,8 @@ const Sidebar = () => {
         left: 0,
         top: 0,
         bottom: 0,
+        background:
+          "linear-gradient(358.3deg, rgb(255, 82, 168) 12.9%, rgb(177, 118, 240) 134.3%)",
       }}
     >
       <div className="sidebar-header">
@@ -109,7 +111,7 @@ const Sidebar = () => {
           src="public\images\Logo-GetIT.jpg"
           alt="Get IT"
           className="logo-sidebar"
-          style={{ width: "50px", height: "60px" }}
+          style={{ width: "50px", height: "60px", paddingTop: "5px" }}
         />
       </div>
       <Menu
