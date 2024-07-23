@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table } from 'antd';
+import { Button, Table, message } from 'antd';
 import ModalAddPosition from './ModalAddPosition';
 import ModalEditPosition from './ModalEditPosition';
 import ModalDeletePosition from './ModalDeletePosition';
-import { fetchAllPositions, postCreatePosition, putUpdatePosition, deletePosition } from "../service/PositionServices";
+import { fetchAllPositions } from "../service/PositionServices";
 
 const { Column } = Table;
 
@@ -18,6 +18,7 @@ const PositionManagement = () => {
   const loadPositions = async () => {
     try {
       const data = await fetchAllPositions();
+      console.log(data); // Debugging: Check the data structure
       setPositions(data);
     } catch (error) {
       console.error("Failed to fetch positions:", error);
@@ -42,7 +43,7 @@ const PositionManagement = () => {
       setPositionIdToDelete(record.key);
       setIsDeleteModalVisible(true);
     } else {
-      message.error('Only inactive position can be deleted.');
+      message.error('Only inactive positions can be deleted.');
     }
   };
 
@@ -68,10 +69,11 @@ const PositionManagement = () => {
       <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
         Add New Position
       </Button>
-      <Table dataSource={positions} pagination={false}>
-        <Column title="Title" dataIndex="title" key="title" />
+      <Table dataSource={positions} rowKey="key" pagination={false}>
+        <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
         <Column title="Department" dataIndex="department" key="department" />
+        <Column title="Status" dataIndex="status" key="status" />
         <Column
           title="Actions"
           key="actions"
@@ -80,7 +82,7 @@ const PositionManagement = () => {
               <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
-              <Button type="danger" onClick={() => showDeleteModal(record.key)}>
+              <Button type="danger" onClick={() => showDeleteModal(record)}>
                 Delete
               </Button>
             </span>
