@@ -1,0 +1,36 @@
+.logout-button {
+  position: relative;
+  padding: 10px 15px;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  z-index: 1;
+
+  &.collapsed {
+    justify-content: center;
+  }
+
+  &::before {
+    content: '';
+    background: linear-gradient(135deg, #6253E1, #04BEFE);
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    transition: all 0.3s;
+    border-radius: 4px;
+    z-index: -1;
+  }
+
+  &:hover::before {
+    opacity: 0;
+  }
+  
+  span {
+    margin: 0px;
+    
+  }
+
+}
