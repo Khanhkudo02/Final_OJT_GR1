@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table } from 'antd';
+import { Button, Table, message } from 'antd';
 import ModalAddEmployee from './ModalAddEmployee';
 import ModalEditEmployee from './ModalEditEmployee';
 import ModalDeleteEmployee from './ModalDeleteEmployee';
@@ -13,7 +13,7 @@ const EmployeeManagement = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [dataEmployeeEdit, setDataEmployeeEdit] = useState(null);
-  const [employeeIdToDelete, setEmployeeIdToDelete] = useState(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
 
   const loadEmployees = async () => {
     try {
@@ -38,9 +38,13 @@ const EmployeeManagement = () => {
     setIsAddModalVisible(true);
   };
 
-  const showDeleteModal = (id) => {
-    setEmployeeIdToDelete(id);
-    setIsDeleteModalVisible(true);
+  const showDeleteModal = (record) => {
+    if (record.status && record.status.toLowerCase() === 'inactive') {
+      setEmployeeToDelete(record);
+      setIsDeleteModalVisible(true);
+    } else {
+      message.error('Only inactive employees can be deleted.');
+    }
   };
 
   const handleCloseEditModal = () => {
@@ -56,7 +60,7 @@ const EmployeeManagement = () => {
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalVisible(false);
-    setEmployeeIdToDelete(null);
+    setEmployeeToDelete(null);
     setTimeout(loadEmployees, 100);
   };
 
@@ -89,7 +93,7 @@ const EmployeeManagement = () => {
               <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
-              <Button type="danger" onClick={() => showDeleteModal(record.key)}>
+              <Button type="danger" onClick={() => showDeleteModal(record)}>
                 Delete
               </Button>
             </span>
@@ -107,11 +111,11 @@ const EmployeeManagement = () => {
         open={isAddModalVisible}
         handleClose={handleCloseAddModal}
       />
-      {employeeIdToDelete && (
+      {employeeToDelete && (
         <ModalDeleteEmployee
           open={isDeleteModalVisible}
           handleClose={handleCloseDeleteModal}
-          employeeId={employeeIdToDelete}
+          employee={employeeToDelete}
         />
       )}
     </div>

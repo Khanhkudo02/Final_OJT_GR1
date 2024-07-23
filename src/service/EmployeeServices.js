@@ -79,7 +79,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             address,
             phoneNumber,
             skills,
-            status,
+            status, // Ensure status is included
             imageUrl: imageUrl || null,
         };
 

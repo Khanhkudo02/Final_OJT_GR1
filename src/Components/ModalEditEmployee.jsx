@@ -33,7 +33,17 @@ const ModalEditEmployee = ({ open, handleClose, dataEmployeeEdit }) => {
     const handleEditEmployee = async () => {
         try {
             const formattedDateOfBirth = dateOfBirth ? moment(dateOfBirth).format('YYYY-MM-DD') : null;
-            const res = await putUpdateEmployee(dataEmployeeEdit.key, name, email, formattedDateOfBirth, address, phoneNumber, skills, imageFile, status);
+            const res = await putUpdateEmployee(
+                dataEmployeeEdit.key,
+                name,
+                email,
+                formattedDateOfBirth,
+                address,
+                phoneNumber,
+                skills,
+                status, // Pass status here
+                imageFile
+            );
             if (res) {
                 handleClose();
                 toast.success("Employee updated successfully!");
@@ -44,6 +54,7 @@ const ModalEditEmployee = ({ open, handleClose, dataEmployeeEdit }) => {
             toast.error("An error occurred.");
         }
     };
+
 
     const handleImageChange = ({ file }) => {
         if (file.type === "image/png" || file.type === "image/svg+xml") {

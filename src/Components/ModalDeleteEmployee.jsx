@@ -3,10 +3,10 @@ import { Modal, Button } from "antd";
 import { deleteEmployee } from "../service/EmployeeServices";
 import { toast } from "react-toastify";
 
-const ModalDeleteEmployee = ({ open, handleClose, dataEmployeeDelete }) => {
+const ModalDeleteEmployee = ({ open, handleClose, employee }) => {
     const handleDeleteEmployee = async () => {
         try {
-            await deleteEmployee(dataEmployeeDelete.key);
+            await deleteEmployee(employee.key); // Use employee.key or employee.id as needed
             handleClose();
             toast.success("Employee deleted successfully!");
         } catch (error) {
@@ -23,7 +23,7 @@ const ModalDeleteEmployee = ({ open, handleClose, dataEmployeeDelete }) => {
                 <Button key="back" onClick={handleClose}>
                     Cancel
                 </Button>,
-                <Button key="submit" type="primary" onClick={handleDeleteEmployee}>
+                <Button key="submit" type="primary" danger onClick={handleDeleteEmployee}>
                     Delete
                 </Button>,
             ]}
