@@ -2,9 +2,18 @@
   width: 0px;
   height: 0px;
   border-radius: 25%;
-  margin-left: 20px;
 }
 
 .sidebar-header {
-  padding-left: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  padding: 10px;
+}
+
+.sidebar-title {
+  margin-left: 10px;
+  font-size: 15px;
+  font-weight: 700;
 }

@@ -106,11 +106,12 @@ const Sidebar = () => {
     >
       <div className="sidebar-header">
         <img
-          src="public\images\Logo-GetIT.jpg"
+          src="/public/images/logo.jpg"
           alt="Get IT"
           className="logo-sidebar"
-          style={{ width: "50px", height: "60px" }}
+          style={{ width: "50px", height: "40px" }}
         />
+        <h2 className="sidebar-title">GETIT COMPANY</h2>
       </div>
       <Menu
         theme="dark"
