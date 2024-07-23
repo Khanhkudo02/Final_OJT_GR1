@@ -1,22 +1,27 @@
-import { Button, Form, Input, List, message, Modal, Select } from "antd";
-import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
+import { Button, Form, Input, List, message, Modal, Select, Table } from "antd";
+import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import { useNavigate } from "react-router-dom";
-import bcrypt from "bcryptjs"; // Import bcryptjs
+import bcrypt from "bcryptjs";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../Components/LanguageSwitcher"; // Import LanguageSwitcher
 
 const { Option } = Select;
 
 function AdminPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("employee");
+  const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editUserEmail, setEditUserEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false); // For modal visibility
+  const [modalVisible, setModalVisible] = useState(false);
+  const [form] = Form.useForm();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,15 +32,23 @@ function AdminPage() {
         const snapshot = await get(userRef);
         const userData = snapshot.val();
         if (userData) {
-          setUsers(Object.values(userData));
+          // Convert userData object to an array
+          const usersArray = Object.values(userData);
+
+          // Sort users by createdAt in ascending order (oldest first)
+          usersArray.sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          );
+
+          setUsers(usersArray);
         }
       } catch (error) {
-        message.error("Error fetching users");
+        message.error(t("errorFetchingUsers"));
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -45,28 +58,37 @@ function AdminPage() {
   }, [navigate]);
 
   const handleAddOrUpdateUser = async (values) => {
-    const { email, password, role } = values;
+    const { email, password, role, name } = values;
 
-    if (!email || !password) {
-      message.error("Please fill in all fields");
+    if (!email || !password || !name) {
+      message.error(t("pleaseFillAllFields"));
       return;
     }
 
     if (!validateEmail(email)) {
-      message.error("Invalid email format");
+      message.error(t("invalidEmailFormat"));
       return;
     }
 
     if (password.length < 6) {
-      message.error("Password must be at least 6 characters long");
+      message.error(t("passwordMinLength"));
       return;
     }
 
     try {
       const db = getDatabase();
       const userRef = ref(db, `users/${email.replace(".", ",")}`);
+
+      if (!editMode) {
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          message.error(t("emailAlreadyExists"));
+          return;
+        }
+      }
       let userData = {
         email,
+        name,
         contact: "",
         cv_list: [
           {
@@ -89,7 +111,7 @@ function AdminPage() {
           userData.password = hashedPassword;
         }
         await update(userRef, userData);
-        message.success("User updated successfully!");
+        message.success(t("userUpdatedSuccessfully"));
       } else {
         const hashedPassword = await bcrypt.hash(password, 10);
         userData.password = hashedPassword;
@@ -105,22 +127,28 @@ function AdminPage() {
         }
 
         await set(userRef, userData);
-        message.success("User added successfully!");
+        message.success(t("userAddedSuccessfully"));
       }
 
+      form.resetFields();
       setEmail("");
       setPassword("");
+      setName("");
       setRole("employee");
       setEditMode(false);
       setEditUserEmail("");
 
+      // Fetch and update the user list
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
-        setUsers(Object.values(updatedUserData));
+        // Convert updatedUserData object to an array
+        const usersArray = Object.values(updatedUserData);
+
+        setUsers(usersArray); // No sorting here
       }
     } catch (error) {
-      message.error("Error adding or updating user");
+      message.error(t("errorAddingOrUpdatingUser"));
     }
   };
 
@@ -134,37 +162,53 @@ function AdminPage() {
       const adminUsers = users.filter((user) => user.isAdmin);
 
       if (userData.isAdmin && adminUsers.length === 1) {
-        message.error("Cannot delete the only admin user");
+        message.error(t("cannotDeleteOnlyAdminUser"));
         return;
       }
 
       if (userData.isAdmin) {
-        message.error("Cannot delete an admin user");
+        message.error(t("cannotDeleteAdminUser"));
         return;
       }
 
       await remove(userRef);
-      message.success("User deleted successfully!");
+      message.success(t("userDeletedSuccessfully"));
 
+      // Fetch and update the user list
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
-        setUsers(Object.values(updatedUserData));
+        // Convert updatedUserData object to an array
+        const usersArray = Object.values(updatedUserData);
+
+        // Sort users by createdAt in ascending order (oldest first)
+        usersArray.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+
+        setUsers(usersArray);
       } else {
         setUsers([]);
       }
     } catch (error) {
-      message.error("Error deleting user");
+      message.error(t("errorDeletingUser"));
     }
   };
 
   const handleEditUser = (user) => {
     setEmail(user.email);
-    setPassword(user.password); // Set password for editing
+    setPassword(user.password);
+    setName(user.name);
     setRole(user.role);
     setEditMode(true);
     setEditUserEmail(user.email);
-    setModalVisible(true); // Open modal for editing
+    setModalVisible(true);
+    form.setFieldsValue({
+      email: user.email,
+      password: user.password,
+      name: user.name, // Set name for editing
+      role: user.role,
+    }); // Open modal for editing
   };
 
   const handleModalCancel = () => {
@@ -172,35 +216,75 @@ function AdminPage() {
     setEditMode(false);
     setEmail("");
     setPassword("");
+    setName("");
     setRole("employee");
+    setEditUserEmail("");
+    form.resetFields();
   };
 
   const validateEmail = (email) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(String(email).toLowerCase());
   };
+  const columns = [
+    {
+      title: t("email"),
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: t("Name"),
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: t("role"),
+      dataIndex: "role",
+      key: "role",
+    },
+    {
+      title: t("Created At"),
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => new Date(text).toLocaleDateString(),
+    },
+    {
+      title: t("Actions"),
+      key: "actions",
+      render: (_, record) => (
+        <div>
+          <Button onClick={() => handleEditUser(record)}>{t("edit")}</Button>
+          <Button onClick={() => handleDeleteUser(record.email)}>
+            {t("delete")}
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div>
-      <h1>Admin Page</h1>
+      <LanguageSwitcher />
+      <h1>{t("adminPage")}</h1>
       <Button type="primary" onClick={() => setModalVisible(true)}>
-        Add User
+        {t("addUser")}
       </Button>
       <Modal
-        title={editMode ? "Edit User" : "Add User"}
-        open={modalVisible} // Updated
+        title={editMode ? t("editUser") : t("addUser")}
+        open={modalVisible}
         onCancel={handleModalCancel}
         footer={null}
       >
         <Form
+          form={form}
           onFinish={handleAddOrUpdateUser}
-          initialValues={{ email, password, role }}
+          initialValues={{ email, password, role, name }}
           layout="vertical"
         >
           <Form.Item
-            label="Email"
+            label={t("email")}
             name="email"
-            rules={[{ required: true, message: "Please input your email!" }]}
+            rules={[{ required: true, message: t("pleaseInputEmail") }]}
           >
             <Input
               disabled={editMode}
@@ -208,74 +292,45 @@ function AdminPage() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Item>
+          <Form.Item
+            label={t("name")}
+            name="name"
+            rules={[{ required: true, message: t("pleaseInput Name") }]}
+          >
+            <Input value={name} onChange={(e) => setName(e.target.value)} />
+          </Form.Item>
 
           <Form.Item
-            label="Password"
+            label={t("password")}
             name="password"
             rules={[
-              { required: true, message: "Please input your password!" },
-              {
-                min: 6,
-                message: "Password must be at least 6 characters long",
-              },
+              { required: true, message: t("pleaseInputPassword") },
+              { min: 6, message: t("passwordMinLength") },
             ]}
           >
             <Input.Password
+              disabled={editMode}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              iconRender={(visible) => (
-                <Button
-                  type="text"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {visible ? "Hide" : "Show"}
-                </Button>
-              )}
             />
           </Form.Item>
 
-          <Form.Item label="Role" name="role">
+          <Form.Item label={t("role")} name="role">
             <Select value={role} onChange={(value) => setRole(value)}>
-              <Option value="employee">Employee</Option>
-              <Option value="admin">Admin</Option>
+              <Option value="employee">{t("employee")}</Option>
+              <Option value="admin">{t("admin")}</Option>
             </Select>
           </Form.Item>
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              {editMode ? "Update User" : "Add User"}
+              {editMode ? t("updateUser") : t("addUser")}
             </Button>
           </Form.Item>
         </Form>
       </Modal>
 
-      <h2>Current Users</h2>
-      <List
-        dataSource={users}
-        renderItem={(user) => (
-          <List.Item
-            actions={[
-              <Button onClick={() => handleEditUser(user)} key="edit">
-                Edit
-              </Button>,
-              !user.isAdmin && (
-                <Button
-                  type="danger"
-                  onClick={() => handleDeleteUser(user.email)}
-                  key="delete"
-                >
-                  Delete
-                </Button>
-              ),
-            ]}
-          >
-            {user.email} - {user.role}
-          </List.Item>
-        )}
-      />
+      <Table dataSource={users} columns={columns} rowKey="email" />
     </div>
   );
 }
