@@ -1,12 +1,12 @@
 import { ref, set, push, update, get, remove } from "firebase/database";
-import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import { database, storage } from '../firebaseConfig';
 
 const db = database;
 const storageInstance = storage;
 
 // Create new position
-const postCreatePosition = async (title, description, department, imageFile) => {
+const postCreatePosition = async (name, description, department, status, imageFile) => {
     try {
         const newPositionRef = push(ref(db, 'positions'));
 
@@ -19,9 +19,10 @@ const postCreatePosition = async (title, description, department, imageFile) => 
         }
 
         await set(newPositionRef, {
-            title,
+            name,
             description,
             department,
+            status,
             imageUrl,
         });
 
@@ -46,7 +47,7 @@ const fetchAllPositions = async () => {
 };
 
 // Update existing position
-const putUpdatePosition = async (id, title, description, department, imageFile) => {
+const putUpdatePosition = async (id, name, description, department, status, salary, imageFile) => {
     try {
         const positionRef = ref(db, `positions/${id}`);
 
@@ -58,9 +59,11 @@ const putUpdatePosition = async (id, title, description, department, imageFile) 
         }
 
         await update(positionRef, {
-            title,
+            name,
             description,
             department,
+            status,
+            salary,
             imageUrl: imageUrl || null,
         });
 
