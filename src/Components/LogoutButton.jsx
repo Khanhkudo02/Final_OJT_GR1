@@ -1,4 +1,3 @@
-// src/LogoutButton.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,7 +6,7 @@ function LogoutButton() {
 
   const handleLogout = () => {
     localStorage.removeItem('userId');
-    navigate('/login'); 
+    navigate('/login');
   };
 
   return (
