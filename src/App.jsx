@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   Navigate,
@@ -48,6 +49,7 @@ const App = () => {
     setRole(userInfo.role);
   };
 
+  // eslint-disable-next-line react/prop-types
   const ProtectedRoute = ({ children }) => {
     if (!user) {
       return <Navigate to="/login" />;

@@ -1,14 +1,15 @@
+import bcrypt from "bcryptjs";
 import {
-  getDatabase,
-  ref,
-  query,
-  orderByChild,
   equalTo,
   get,
+  getDatabase,
+  orderByChild,
+  query,
+  ref,
   set,
   update,
 } from "firebase/database";
-import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from 'uuid';
 
 // Hàm cập nhật mật khẩu đã mã hóa cho tất cả người dùng hiện có
 const updateExistingPasswords = async () => {
@@ -42,6 +43,7 @@ const updateExistingPasswords = async () => {
     console.error("Error updating passwords:", error);
   }
 };
+
 
 // Hàm đăng nhập người dùng
 export const loginUser = async (
@@ -86,6 +88,8 @@ export const loginUser = async (
   }
 };
 
+
+
 // Hàm đăng ký người dùng
 export const signUpUser = async (
   email,
@@ -110,7 +114,10 @@ export const signUpUser = async (
     // Mã hóa mật khẩu
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUserRef = ref(db, `users/${email.replace(".", ",")}`);
+    // Tạo ID ngẫu nhiên cho người dùng
+    const userId = uuidv4();
+
+    const newUserRef = ref(db, `users/${userId}`);
     const newUser = {
       email,
       password: hashedPassword,
@@ -128,7 +135,7 @@ export const signUpUser = async (
       createdAt: new Date().toISOString(),
       projetcIds: "",
       skill: "",
-      Status: "",
+      status: "active",
     };
     await set(newUserRef, newUser);
 
