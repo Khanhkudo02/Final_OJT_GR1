@@ -3,11 +3,14 @@
   padding: 10px 15px;
   border: none;
   color: #fff;
+  font-weight: 500;
   font-size: 16px;
   cursor: pointer;
   display: flex;
+  align-items: center; /* Ensures icon and text are centered */
   width: 100%;
   z-index: 1;
+  transition: all 0.3s;
 
   &.collapsed {
     justify-content: center;
@@ -25,12 +28,28 @@
   }
 
   &:hover::before {
-    opacity: 0;
-  }
-  
-  span {
-    margin: 0px;
-    
+    opacity: 0.5;
+    transition: all 0.3s;
   }
 
+  &:hover {
+    color: #fff;
+    font-weight: 500;
+    transition: all 0.3s;
+
+    .anticon,
+    span {
+      color: #fff;
+      transition: all 0.3s;
+    }
+  }
+
+  .anticon,
+  span {
+    transition: all 0.3s;
+  }
+
+  span {
+    margin: 0 0 0 8px; /* Add margin between icon and text */
+  }
 }
