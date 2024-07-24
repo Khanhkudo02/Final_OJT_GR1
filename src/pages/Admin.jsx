@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Input, List, message, Modal, Select, Table } from "antd";
+import { Button, Form, Input, message, Modal, Select, Table } from "antd";
 import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import bcrypt from "bcryptjs";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../Components/LanguageSwitcher"; // Import LanguageSwitcher
+import ExportExcel from "../Components/ExportExcel"; // Import ExportExcel
 
 const { Option } = Select;
 
@@ -19,7 +20,6 @@ function AdminPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editUserEmail, setEditUserEmail] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -226,6 +226,7 @@ function AdminPage() {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(String(email).toLowerCase());
   };
+
   const columns = [
     {
       title: t("email"),
@@ -269,6 +270,8 @@ function AdminPage() {
       <Button type="primary" onClick={() => setModalVisible(true)}>
         {t("addUser")}
       </Button>
+      <ExportExcel data={users} fileName="UsersData" />{" "}
+      {/* Add ExportExcel component */}
       <Modal
         title={editMode ? t("editUser") : t("addUser")}
         open={modalVisible}
@@ -295,7 +298,7 @@ function AdminPage() {
           <Form.Item
             label={t("name")}
             name="name"
-            rules={[{ required: true, message: t("pleaseInput Name") }]}
+            rules={[{ required: true, message: t("pleaseInputName") }]}
           >
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </Form.Item>
@@ -329,7 +332,6 @@ function AdminPage() {
           </Form.Item>
         </Form>
       </Modal>
-
       <Table dataSource={users} columns={columns} rowKey="email" />
     </div>
   );
