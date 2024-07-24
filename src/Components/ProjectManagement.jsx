@@ -11,7 +11,7 @@ const data = [
     createdDate: "Aug 18th, 2023",
     deadline: "Oct 15th, 2023",
     client: "Ava Williams",
-    personInCharge: "Mia Rodriguez",
+    personInCharge: "Mia Rodriggit uez",
     status: "COMPLETED",
   },
   {
@@ -54,6 +54,17 @@ const statusColors = {
 };
 
 const ProjectManagement = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const paginatedData = data.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
   const columns = [
     {
       title: "ID",

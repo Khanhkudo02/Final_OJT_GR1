@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.4.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.16.4",
@@ -35,7 +36,10 @@
     "react-i18next": "^15.0.0",
     "react-router-dom": "^6.25.1",
     "react-toastify": "^10.0.5",
-    "sass": "^1.77.8"
+    "sass": "^1.77.8",
+    "uuid": "^10.0.0",
+    "xlsx": "^0.18.5",
+    "xlsx-style": "^0.8.13"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

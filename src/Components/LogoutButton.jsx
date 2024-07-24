@@ -1,4 +1,3 @@
-// src/LogoutButton.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
@@ -6,12 +5,13 @@ import { Button } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
 import "../assets/style/Pages/LogoutButton.scss";
 
+// eslint-disable-next-line react/prop-types
 function LogoutButton({ collapsed }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem('userId');
-    navigate('/login'); 
+    navigate('/login');
   };
 
   return (  
