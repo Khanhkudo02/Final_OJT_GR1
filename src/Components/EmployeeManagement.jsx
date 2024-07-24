@@ -4,6 +4,7 @@ import ModalAddEmployee from './ModalAddEmployee';
 import ModalEditEmployee from './ModalEditEmployee';
 import ModalDeleteEmployee from './ModalDeleteEmployee';
 import { fetchAllEmployees } from "../service/EmployeeServices";
+import "../assets/style/Pages/EmployeeManagement.scss";
 
 const { Column } = Table;
 
@@ -93,7 +94,7 @@ const EmployeeManagement = () => {
               <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
-              <Button type="danger" onClick={() => showDeleteModal(record)}>
+              <Button type="danger" className="delete-button"  onClick={() => showDeleteModal(record)}>
                 Delete
               </Button>
             </span>
