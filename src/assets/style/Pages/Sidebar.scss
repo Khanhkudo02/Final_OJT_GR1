@@ -1,6 +1,29 @@
+.sidebar {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: 0;
+  background: linear-gradient(
+    358.3deg,
+    rgb(255, 82, 168) 12.9%,
+    rgb(177, 118, 240) 134.3%
+  );
+  width: 50%;
+  &-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  .sidebar-title {
+    margin-left: 10px;
+    font-size: 15px;
+    font-weight: 0;
+  }
+}
+
 .logo-sidebar {
-  width: 0px;
-  height: 0px;
+  width: 50px;
   border-radius: 25%;
 }
 
@@ -9,18 +32,13 @@
   justify-content: space-between;
   align-items: center;
   color: white;
-  padding: 10px;
+  padding: 1px;
+  margin-top: 15px;
 }
 
-.sidebar-title {
-  margin-left: 10px;
-  font-size: 15px;
-  font-weight: 700;
+.ant-layout-slider {
+  padding-top: 15px !important;
 }
-
-// .ant-layout-sider {
-//   background: linear-gradient(-225deg, #ff057c 0%, #8d0b93 50%, #321575 100%);
-// }
 
 .ant-menu {
   background: transparent;
@@ -28,6 +46,11 @@
 
 .ant-menu-item {
   background: transparent !important;
+}
+
+.ant-menu-item-only-child {
+  display: flex !important;
+  justify-content: center !important;
 }
 
 .ant-menu-item a {
