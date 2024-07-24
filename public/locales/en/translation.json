@@ -46,13 +46,12 @@
   "Save": "Save",
   "Department": "Department",
 
-  "NewProject":"New Project",
+  "NewProject": "New Project",
   "AddNewPosition": "Add New Position",
   "AddNewTechnology": "Add New Technology",
   "AddNewEmployee": "Add New Employee",
   "AddNewProgramLanguage": "Add New Program Language",
   "DownloadPDF": "Download PDF",
-
 
   "ManageAccounts": "Manage Accounts",
   "AccountInfo": "Account Info",
