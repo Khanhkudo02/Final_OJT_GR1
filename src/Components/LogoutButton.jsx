@@ -1,5 +1,6 @@
 // src/LogoutButton.jsx
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
@@ -13,8 +14,7 @@ function LogoutButton({ collapsed }) {
     navigate('/login'); 
   };
 
-  return (
-    
+  return (  
     <Button
       className={`logout-button ${collapsed ? 'collapsed' : ''}`}
       type="text"
@@ -26,6 +26,10 @@ function LogoutButton({ collapsed }) {
  
   );
 }
+
+LogoutButton.propTypes = {
+  collapsed: PropTypes.bool.isRequired,
+};
 
 export default LogoutButton;
 

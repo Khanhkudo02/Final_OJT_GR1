@@ -37,6 +37,11 @@
   align-items: center;
   color: white;
   padding: 1px;
+  margin-top: 15px;
+}
+
+.ant-layout-slider {
+  padding-top: 15px !important;
 }
 
 .ant-menu {
@@ -45,6 +50,11 @@
 
 .ant-menu-item {
   background: transparent !important;
+}
+
+.ant-menu-item-only-child {
+  display: flex !important;
+  justify-content: center !important;
 }
 
 .ant-menu-item a {
