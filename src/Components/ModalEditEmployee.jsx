@@ -26,7 +26,7 @@ const ModalEditEmployee = ({ open, handleClose, dataEmployeeEdit }) => {
             setPhoneNumber(dataEmployeeEdit.phoneNumber || "");
             setSkills(dataEmployeeEdit.skills || []);
             setStatus(dataEmployeeEdit.status || "");
-            setImageFile(null); // Keep current image file
+            setImageFile(null);
         }
     }, [dataEmployeeEdit]);
 
@@ -41,7 +41,7 @@ const ModalEditEmployee = ({ open, handleClose, dataEmployeeEdit }) => {
                 address,
                 phoneNumber,
                 skills,
-                status, // Pass status here
+                status,
                 imageFile
             );
             if (res) {
@@ -66,7 +66,7 @@ const ModalEditEmployee = ({ open, handleClose, dataEmployeeEdit }) => {
 
     const beforeUpload = (file) => {
         handleImageChange({ file });
-        return false; // Prevent automatic upload
+        return false;
     };
 
     const handleSkillsChange = (value) => {
@@ -79,7 +79,7 @@ const ModalEditEmployee = ({ open, handleClose, dataEmployeeEdit }) => {
             open={open}
             onCancel={() => {
                 handleClose();
-                setImageFile(null); // Reset image file when modal is closed
+                setImageFile(null);
             }}
             footer={[
                 <Button key="back" onClick={handleClose}>
@@ -138,7 +138,6 @@ const ModalEditEmployee = ({ open, handleClose, dataEmployeeEdit }) => {
                         onChange={handleSkillsChange}
                         placeholder="Select Skills"
                     >
-                        {/* Replace with your actual skills options */}
                         <Option value="JavaScript">JavaScript</Option>
                         <Option value="React">React</Option>
                         <Option value="Node.js">Node.js</Option>

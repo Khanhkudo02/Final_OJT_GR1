@@ -3,6 +3,7 @@ import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { putUpdateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
+import { storage } from "../firebaseConfig";
 
 const { Option } = Select;
 
@@ -10,53 +11,82 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState("");
-    const [imageFile, setImageFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
 
     useEffect(() => {
         if (dataTechnologyEdit) {
             setName(dataTechnologyEdit.name || "");
             setDescription(dataTechnologyEdit.description || "");
             setStatus(dataTechnologyEdit.status || "");
+            setImagePreview(dataTechnologyEdit.imageUrl || "");
         }
     }, [dataTechnologyEdit]);
 
     const handleEditTechnology = async () => {
         try {
-            const res = await putUpdateTechnology(
-                dataTechnologyEdit.key,
-                name,
-                description,
-                status,
-                imageFile
-            );
-            if (res) {
-                handleClose();
-                toast.success("Technology updated successfully!");
+            if (selectedFile) {
+                const uploadTask = storage.ref(`images/${selectedFile.name}`).put(selectedFile);
+                uploadTask.on(
+                    "state_changed",
+                    snapshot => { },
+                    error => {
+                        console.log(error);
+                        toast.error("Failed to upload image.");
+                    },
+                    () => {
+                        storage
+                            .ref("images")
+                            .child(selectedFile.name)
+                            .getDownloadURL()
+                            .then(async (url) => {
+                                setImageUrl(url);
+                                const res = await putUpdateTechnology(
+                                    dataTechnologyEdit.key,
+                                    name,
+                                    description,
+                                    status,
+                                    url
+                                );
+                                if (res) {
+                                    handleClose();
+                                    toast.success("Technology updated successfully!");
+                                } else {
+                                    toast.error("Failed to update technology.");
+                                }
+                            });
+                    }
+                );
             } else {
-                toast.error("Failed to update technology.");
+                const res = await putUpdateTechnology(
+                    dataTechnologyEdit.key,
+                    name,
+                    description,
+                    status,
+                    imagePreview
+                );
+                if (res) {
+                    handleClose();
+                    toast.success("Technology updated successfully!");
+                } else {
+                    toast.error("Failed to update technology.");
+                }
             }
         } catch (error) {
             toast.error("An error occurred.");
         }
     };
 
-    const handleImageChange = ({ file }) => {
-        if (file.type === "image/png" || file.type === "image/svg+xml") {
-            setImageFile(file.originFileObj);
-        } else {
-            toast.error("Only PNG and SVG images are allowed.");
-        }
+    const handleImageChange = (info) => {
+        const file = info.file.originFileObj;
+        setSelectedFile(file);
+        setImagePreview(URL.createObjectURL(file));
     };
 
     const beforeUpload = (file) => {
         handleImageChange({ file });
-        return false; // Prevent automatic upload
-    };
-
-    const formatStatus = (status) => {
-        if (status === "active") return "Active";
-        if (status === "inactive") return "Inactive";
-        return "";
+        return false;
     };
 
     return (
@@ -65,7 +95,9 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
             open={open}
             onCancel={() => {
                 handleClose();
-                setImageFile(null); // Reset image file when modal is closed
+                setSelectedFile(null);
+                setImagePreview("");
+                setImageUrl("");
             }}
             footer={[
                 <Button key="back" onClick={handleClose}>
@@ -106,11 +138,17 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
                 </div>
                 <div className="mb-3">
                     <Upload
-                        accept=".png,.svg"
-                        beforeUpload={beforeUpload} // Use beforeUpload to handle image selection
+                        accept="image/*"
+                        beforeUpload={beforeUpload}
+                        showUploadList={false}
                     >
-                        <Button icon={<PlusOutlined />}>Select Image (PNG/SVG only)</Button>
+                        <Button icon={<PlusOutlined />}>Select Image</Button>
                     </Upload>
+                    {imagePreview && (
+                        <div style={{ marginTop: 10 }}>
+                            <img src={imagePreview} alt="preview" style={{ width: '100%', maxHeight: 200, objectFit: 'contain' }} />
+                        </div>
+                    )}
                 </div>
             </div>
         </Modal>

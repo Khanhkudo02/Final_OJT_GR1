@@ -1,287 +1,175 @@
-import React from "react";
+import React, { useEffect } from "react";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import "../assets/style/Pages/PageCV.scss";
-import { PDFDocument, rgb, PageSizes } from "pdf-lib";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-// import jsPDF from "jspdf";
+import avt from "../../public/images/avatar.jpg";
+
+const loadFont = async (url) => {
+  const response = await fetch(url);
+  const buffer = await response.arrayBuffer();
+  return new Uint8Array(buffer);
+};
 
 function PageCV() {
-  // Trái phải bằng nhau
-  // const createPDF = async () => {
-  //   const leftSection = document.querySelector(".left");
-  //   const rightSection = document.querySelector(".right");
+  useEffect(() => {
+    const loadAndAddFont = async () => {
+      const font = await loadFont("/fonts/times-new-roman/times.ttf");
+      jsPDF.API.addFileToVFS("times.ttf", font);
+      jsPDF.API.addFont("times.ttf", "Times", "normal");
+    };
+    loadAndAddFont();
+  }, []);
 
-  //   // Chụp ảnh các phần nội dung HTML
-  //   const leftCanvas = await html2canvas(leftSection, { scale: 2 }); // Tăng chất lượng ảnh
-  //   const rightCanvas = await html2canvas(rightSection, { scale: 2 });
+  const handleDownloadPdf = () => {
+    const doc = new jsPDF("p", "mm", "a4");
 
-  //   const leftImgData = leftCanvas.toDataURL("image/png");
-  //   const rightImgData = rightCanvas.toDataURL("image/png");
+    // Add profile picture
+    const img = new Image();
+    img.src = avt; // Replace with the path to your image
+    doc.addImage(img, "JPEG", 15, 20, 30, 30);
 
-  //   // Tạo tài liệu PDF
-  //   const pdfDoc = await PDFDocument.create();
-  //   const page = pdfDoc.addPage(PageSizes.A4);
+    // Header
+    doc.setFont("Times", "normal");
+    doc.setFontSize(24);
+    doc.setTextColor(243, 156, 18);
+    doc.text("Nguyễn Minh Anh", 50, 30);
 
-  //   const { width, height } = page.getSize();
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Nhân viên Chăm sóc khách hàng", 50, 40);
 
-  //   // Thêm ảnh vào tài liệu PDF
-  //   const leftImg = await pdfDoc.embedPng(leftImgData);
-  //   const rightImg = await pdfDoc.embedPng(rightImgData);
+    doc.setFontSize(12);
+    doc.text("26/08/1999", 50, 50);
+    doc.text("0123456789", 50, 55);
+    doc.text("minhanhtopcv@gmail.com", 50, 60);
+    doc.text("Số 47 đường Nguyễn Tuân, Hà Nội", 50, 65);
+    doc.text("https://fb.com/minhanhtopcv", 50, 70);
 
-  //   const leftImgDims = leftImg.scale(1);
-  //   const rightImgDims = rightImg.scale(2);
+    // Sections
+    doc.setFontSize(16);
+    doc.setTextColor(243, 156, 18);
+    doc.text("HỌC VẤN", 15, 90);
 
-  //   const leftWidth = width / 2; // Đặt chiều rộng của phần trái
-  //   const rightWidth = width / 2; // Đặt chiều rộng của phần phải
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("10/2017 -> 05/21", 15, 100);
+    doc.text("TRƯỜNG ĐẠI HỌC TOPCV", 15, 105);
+    doc.text("Chuyên ngành: Quản trị kinh doanh", 15, 110);
+    doc.text("Điểm trung bình năm học 2019-2020: 8.0", 15, 115);
 
-  //   // Thêm phần trái vào trang PDF
-  //   page.drawImage(leftImg, {
-  //     x: 0,
-  //     y: 0,
-  //     width: leftWidth,
-  //     height: height,
-  //   });
+    doc.setTextColor(243, 156, 18);
+    doc.text("KINH NGHIỆM LÀM VIỆC", 15, 130);
 
-  //   // Thêm phần phải vào trang PDF
-  //   page.drawImage(rightImg, {
-  //     x: leftWidth,
-  //     y: 0,
-  //     width: rightWidth,
-  //     height: height,
-  //   });
+    doc.setTextColor(0, 0, 0);
+    doc.text("07/2019 -> Hiện tại", 15, 140);
+    doc.text("CÔNG TY CỔ PHẦN TOPCV VIỆT NAM", 15, 145);
+    doc.text("Nhân viên chăm sóc khách hàng", 15, 150);
+    doc.text(
+      "Hỗ trợ khách hàng sử dụng dịch vụ (hơn 200 khách hàng/tháng)",
+      15,
+      155
+    );
+    doc.text(
+      "Đào tạo khách hàng sử dụng hệ thống quản lý của công ty",
+      15,
+      160
+    );
+    doc.text(
+      "Phối hợp với các bộ phận liên quan để giải quyết các vấn đề của khách hàng",
+      15,
+      165
+    );
 
-  //   // Lưu tệp PDF
-  //   const pdfBytes = await pdfDoc.save();
-  //   saveAs(new Blob([pdfBytes], { type: "application/pdf" }), "cv.pdf");
-  // };
+    doc.setTextColor(243, 156, 18);
+    doc.text("HOẠT ĐỘNG", 15, 180);
 
-  // 1 phải bằng 2 trái
-  const createPDF = async () => {
-    const leftSection = document.querySelector(".left");
-    const rightSection = document.querySelector(".right");
+    doc.setTextColor(0, 0, 0);
+    doc.text("10/2015 -> 06/2019", 15, 190);
+    doc.text("CLB KINH DOANH QUỐC TẾ ĐH NGOẠI THƯƠNG - IBE", 15, 195);
+    doc.text("Thành viên", 15, 200);
+    doc.text("Chia sẻ kiến thức chuyên ngành", 15, 205);
+    doc.text(
+      "Tham gia tổ chức các hội thảo doanh nghiệp và các sự kiện tuyển dụng",
+      15,
+      210
+    );
 
-    // Chụp ảnh các phần nội dung HTML
-    const leftCanvas = await html2canvas(leftSection, { scale: 2 }); // Tăng chất lượng ảnh
-    const rightCanvas = await html2canvas(rightSection, { scale: 2 });
+    doc.setTextColor(243, 156, 18);
+    doc.text("CHỨNG CHỈ", 15, 225);
 
-    const leftImgData = leftCanvas.toDataURL("image/png");
-    const rightImgData = rightCanvas.toDataURL("image/png");
+    doc.setTextColor(0, 0, 0);
+    doc.text("2018", 15, 235);
+    doc.text("CHỨNG CHỈ TOEIC 700 ĐIỂM ĐƯỢC CẤP BỞI TOPCV", 15, 240);
 
-    // Tạo tài liệu PDF
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage(PageSizes.A4);
+    doc.setTextColor(243, 156, 18);
+    doc.text("GIẢI THƯỞNG", 15, 255);
 
-    const { width, height } = page.getSize();
+    doc.setTextColor(0, 0, 0);
+    doc.text("2018", 15, 265);
+    doc.text(
+      "TOP 10 NHÂN VIÊN CHĂM SÓC KHÁCH HÀNG XUẤT SẮC QUÝ III NĂM 2018 CỦA CÔNG TY",
+      15,
+      270
+    );
 
-    // Thêm ảnh vào tài liệu PDF
-    const leftImg = await pdfDoc.embedPng(leftImgData);
-    const rightImg = await pdfDoc.embedPng(rightImgData);
+    doc.setTextColor(243, 156, 18);
+    doc.text("MỤC TIÊU NGHỀ NGHIỆP", 105, 90);
 
-    const leftImgDims = leftImg.scale(1);
-    const rightImgDims = rightImg.scale(1);
+    doc.setTextColor(0, 0, 0);
+    doc.text(
+      "Trở thành nhân viên Chăm sóc khách hàng cao cấp cho các doanh nghiệp.",
+      105,
+      100
+    );
+    doc.text(
+      "Đóng góp vào sự phát triển và nâng cao năng lực chuyên môn để trở thành trưởng phòng",
+      105,
+      105
+    );
+    doc.text("Kinh doanh chuyên nghiệp trong vòng 5 năm tới.", 105, 110);
 
-    const leftWidth = width / 3; // Đặt chiều rộng của phần trái
-    const rightWidth = (2 * width) / 3; // Đặt chiều rộng của phần phải
+    doc.setTextColor(243, 156, 18);
+    doc.text("THÔNG TIN THÊM", 105, 130);
 
-    // Thêm phần trái vào trang PDF
-    page.drawImage(leftImg, {
-      x: 0,
-      y: 0,
-      width: leftWidth,
-      height: height,
+    doc.setTextColor(0, 0, 0);
+    doc.text("Có thể đi làm ngay", 105, 140);
+
+    doc.setTextColor(243, 156, 18);
+    doc.text("NGƯỜI THAM CHIẾU", 105, 155);
+
+    doc.setTextColor(0, 0, 0);
+    doc.text("Anh Cao Duy Sơn - Trưởng phòng Kinh doanh", 105, 165);
+    doc.text("Công ty Cổ phần TOPCV Việt Nam", 105, 170);
+    doc.text("Điện thoại: 0123456789", 105, 175);
+
+    doc.setTextColor(243, 156, 18);
+    doc.text("KỸ NĂNG", 105, 195);
+
+    doc.setTextColor(0, 0, 0);
+    doc.text("Tin học văn phòng", 105, 205);
+    doc.text("Tiếng Anh", 105, 210);
+    doc.text("Làm việc nhóm", 105, 215);
+    doc.text("Giải quyết vấn đề", 105, 220);
+
+    // Add dots for skills
+    const skillDots = [6, 5, 5, 4]; // Number of dots for each skill
+    skillDots.forEach((dots, index) => {
+      for (let i = 0; i < dots; i++) {
+        doc.circle(150 + i * 5, 204 + index * 5, 1.5, "FD");
+      }
     });
 
-    // Thêm phần phải vào trang PDF
-    page.drawImage(rightImg, {
-      x: leftWidth,
-      y: 0,
-      width: rightWidth,
-      height: height,
-    });
-
-    // Lưu tệp PDF
-    const pdfBytes = await pdfDoc.save();
-    saveAs(new Blob([pdfBytes], { type: "application/pdf" }), "cv.pdf");
+    doc.save("cv.pdf");
   };
 
   return (
-    <>
-      {/* Button to change file from JSX to PDF */}
+    <div>
       <div className="PDF-Button">
-        <button onClick={createPDF} className="download-btn">
+        <button className="download-btn" onClick={handleDownloadPdf}>
           Download PDF
         </button>
       </div>
-
-      <div className="container" id="cv-page">
-        <div className="left">
-          {/* Avatar */}
-          <div className="image-container">
-            <img
-              className="image"
-              src="/public/images/avatar.jpg"
-              alt="Profile"
-            />
-          </div>
-          {/* Info */}
-          <div className="section bottom-left">
-            <h2 className="section-title">About Me</h2>
-            <p className="text">
-              Motivated with 8 years of area of expertise...
-            </p>
-          </div>
-          {/* Website & link */}
-          <div className="section bottom-left">
-            <h2 className="section-title">Website & Social Links</h2>
-            <p className="text">Facebook: facebook.com/robinson</p>
-            <p className="text">Behance: behance.net/robinson</p>
-            <p className="text">Twitter: twitter.com/robinson</p>
-          </div>
-          {/* Reference */}
-          <div className="section bottom-left">
-            <h2 className="section-title">References</h2>
-            <ul className="list">
-              <li className="list-item">
-                <p className="text">Mr. Michel Robinson</p>
-                <p className="text">Graphic and Web Designer</p>
-                <p className="text">+1 212-941-7824</p>
-                <p className="text">info@urmailname.com</p>
-              </li>
-            </ul>
-          </div>
-          {/* Language */}
-          <div className="section bottom-left">
-            <h2 className="section-title">Languages</h2>
-            <p className="text">English, UR Language</p>
-          </div>
-          {/* Addition details */}
-          <div className="section bottom-left">
-            <h2 className="section-title">Additional Details</h2>
-            <p className="text">Driving License: Full</p>
-          </div>
-        </div>
-
-        <div className="right">
-          {/* Name and contact method */}
-          <div className="header bottom-right">
-            <div>
-              <h1 className="name">Michelle Robinson</h1>
-              <p className="title">Graphic Designer</p>
-            </div>
-            <div className="contact">
-              <p className="text">14585 10th Ave, Whitestone, NY</p>
-              <p className="text">+1 212-941-7824</p>
-              <p className="text">info@urmailaddress.com</p>
-            </div>
-          </div>
-          {/* Work experience */}
-          <div className="section bottom-right">
-            <h2 className="section-title">Work Experience</h2>
-            <ul className="list">
-              <li className="list-item">
-                <p className="text">
-                  Senior Graphic Designer at GlowPixel Ltd, Orlando (2015 -
-                  2016)
-                </p>
-                <p className="text">
-                  Customer-oriented Graphic Designer with a strong history...
-                </p>
-              </li>
-              <li className="list-item">
-                <p className="text">
-                  Graphic Designer at Lorem Ipsum, New York (2014 - 2015)
-                </p>
-                <p className="text">
-                  Customer-oriented Graphic Designer with a strong history...
-                </p>
-              </li>
-              <li className="list-item">
-                <p className="text">
-                  Graphic & Web Designer at Pixelate Agency, New Jersey (2013 -
-                  2014)
-                </p>
-                <p className="text">
-                  Customer-oriented Graphic Designer with a strong history...
-                </p>
-              </li>
-            </ul>
-          </div>
-          {/* Education */}
-          <div className="section bottom-right">
-            <h2 className="section-title">Education</h2>
-            <ul className="list">
-              <li className="list-item">
-                <p className="text">
-                  Master in Web Develop at University of UK, Toronto (2010 -
-                  2012)
-                </p>
-                <p className="text">
-                  Customer-oriented Graphic Designer with a strong history...
-                </p>
-              </li>
-              <li className="list-item">
-                <p className="text">
-                  Bachelor in Graphic Design at College of Art, New Ark (2006 -
-                  2010)
-                </p>
-                <p className="text">
-                  Customer-oriented Graphic Designer with a strong history...
-                </p>
-              </li>
-            </ul>
-          </div>
-          {/* Skill */}
-          <div className="section bottom-right">
-            <h2 className="section-title">Skills</h2>
-            <div className="skills">
-              <div className="skill">
-                <p className="text">Adobe Photoshop</p>
-                <div className="skill-bar">
-                  <div className="skill-level" style={{ width: "80%" }} />
-                </div>
-              </div>
-              <div className="skill">
-                <p className="text">Adobe Illustrator</p>
-                <div className="skill-bar">
-                  <div className="skill-level" style={{ width: "75%" }} />
-                </div>
-              </div>
-              <div className="skill">
-                <p className="text">Adobe InDesign</p>
-                <div className="skill-bar">
-                  <div className="skill-level" style={{ width: "70%" }} />
-                </div>
-              </div>
-              <div className="skill">
-                <p className="text">HTML/CSS</p>
-                <div className="skill-bar">
-                  <div className="skill-level" style={{ width: "85%" }} />
-                </div>
-              </div>
-              <div className="skill">
-                <p className="text">WordPress</p>
-                <div className="skill-bar">
-                  <div className="skill-level" style={{ width: "60%" }} />
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Hobbies */}
-          <div className="section bottom-right">
-            <h2 className="section-title">Hobbies</h2>
-            <p className="text">Art, Traveling, Photography, Sports, Movie</p>
-          </div>
-          {/* Publication */}
-          <div className="section bottom-right">
-            <h2 className="section-title">Publications</h2>
-            <p className="text">
-              Complex cognition: The psychology of human thought, Oxford
-              University Press, New York, NY, 2001
-            </p>
-          </div>
-        </div>
-      </div>
-    </>
+    </div>
   );
 }
 
