@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Button, Table } from "antd";
-import ModalAddTechnology from "./ModalAddTechnology";
-import ModalEditTechnology from "./ModalEditTechnology";
-import ModalDeleteTechnology from "./ModalDeleteTechnology";
+import React, { useState, useEffect } from 'react';
+import { Button, Table, message } from 'antd';
+import ModalAddTechnology from './ModalAddTechnology';
+import ModalEditTechnology from './ModalEditTechnology';
+import ModalDeleteTechnology from './ModalDeleteTechnology';
 import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
@@ -37,35 +37,35 @@ const TechnologyManagement = () => {
     setIsAddModalVisible(true);
   };
 
-  const showDeleteModal = (id) => {
-    setTechnologyIdToDelete(id);
-    setIsDeleteModalVisible(true);
+  const showDeleteModal = (record) => {
+    if (record.status && record.status.toLowerCase() === 'inactive') {
+      setTechnologyIdToDelete(record);
+      setIsDeleteModalVisible(true);
+    } else {
+      message.error('Only inactive technologies can be deleted.');
+    }
   };
 
   const handleCloseEditModal = () => {
     setIsEditModalVisible(false);
     setDataTechnologyEdit(null);
-    setTimeout(() => loadTechnologies(), 100);
+    setTimeout(loadTechnologies, 100);
   };
 
   const handleCloseAddModal = () => {
     setIsAddModalVisible(false);
-    setTimeout(() => loadTechnologies(), 100);
+    setTimeout(loadTechnologies, 100);
   };
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalVisible(false);
     setTechnologyIdToDelete(null);
-    setTimeout(() => loadTechnologies(), 100);
+    setTimeout(loadTechnologies, 100);
   };
 
   return (
     <div>
-      <Button
-        type="primary"
-        style={{ marginBottom: 16 }}
-        onClick={showAddModal}
-      >
+      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
         Add New Technology
       </Button>
       <Table dataSource={technologies} pagination={false}>
@@ -83,20 +83,21 @@ const TechnologyManagement = () => {
         />
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
-        <Column title="Status" dataIndex="status" key="status" />
+        <Column
+          title="Status"
+          dataIndex="status"
+          key="status"
+          render={(text) => text.charAt(0).toUpperCase() + text.slice(1)}
+        />
         <Column
           title="Actions"
           key="actions"
           render={(text, record) => (
             <span>
-              <Button
-                type="primary"
-                style={{ marginRight: 8 }}
-                onClick={() => showEditModal(record)}
-              >
+              <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
-              <Button type="danger" onClick={() => showDeleteModal(record.key)}>
+              <Button type="danger" onClick={() => showDeleteModal(record)}>
                 Delete
               </Button>
             </span>
@@ -118,7 +119,7 @@ const TechnologyManagement = () => {
         <ModalDeleteTechnology
           open={isDeleteModalVisible}
           handleClose={handleCloseDeleteModal}
-          technologyId={technologyIdToDelete}
+          dataTechnologyDelete={technologyIdToDelete}
         />
       )}
     </div>
