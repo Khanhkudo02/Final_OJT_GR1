@@ -3,6 +3,8 @@ import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebaseConfig"; // import storage from firebaseConfig.js
 
 const { Option } = Select;
 
@@ -14,7 +16,13 @@ const ModalAddTechnology = ({ open, handleClose }) => {
 
     const handleAddTechnology = async () => {
         try {
-            await postCreateTechnology(name, description, status, imageFile);
+            let imageUrl = "";
+            if (imageFile) {
+                const storageRef = ref(storage, `technologies/${imageFile.name}`);
+                const snapshot = await uploadBytes(storageRef, imageFile);
+                imageUrl = await getDownloadURL(snapshot.ref);
+            }
+            await postCreateTechnology(name, description, status, imageUrl);
             handleClose();
             toast.success("Technology added successfully!");
             // Clear the form fields and the image file after successfully adding
@@ -37,7 +45,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
 
     const beforeUpload = (file) => {
         handleImageChange({ file });
-        return false; // Prevent automatic upload
+        return false;
     };
 
     const formatStatus = (status) => {
@@ -52,7 +60,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
             open={open}
             onCancel={() => {
                 handleClose();
-                setImageFile(null); // Reset image file when modal is closed
+                setImageFile(null);
             }}
             footer={[
                 <Button key="back" onClick={handleClose}>
@@ -94,7 +102,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
                 <div className="mb-3">
                     <Upload
                         accept=".png,.svg"
-                        beforeUpload={beforeUpload} // Use beforeUpload to handle image selection
+                        beforeUpload={beforeUpload}
                     >
                         <Button icon={<PlusOutlined />}>Select Image (PNG/SVG only)</Button>
                     </Upload>

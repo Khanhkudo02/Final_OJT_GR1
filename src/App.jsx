@@ -19,6 +19,7 @@ import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
 
+
 const { Content } = Layout;
 
 const App = () => {

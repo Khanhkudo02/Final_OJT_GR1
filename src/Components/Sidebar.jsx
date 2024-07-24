@@ -13,11 +13,13 @@ import {
 import { NavLink } from "react-router-dom";
 import "../assets/style/Pages/Sidebar.scss";
 import LogoutButton from "./LogoutButton";
+import { useTranslation } from "react-i18next";
 
 const { Sider } = Layout;
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { t } = useTranslation();
 
   const menuItems = [
     {
@@ -86,7 +88,7 @@ const Sidebar = () => {
     {
       key: "8",
       label: <LogoutButton collapsed={collapsed} />,
-    }    
+    },
   ];
 
   return (
@@ -103,9 +105,7 @@ const Sidebar = () => {
           alt="Get IT"
           className="logo-sidebar"
         />
-         {!collapsed && (
-          <h2 className="sidebar-title">GETIT COMPANY</h2>
-        )}
+        {!collapsed && <h2 className="sidebar-title">GETIT COMPANY</h2>}
       </div>
       <Menu
         theme="dark"

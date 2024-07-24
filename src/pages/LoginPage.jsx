@@ -15,11 +15,12 @@ function Login({ setUser }) {
   const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
-    const { email, password } = values;
+    const { email, password,name  } = values;
     if (isSignUp) {
       const { success, error } = await signUpUser(
         email,
         password,
+        name,
         setSuccessMessage,
         setError
       );
@@ -65,6 +66,17 @@ function Login({ setUser }) {
           form={form}
           onFinish={handleSubmit}
         >
+          {isSignUp && (
+            <Form.Item
+              label="Name"
+              name="name"
+              rules={[{ required: true, message: "Please input your name!" }]}
+            >
+              <Input
+                onBlur={() => handleBlur('name')}
+              />
+            </Form.Item>
+          )}
           <Form.Item
             label="Email"
             name="email"
