@@ -4,7 +4,7 @@ import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
 
 const { Option } = Select;
@@ -34,7 +34,9 @@ function AdminPage() {
             id,
             ...data,
           }));
-          usersArray.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          usersArray.sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          );
           setUsers(usersArray);
         }
       } catch (error) {
@@ -52,134 +54,39 @@ function AdminPage() {
     }
   }, [navigate]);
 
-  // const handleAddOrUpdateUser = async (values) => {
-  //   const { email, password, role, name } = values;
-  
-  //   if (!email || !password || !name) {
-  //     message.error(t("pleaseFillAllFields"));
-  //     return;
-  //   }
-  
-  //   if (!validateEmail(email)) {
-  //     message.error(t("invalidEmailFormat"));
-  //     return;
-  //   }
-  
-  //   if (password.length < 6) {
-  //     message.error(t("passwordMinLength"));
-  //     return;
-  //   }
-  
-  //   try {
-  //     const db = getDatabase();
-  //     const snapshot = await get(ref(db, "users"));
-  //     const usersData = snapshot.val();
-  
-  //     if (!editMode && usersData) {
-  //       const emailExists = Object.values(usersData).some(user => user.email === email);
-  //       if (emailExists) {
-  //         message.error(t("emailAlreadyExists"));
-  //         return;
-  //       }
-  //     }
-  
-  //     const userRef = ref(db, `users/${editUserId || uuidv4()}`);
-  
-  //     let userData = {
-  //       email,
-  //       name,
-  //       contact: "",
-  //       cv_list: [
-  //         {
-  //           title: "",
-  //           description: "",
-  //           file: "",
-  //           updatedAt: new Date().toISOString(),
-  //         },
-  //       ],
-  //       role,
-  //       createdAt: new Date().toISOString(),
-  //       projetcIds: "",
-  //       skill: "",
-  //       status: "active",
-  //     };
-  
-  //     if (editMode) {
-  //       if (password) {
-  //         const hashedPassword = await bcrypt.hash(password, 10);
-  //         userData.password = hashedPassword;
-  //       }
-  //       await update(userRef, userData);
-  //       message.success(t("userUpdatedSuccessfully"));
-  //     } else {
-  //       const hashedPassword = await bcrypt.hash(password, 10);
-  //       userData.password = hashedPassword;
-  
-  //       const adminUsers = Object.values(usersData).filter(
-  //         (user) => user.role === "admin"
-  //       );
-  
-  //       if (role === "admin" && adminUsers.length === 0) {
-  //         userData.isAdmin = true;
-  //       }
-  
-  //       await set(userRef, userData);
-  //       message.success(t("userAddedSuccessfully"));
-  //     }
-  
-  //     form.resetFields();
-  //     setEmail("");
-  //     setPassword("");
-  //     setName("");
-  //     setRole("employee");
-  //     setEditMode(false);
-  //     setEditUserId("");
-  //     setModalVisible(false); // Đóng modal sau khi xử lý xong
-  
-  //     const updatedSnapshot = await get(ref(db, "users"));
-  //     const updatedUserData = updatedSnapshot.val();
-  //     if (updatedUserData) {
-  //       const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
-  //         id,
-  //         ...data,
-  //       }));
-  //       setUsers(usersArray);
-  //     }
-  //   } catch (error) {
-  //     message.error(t("errorAddingOrUpdatingUser"));
-  //   }
-  // };
   const handleAddOrUpdateUser = async (values) => {
     const { email, password, role, name } = values;
-  
+
     if (!email || !name) {
       message.error(t("pleaseFillAllFields"));
       return;
     }
-  
+
     if (!validateEmail(email)) {
       message.error(t("invalidEmailFormat"));
       return;
     }
-  
+
     if (!editMode && password.length < 6) {
       message.error(t("passwordMinLength"));
       return;
     }
-  
+
     try {
       const db = getDatabase();
       const snapshot = await get(ref(db, "users"));
       const usersData = snapshot.val();
-  
+
       if (!editMode && usersData) {
-        const emailExists = Object.values(usersData).some(user => user.email === email);
+        const emailExists = Object.values(usersData).some(
+          (user) => user.email === email
+        );
         if (emailExists) {
           message.error(t("emailAlreadyExists"));
           return;
         }
       }
-  
+
       const userRef = ref(db, `users/${editUserId || uuidv4()}`);
       let userData = {
         email,
@@ -199,7 +106,7 @@ function AdminPage() {
         skill: "",
         status: "active",
       };
-  
+
       if (editMode) {
         if (password) {
           const hashedPassword = await bcrypt.hash(password, 10);
@@ -210,19 +117,19 @@ function AdminPage() {
       } else {
         const hashedPassword = await bcrypt.hash(password, 10);
         userData.password = hashedPassword;
-  
+
         const adminUsers = Object.values(usersData).filter(
           (user) => user.role === "admin"
         );
-  
+
         if (role === "admin" && adminUsers.length === 0) {
           userData.isAdmin = true;
         }
-  
+
         await set(userRef, userData);
         message.success(t("userAddedSuccessfully"));
       }
-  
+
       form.resetFields();
       setEmail("");
       setPassword("");
@@ -231,21 +138,22 @@ function AdminPage() {
       setEditMode(false);
       setEditUserId("");
       setModalVisible(false);
-  
+
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
-        const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
-          id,
-          ...data,
-        }));
+        const usersArray = Object.entries(updatedUserData).map(
+          ([id, data]) => ({
+            id,
+            ...data,
+          })
+        );
         setUsers(usersArray);
       }
     } catch (error) {
       message.error(t("errorAddingOrUpdatingUser"));
     }
   };
-  
 
   const handleDeleteUser = async (userId) => {
     console.log(userId);
@@ -275,10 +183,12 @@ function AdminPage() {
         const updatedSnapshot = await get(ref(db, "users"));
         const updatedUserData = updatedSnapshot.val();
         if (updatedUserData) {
-          const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
-            id,
-            ...data,
-          }));
+          const usersArray = Object.entries(updatedUserData).map(
+            ([id, data]) => ({
+              id,
+              ...data,
+            })
+          );
           setUsers(usersArray);
         } else {
           setUsers([]);
@@ -360,146 +270,76 @@ function AdminPage() {
   ];
 
   return (
-    // <div>
-    //   <LanguageSwitcher />
-    //   <h1>{t("adminPage")}</h1>
-    //   <Button type="primary" onClick={() => setModalVisible(true)}>
-    //     {t("addUser")}
-    //   </Button>
-    //   <Modal
-    //     title={editMode ? t("editUser") : t("addUser")}
-    //     open={modalVisible}
-    //     onCancel={handleModalCancel}
-    //     footer={null}
-    //   >
-    //     <Form
-    //       form={form}
-    //       onFinish={handleAddOrUpdateUser}
-    //       initialValues={{ email, password, role, name }}
-    //       layout="vertical"
-    //     >
-    //       <Form.Item
-    //         label={t("email")}
-    //         name="email"
-    //         rules={[{ required: true, message: t("pleaseInputEmail") }]}
-    //       >
-    //         <Input
-    //           disabled={editMode}
-    //           value={email}
-    //           onChange={(e) => setEmail(e.target.value)}
-    //         />
-    //       </Form.Item>
-    //       <Form.Item
-    //         label={t("name")}
-    //         name="name"
-    //         rules={[{ required: true, message: t("pleaseInputName") }]}
-    //       >
-    //         <Input value={name} onChange={(e) => setName(e.target.value)} />
-    //       </Form.Item>
-
-    //       {!editMode && (
-    //     <Form.Item
-    //       label={t("password")}
-    //       name="password"
-    //       rules={[
-    //         { required: true, message: t("pleaseInputPassword") },
-    //         { min: 6, message: t("passwordMinLength") },
-    //       ]}
-    //     >
-    //       <Input.Password
-    //         value={password}
-    //         onChange={(e) => setPassword(e.target.value)}
-    //       />
-    //     </Form.Item>
-    //   )}
-
-    //       <Form.Item label={t("role")} name="role">
-    //         <Select value={role} onChange={(value) => setRole(value)}>
-    //           <Option value="admin">{t("admin")}</Option>
-    //           <Option value="employee">{t("employee")}</Option>
-    //         </Select>
-    //       </Form.Item>
-
-    //       <Form.Item>
-    //         <Button type="primary" htmlType="submit">
-    //           {editMode ? t("update") : t("add")}
-    //         </Button>
-    //       </Form.Item>
-    //     </Form>
-    //   </Modal>
-    //   <Table dataSource={users} columns={columns} rowKey="id" />
-    // </div>
     <div>
-  <LanguageSwitcher />
-  <h1>{t("adminPage")}</h1>
-  <Button type="primary" onClick={() => setModalVisible(true)}>
-    {t("addUser")}
-  </Button>
-  <Modal
-    title={editMode ? t("editUser") : t("addUser")}
-    open={modalVisible}
-    onCancel={handleModalCancel}
-    footer={null}
-  >
-    <Form
-      form={form}
-      onFinish={handleAddOrUpdateUser}
-      initialValues={{ email, role, name }} // Không đưa mật khẩu vào initialValues
-      layout="vertical"
-    >
-      <Form.Item
-        label={t("email")}
-        name="email"
-        rules={[{ required: true, message: t("pleaseInputEmail") }]}
+      <LanguageSwitcher />
+      <h1>{t("adminPage")}</h1>
+      <Button type="primary" onClick={() => setModalVisible(true)}>
+        {t("addUser")}
+      </Button>
+      <Modal
+        title={editMode ? t("editUser") : t("addUser")}
+        open={modalVisible}
+        onCancel={handleModalCancel}
+        footer={null}
       >
-        <Input
-          disabled={editMode}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </Form.Item>
-      <Form.Item
-        label={t("name")}
-        name="name"
-        rules={[{ required: true, message: t("pleaseInputName") }]}
-      >
-        <Input value={name} onChange={(e) => setName(e.target.value)} />
-      </Form.Item>
-
-      {/* Ẩn trường mật khẩu khi ở chế độ chỉnh sửa */}
-      {!editMode && (
-        <Form.Item
-          label={t("password")}
-          name="password"
-          rules={[
-            { required: true, message: t("pleaseInputPassword") },
-            { min: 6, message: t("passwordMinLength") },
-          ]}
+        <Form
+          form={form}
+          onFinish={handleAddOrUpdateUser}
+          initialValues={{ email, role, name }} // Không đưa mật khẩu vào initialValues
+          layout="vertical"
         >
-          <Input.Password
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Form.Item>
-      )}
+          <Form.Item
+            label={t("email")}
+            name="email"
+            rules={[{ required: true, message: t("pleaseInputEmail") }]}
+          >
+            <Input
+              disabled={editMode}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form.Item>
+          <Form.Item
+            label={t("name")}
+            name="name"
+            rules={[{ required: true, message: t("pleaseInputName") }]}
+          >
+            <Input value={name} onChange={(e) => setName(e.target.value)} />
+          </Form.Item>
 
-      <Form.Item label={t("role")} name="role">
-        <Select value={role} onChange={(value) => setRole(value)}>
-          <Option value="admin">{t("admin")}</Option>
-          <Option value="employee">{t("employee")}</Option>
-        </Select>
-      </Form.Item>
+          {/* Ẩn trường mật khẩu khi ở chế độ chỉnh sửa */}
+          {!editMode && (
+            <Form.Item
+              label={t("password")}
+              name="password"
+              rules={[
+                { required: true, message: t("pleaseInputPassword") },
+                { min: 6, message: t("passwordMinLength") },
+              ]}
+            >
+              <Input.Password
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Item>
+          )}
 
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          {editMode ? t("update") : t("add")}
-        </Button>
-      </Form.Item>
-    </Form>
-  </Modal>
-  <Table dataSource={users} columns={columns} rowKey="id" />
-</div>
+          <Form.Item label={t("role")} name="role">
+            <Select value={role} onChange={(value) => setRole(value)}>
+              <Option value="admin">{t("admin")}</Option>
+              <Option value="employee">{t("employee")}</Option>
+            </Select>
+          </Form.Item>
 
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              {editMode ? t("update") : t("add")}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Table dataSource={users} columns={columns} rowKey="id" />
+    </div>
   );
 }
 
