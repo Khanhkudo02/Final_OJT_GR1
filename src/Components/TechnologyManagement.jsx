@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, message } from 'antd';
-import ModalAddTechnology from './ModalAddTechnology';
+import { Button, Table, message, Modal } from 'antd';
+import { Link } from 'react-router-dom';
 import ModalEditTechnology from './ModalEditTechnology';
 import ModalDeleteTechnology from './ModalDeleteTechnology';
 import { fetchAllTechnology } from "../service/TechnologyServices";
@@ -10,10 +10,11 @@ const { Column } = Table;
 const TechnologyManagement = () => {
   const [technologies, setTechnologies] = useState([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
   const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
+  const [dataTechnologyView, setDataTechnologyView] = useState(null);
 
   const loadTechnologies = async () => {
     try {
@@ -25,24 +26,12 @@ const TechnologyManagement = () => {
   };
 
   useEffect(() => {
-    const loadTechnologies = async () => {
-      try {
-        const data = await fetchAllTechnology();
-        setTechnologies(data);
-      } catch (error) {
-        console.error("Failed to fetch technologies:", error);
-      }
-    };
     loadTechnologies();
   }, []);
 
   const showEditModal = (record) => {
     setDataTechnologyEdit(record);
     setIsEditModalVisible(true);
-  };
-
-  const showAddModal = () => {
-    setIsAddModalVisible(true);
   };
 
   const showDeleteModal = (record) => {
@@ -54,14 +43,14 @@ const TechnologyManagement = () => {
     }
   };
 
+  const showViewModal = (record) => {
+    setDataTechnologyView(record);
+    setIsViewModalVisible(true);
+  };
+
   const handleCloseEditModal = () => {
     setIsEditModalVisible(false);
     setDataTechnologyEdit(null);
-    setTimeout(loadTechnologies, 100);
-  };
-
-  const handleCloseAddModal = () => {
-    setIsAddModalVisible(false);
     setTimeout(loadTechnologies, 100);
   };
 
@@ -71,11 +60,18 @@ const TechnologyManagement = () => {
     setTimeout(loadTechnologies, 100);
   };
 
+  const handleCloseViewModal = () => {
+    setIsViewModalVisible(false);
+    setDataTechnologyView(null);
+  };
+
   return (
     <div>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
-        Add New Technology
-      </Button>
+      <Link to="/add-technology">
+        <Button type="primary" style={{ marginBottom: 16 }}>
+          Add New Technology
+        </Button>
+      </Link>
       <Table dataSource={technologies} pagination={false}>
         <Column
           title="Image"
@@ -105,8 +101,11 @@ const TechnologyManagement = () => {
               <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
               </Button>
-              <Button type="danger" onClick={() => showDeleteModal(record)}>
+              <Button type="danger" style={{ marginRight: 8 }} onClick={() => showDeleteModal(record)}>
                 Delete
+              </Button>
+              <Button type="default" onClick={() => showViewModal(record)}>
+                View
               </Button>
             </span>
           )}
@@ -119,16 +118,35 @@ const TechnologyManagement = () => {
           dataTechnologyEdit={dataTechnologyEdit}
         />
       )}
-      <ModalAddTechnology
-        open={isAddModalVisible}
-        handleClose={handleCloseAddModal}
-      />
       {technologyIdToDelete && (
         <ModalDeleteTechnology
           open={isDeleteModalVisible}
           handleClose={handleCloseDeleteModal}
           technologyId={technologyIdToDelete}
         />
+      )}
+      {dataTechnologyView && (
+        <Modal
+          title="View Technology"
+          visible={isViewModalVisible}
+          onCancel={handleCloseViewModal}
+          footer={[
+            <Button key="back" onClick={handleCloseViewModal}>
+              Close
+            </Button>,
+          ]}
+        >
+          <p><strong>Name:</strong> {dataTechnologyView.name}</p>
+          <p><strong>Description:</strong> {dataTechnologyView.description}</p>
+          <p><strong>Status:</strong> {dataTechnologyView.status}</p>
+          {dataTechnologyView.imageUrl && (
+            <img
+              src={dataTechnologyView.imageUrl}
+              alt={dataTechnologyView.name}
+              style={{ width: 100, height: 100 }}
+            />
+          )}
+        </Modal>
       )}
     </div>
   );
