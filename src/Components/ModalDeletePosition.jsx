@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import { Modal, Button } from "antd";
 import { deletePosition } from "/src/service/PositionServices.js"; // Đảm bảo đường dẫn này đúng
 import { toast } from "react-toastify";
@@ -32,5 +33,14 @@ const ModalDeletePosition = ({ open, handleClose, positionId }) => {
         </Modal>
     );
 };
+
+ModalDeletePosition.propTypes = {
+    open: PropTypes.bool.isRequired,
+    handleClose: PropTypes.func.isRequired,
+    positionId: PropTypes.shape({
+        key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+    }).isRequired
+};
+
 
 export default ModalDeletePosition;
