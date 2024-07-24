@@ -4,6 +4,7 @@ import { Button } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
 import "../assets/style/Pages/LogoutButton.scss";
 
+// eslint-disable-next-line react/prop-types
 function LogoutButton({ collapsed }) {
   const navigate = useNavigate();
 
