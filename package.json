@@ -37,6 +37,7 @@
     "react-router-dom": "^6.25.1",
     "react-toastify": "^10.0.5",
     "sass": "^1.77.8",
+    "uuid": "^10.0.0",
     "xlsx": "^0.18.5",
     "xlsx-style": "^0.8.13"
   },
