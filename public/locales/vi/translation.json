@@ -45,13 +45,12 @@
   "Save": "Lưu",
   "Department": "Ban",
 
-  "NewProject":"Dự án mới",
+  "NewProject": "Dự án mới",
   "AddNewPosition": "Thêm mới vị trí",
   "AddNewTechnology": "Thêm mới công nghê",
   "AddNewEmployee": "Thêm mới nhân viên",
   "AddNewProgramLanguage": "Thêm mới ngôn ngứ",
   "DownloadPDF": "Tải PDF",
-
 
   "ManageAccounts": "Quản lý tài khoản",
   "AccountInfo": "Thông tin tài khoản",
