@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table } from "antd";
+import { Button, Table, message } from "antd";
 import ModalAddTechnology from "./ModalAddTechnology";
 import ModalEditTechnology from "./ModalEditTechnology";
 import ModalDeleteTechnology from "./ModalDeleteTechnology";
@@ -38,26 +38,30 @@ const TechnologyManagement = () => {
     setIsAddModalVisible(true);
   };
 
-  const showDeleteModal = (id) => {
-    setTechnologyIdToDelete(id);
-    setIsDeleteModalVisible(true);
+  const showDeleteModal = (record) => {
+    if (record.status && record.status.toLowerCase() === "inactive") {
+      setTechnologyIdToDelete(record);
+      setIsDeleteModalVisible(true);
+    } else {
+      message.error("Only inactive technologies can be deleted.");
+    }
   };
 
   const handleCloseEditModal = () => {
     setIsEditModalVisible(false);
     setDataTechnologyEdit(null);
-    setTimeout(() => loadTechnologies(), 100);
+    setTimeout(loadTechnologies, 100);
   };
 
   const handleCloseAddModal = () => {
     setIsAddModalVisible(false);
-    setTimeout(() => loadTechnologies(), 100);
+    setTimeout(loadTechnologies, 100);
   };
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalVisible(false);
     setTechnologyIdToDelete(null);
-    setTimeout(() => loadTechnologies(), 100);
+    setTimeout(loadTechnologies, 100);
   };
 
   return (
@@ -84,7 +88,12 @@ const TechnologyManagement = () => {
         />
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
-        <Column title="Status" dataIndex="status" key="status" />
+        <Column
+          title="Status"
+          dataIndex="status"
+          key="status"
+          render={(text) => text.charAt(0).toUpperCase() + text.slice(1)}
+        />
         <Column
           title="Actions"
           key="actions"
@@ -97,11 +106,7 @@ const TechnologyManagement = () => {
               >
                 Edit
               </Button>
-              <Button
-                type="danger"
-                className="delete-button"
-                onClick={() => showDeleteModal(record)}
-              >
+              <Button type="danger" onClick={() => showDeleteModal(record)}>
                 Delete
               </Button>
             </span>
@@ -123,7 +128,7 @@ const TechnologyManagement = () => {
         <ModalDeleteTechnology
           open={isDeleteModalVisible}
           handleClose={handleCloseDeleteModal}
-          technologyId={technologyIdToDelete}
+          dataTechnologyDelete={technologyIdToDelete}
         />
       )}
     </div>
