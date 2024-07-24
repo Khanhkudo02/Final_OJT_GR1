@@ -54,6 +54,14 @@ const statusColors = {
 };
 
 const ProjectManagement = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const paginatedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const columns = [
     {
       title: "ID",
