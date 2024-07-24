@@ -78,7 +78,7 @@ const Sidebar = () => {
     {
       key: "6",
       icon: <CodeOutlined />,
-      label: <NavLink to="/programing-language">Languages</NavLink>,
+      label: <NavLink to="/programing-language">Programming Languages</NavLink>,
     },
     {
       key: "7",

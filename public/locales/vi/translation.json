@@ -27,5 +27,48 @@
   "adminPage": "Trang quản trị viên",
   "employee": "Nhân viên",
   "admin": "Quản trị viên",
-  "edit": "Sửa"
+  "edit": "Sửa",
+
+  "AllProject": "Tất cả dự án",
+  "Ongoing": "Đang diễn ra",
+  "NotStarted": "Chưa bắt đầu",
+  "Completed": "Hoàn thành",
+  "Active": "Hoạt động",
+  "Inactive": "Không hoạt động",
+
+  "Client": "Khách",
+  "Deadline": "Thời hạn",
+  "CreatedDate": "Ngày tạo",
+  "PersonChange": " Người đổi",
+  "Status": "Tình trạng",
+  "Image": "Hình ảnh",
+  "Description": "Mô tả",
+  "Save": "Lưu",
+  "Department": "Ban",
+
+  "NewProject":"Dự án mới",
+  "AddNewPosition": "Thêm mới vị trí",
+  "AddNewTechnology": "Thêm mới công nghê",
+  "AddNewEmployee": "Thêm mới nhân viên",
+  "AddNewProgramLanguage": "Thêm mới ngôn ngứ",
+  "DownloadPDF": "Tải PDF",
+
+
+  "ManageAccounts": "Quản lý tài khoản",
+  "AccountInfo": "Thông tin tài khoản",
+  "ProjectManagement": "Quản lý dự án",
+  "AssignEmployees": "Phân công nhân sự",
+  "ProjectTracking": "Theo dõi dự án",
+  "PositionManagement": "Quản lý vị trí",
+  "TechnologyManagement": "Quản lý công nghệ",
+  "EmployeeManagement": "Quản lý nhân sự",
+  "ProgrammingLanguageManagement": "Quản lý ngôn ngữ lập trình",
+  "CV": "CV",
+  "Log Out": "Đăng xuất",
+
+  "Login": "Đăng nhập",
+  "Email": "Email",
+  "Password": "Mật khẩu",
+  "LOGIN": "Đăng nhập",
+  "ForgotPassword": "Quên mật khẩu"
 }
