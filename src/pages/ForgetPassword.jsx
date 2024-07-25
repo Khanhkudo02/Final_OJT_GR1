@@ -3,7 +3,7 @@
 import { Alert, Button, Form, Input, Typography } from "antd";
 import emailjs from "emailjs-com";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/ForgetPassword.scss";
 // Import SCSS file
 
@@ -17,17 +17,19 @@ function ForgetPassword() {
 
   const handleForgetPassword = async (values) => {
     const { email } = values;
-    const resetLink = `http://localhost:5173/reset-password?email=${encodeURIComponent(email)}`; 
+    const resetLink = `http://localhost:5173/reset-password?email=${encodeURIComponent(
+      email
+    )}`;
 
     try {
       const response = await emailjs.send(
-        'service_38z8rf8',      // Service ID của bạn
-        'template_yh7totx',     // Template ID của bạn
-        { 
-          user_email: email,    // Tên biến khớp với template
-          reset_link: resetLink 
-        },  
-        'BLOiZZ22_oSBTDilA'     // User ID của bạn
+        "service_38z8rf8", // Service ID của bạn
+        "template_yh7totx", // Template ID của bạn
+        {
+          user_email: email, // Tên biến khớp với template
+          reset_link: resetLink,
+        },
+        "BLOiZZ22_oSBTDilA" // User ID của bạn
       );
       console.log("Email sent successfully:", response);
       setSuccessMessage("Password reset instructions sent to your email.");
@@ -55,24 +57,22 @@ function ForgetPassword() {
             name="email"
             rules={[{ required: true, message: "Please input your email!" }]}
           >
-            <Input type="email" placeholder="Enter your email address"/>
+            <Input type="email" placeholder="Enter your email address" />
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
-          {successMessage && <Alert message={successMessage} type="success" showIcon />}
+          {successMessage && (
+            <Alert message={successMessage} type="success" showIcon />
+          )}
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               Send Email
             </Button>
           </Form.Item>
         </Form>
-        <Form
-          onFinish={handleLogout}
-          className="logout-form"
-          layout="vertical"
-        >
+        <Form onFinish={handleLogout} className="logout-form" layout="vertical">
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Log Out
+              Back
             </Button>
           </Form.Item>
         </Form>
