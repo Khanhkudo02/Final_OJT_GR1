@@ -12,6 +12,7 @@ const ModalDeleteTechnology = ({ open, handleClose, technologyId }) => {
       toast.success("Technology deleted successfully!");
     } catch (error) {
       toast.error("Failed to delete technology.");
+      console.error("Failed to delete technology:", error);
     }
   };
 

@@ -51,13 +51,16 @@ const ModalAddTechnology = ({ open, handleClose }) => {
 
             await postCreateTechnology(name, description, status, uploadedImageURL);
 
-            handleClose();
             toast.success("Technology added successfully!");
+
+            // Reset form fields to default values
             setName("");
             setDescription("");
             setStatus("active");
             setImage(null);
-            setImagePreview("");
+            setImagePreview(null);
+
+            handleClose();
         } catch (error) {
             toast.error("Failed to add technology.");
             console.error("Error adding technology:", error);
