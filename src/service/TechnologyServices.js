@@ -1,31 +1,30 @@
 import { ref, set, push, update, get, remove } from "firebase/database";
-import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { database, storage } from "../firebaseConfig";
-
-const db = database;
-const storageInstance = storage;
 
 // Create new technology
 const postCreateTechnology = async (name, description, status, imageFile) => {
     try {
-        const newTechnologyRef = push(ref(db, "technologies"));
+        const newTechnologyRef = push(ref(database, "technologies"));
 
         let imageUrl = null;
         if (imageFile) {
             // Upload the image to Firebase Storage
             const imageRef = storageRef(
-                storageInstance,
+                storage,
                 `images/${newTechnologyRef.key}/${imageFile.name}`
             );
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
 
+        // Save the technology data along with image URL (if available)
         await set(newTechnologyRef, {
             name,
             description,
             status,
-            imageUrl,
+            imageURL: imageUrl,
+            createdAt: Date.now(),
         });
 
         return newTechnologyRef.key;
@@ -38,7 +37,7 @@ const postCreateTechnology = async (name, description, status, imageFile) => {
 // Fetch all technologies
 const fetchAllTechnology = async () => {
     try {
-        const technologiesRef = ref(db, "technologies");
+        const technologiesRef = ref(database, "technologies");
         const snapshot = await get(technologiesRef);
         const data = snapshot.val();
         return data
@@ -59,12 +58,12 @@ const putUpdateTechnology = async (
     imageFile
 ) => {
     try {
-        const technologyRef = ref(db, `technologies/${id}`);
+        const technologyRef = ref(database, `technologies/${id}`);
 
         let imageUrl = null;
         if (imageFile) {
             const imageRef = storageRef(
-                storageInstance,
+                storage,
                 `images/${id}/${imageFile.name}`
             );
             const snapshot = await uploadBytes(imageRef, imageFile);
@@ -75,7 +74,7 @@ const putUpdateTechnology = async (
             name,
             description,
             status,
-            imageUrl: imageUrl || null,
+            imageURL: imageUrl || null,
         });
 
         return id;
@@ -88,14 +87,14 @@ const putUpdateTechnology = async (
 // Delete technology
 const deleteTechnology = async (id) => {
     try {
-        const technologyRef = ref(db, `technologies/${id}`);
+        const technologyRef = ref(database, `technologies/${id}`);
         const technologySnapshot = await get(technologyRef);
 
         // Delete image from Firebase Storage
-        const imageUrl = technologySnapshot.val()?.imageUrl;
+        const imageUrl = technologySnapshot.val()?.imageURL;
         if (imageUrl) {
             const imageName = imageUrl.split("/").pop().split("?")[0]; // Extract file name from URL
-            const imageRef = storageRef(storageInstance, `images/${id}/${imageName}`);
+            const imageRef = storageRef(storage, `images/${id}/${imageName}`);
             await deleteObject(imageRef);
         }
 

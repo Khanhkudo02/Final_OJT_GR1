@@ -4,7 +4,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { ref as databaseRef, set } from "firebase/database";
 import { database, storage } from "../firebaseConfig";
 
 const { Option } = Select;
@@ -14,7 +13,6 @@ const ModalAddTechnology = ({ open, handleClose }) => {
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState("active");
     const [image, setImage] = useState(null);
-    const [imageURL, setImageURL] = useState("");
     const [imagePreview, setImagePreview] = useState("");
     const [uploading, setUploading] = useState(false);
 
@@ -25,34 +23,30 @@ const ModalAddTechnology = ({ open, handleClose }) => {
         }
     };
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
         if (image) {
-            const storageReference = storageRef(storage, `images/${image.name}`);
-            uploadBytes(storageReference, image).then((snapshot) => {
-                getDownloadURL(snapshot.ref).then((url) => {
-                    setImageURL(url);
-                    saveImageURLToDatabase(url);
-                });
-            });
+            try {
+                const imageRef = storageRef(storage, `images/${Date.now()}_${image.name}`);
+                const snapshot = await uploadBytes(imageRef, image);
+                const url = await getDownloadURL(snapshot.ref);
+                return url;
+            } catch (error) {
+                console.error("Error uploading image:", error);
+                toast.error("Failed to upload image.");
+                throw error;
+            }
         }
-    };
-
-    const saveImageURLToDatabase = (url) => {
-        const productRef = databaseRef(database, "products/" + Date.now());
-        set(productRef, {
-            imageURL: url,
-            createdAt: Date.now(),
-        });
+        return "";
     };
 
     const handleSubmit = async () => {
         try {
             setUploading(true);
 
-            let uploadedImageURL = imageURL;
+            let uploadedImageURL = "";
             if (image) {
-                await handleUpload();
-                uploadedImageURL = imageURL;
+                uploadedImageURL = await handleUpload();
+                toast.success("Image uploaded successfully!");
             }
 
             await postCreateTechnology(name, description, status, uploadedImageURL);
@@ -66,7 +60,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
             setImagePreview("");
         } catch (error) {
             toast.error("Failed to add technology.");
-            console.error("Error uploading image or adding technology:", error);
+            console.error("Error adding technology:", error);
         } finally {
             setUploading(false);
         }
@@ -128,7 +122,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
                         accept=".jpg,.jpeg,.png"
                         beforeUpload={(file) => {
                             handleImageChange({ target: { files: [file] } });
-                            return false;
+                            return false; // Prevent automatic upload
                         }}
                         listType="picture"
                     >
