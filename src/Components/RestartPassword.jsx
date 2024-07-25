@@ -3,11 +3,11 @@ import { Table, Button } from "antd";
 import axios from "axios";
 import { RestartAlt } from "@mui/icons-material";
 
-const RestartAccount = () => {
+const RestartPassword = () => {
   return (
     <main>
       <div>
-      <h2>Account Infor</h2>
+      <h2>Account Inforgot</h2>
       <p>This is the account info page.</p>
     </div>
       <section className="account">
@@ -22,4 +22,4 @@ const RestartAccount = () => {
   );
 };
 
-export default RestartAccount;
+export default RestartPassword;
