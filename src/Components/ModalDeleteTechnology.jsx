@@ -39,4 +39,10 @@ const ModalDeleteTechnology = ({ open, handleClose, technologyId }) => {
   );
 };
 
+ModalDeleteTechnology.propTypes = {
+  open: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  technologyId: PropTypes.string.isRequired,
+};
+
 export default ModalDeleteTechnology;
