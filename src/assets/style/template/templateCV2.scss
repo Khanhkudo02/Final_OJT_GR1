@@ -5,10 +5,14 @@
   color: #333;
   border: solid 1px;
   .header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     text-align: center;
     background-color: #1e73be;
     color: white;
     padding: 20px;
+    margin-bottom: 0;
     h1 {
       margin: 0;
     }
@@ -24,6 +28,7 @@
     display: flex;
     justify-content: space-between;
     padding: 20px;
+    padding-top: 5px;
     .left-column {
       width: 70%;
       .experience,
