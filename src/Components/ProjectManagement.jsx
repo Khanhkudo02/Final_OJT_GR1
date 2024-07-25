@@ -1,7 +1,9 @@
-import React from "react";
-import { Table, Tag, Space, Button, Avatar, Pagination } from "antd";
+import React, { useState } from "react";
+import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
 import { Link } from "react-router-dom";
 import "../assets/style/Pages/ProjectManagement.scss";
+
+const { TabPane } = Tabs;
 
 const data = [
   {
@@ -55,16 +57,28 @@ const statusColors = {
 
 const ProjectManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredStatus, setFilteredStatus] = useState("All Projects");
   const pageSize = 10;
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  const paginatedData = data.slice(
+  const handleTabChange = (key) => {
+    setFilteredStatus(key);
+    setCurrentPage(1); // Reset to the first page when changing tabs
+  };
+
+  const filteredData = data.filter((item) => {
+    if (filteredStatus === "All Projects") return true;
+    return item.status === filteredStatus.toUpperCase();
+  });
+
+  const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
   const columns = [
     {
       title: "ID",
@@ -123,24 +137,21 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <div
-        style={{
-          marginBottom: "16px",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <Space size="large">
-          <Button type="primary">All Projects</Button>
-          <Button>Ongoing</Button>
-          <Button>Not Started</Button>
-          <Button>Completed</Button>
-        </Space>
-        <Button type="primary">New Project</Button>
-      </div>
-      <Table columns={columns} dataSource={data} pagination={false} />
+      <Button type="primary">New Project</Button>
+      <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} centered>
+        <TabPane tab="All Projects" key="All Projects" />
+        <TabPane tab="Ongoing" key="Ongoing" />
+        <TabPane tab="Not Started" key="Not Started" />
+        <TabPane tab="Completed" key="Completed" />
+      </Tabs>
+      <Table columns={columns} dataSource={paginatedData} pagination={false} />
       <div style={{ marginTop: "16px", textAlign: "right" }}>
-        <Pagination defaultCurrent={1} total={50} />
+        <Pagination
+          current={currentPage}
+          total={filteredData.length}
+          pageSize={pageSize}
+          onChange={handlePageChange}
+        />
       </div>
     </div>
   );
