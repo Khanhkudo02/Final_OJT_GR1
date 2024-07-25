@@ -19,6 +19,7 @@ import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
+import NewProject from "./Components/NewProject";
 
 const { Content } = Layout;
 
@@ -99,6 +100,7 @@ const App = () => {
                           path="/programing-language"
                           element={<ProgramingLanguage />}
                         />
+                        <Route path="/new-project" element={<NewProject />} /> {/* Add the NewProject route */}
                         <Route path="/" element={<Navigate to="/login" />} />
                       </Routes>
                     </div>
