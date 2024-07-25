@@ -104,9 +104,7 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button type="primary" onClick={() => navigate("/new-project")}>
-        New Project
-      </Button>
+      <Button type="primary">New Project</Button>
       <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} centered>
         <TabPane tab="All Projects" key="All Projects" />
         <TabPane tab="Ongoing" key="Ongoing" />

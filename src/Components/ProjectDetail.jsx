@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getProjectById } from "../service/Project";
+import { fetchAllProjects } from "../service/Project";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -8,7 +8,8 @@ const ProjectDetail = () => {
 
   useEffect(() => {
     const fetchProject = async () => {
-      const projectData = await getProjectById(id);
+      const allProjects = await fetchAllProjects();
+      const projectData = allProjects.find(project => project.key === id);
       setProject(projectData);
     };
     fetchProject();
@@ -21,7 +22,7 @@ const ProjectDetail = () => {
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <h2>Project Detail</h2>
-      <p><strong>ID:</strong> {project.id}</p>
+      <p><strong>ID:</strong> {project.key}</p>
       <p><strong>Name:</strong> {project.name}</p>
       <p><strong>Description:</strong> {project.description}</p>
       <p><strong>Client:</strong> {project.client}</p>

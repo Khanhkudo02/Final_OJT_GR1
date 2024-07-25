@@ -1,10 +1,12 @@
+// ModalAddTechnology.jsx
 import React, { useState } from "react";
-import PropTypes from "prop-types";
 import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebaseConfig";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 

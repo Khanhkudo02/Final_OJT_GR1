@@ -5,14 +5,12 @@ import { database, storage } from '../firebaseConfig';
 const db = database;
 const storageInstance = storage;
 
-// Create new project
 const postCreateProject = async (projectData, imageFile) => {
     try {
         const newProjectRef = push(ref(db, 'projects'));
 
         let imageUrl = null;
         if (imageFile) {
-            // Upload the image to Firebase Storage
             const imageRef = storageRef(storageInstance, `images/${newProjectRef.key}/${imageFile.name}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
@@ -30,7 +28,6 @@ const postCreateProject = async (projectData, imageFile) => {
     }
 };
 
-// Fetch all projects
 const fetchAllProjects = async () => {
     try {
         const projectsRef = ref(db, 'projects');
@@ -43,7 +40,6 @@ const fetchAllProjects = async () => {
     }
 };
 
-// Update existing project
 const putUpdateProject = async (id, projectData, imageFile) => {
     try {
         const projectRef = ref(db, `projects/${id}`);
@@ -67,21 +63,18 @@ const putUpdateProject = async (id, projectData, imageFile) => {
     }
 };
 
-// Delete project
 const deleteProject = async (id) => {
     try {
         const projectRef = ref(db, `projects/${id}`);
         const projectSnapshot = await get(projectRef);
 
-        // Delete image from Firebase Storage
         const imageUrl = projectSnapshot.val()?.imageUrl;
         if (imageUrl) {
-            const imageName = imageUrl.split('/').pop().split('?')[0]; // Extract file name from URL
+            const imageName = imageUrl.split('/').pop().split('?')[0];
             const imageRef = storageRef(storageInstance, `images/${id}/${imageName}`);
             await deleteObject(imageRef);
         }
 
-        // Delete project from Realtime Database
         await remove(projectRef);
     } catch (error) {
         console.error("Failed to delete project:", error);
