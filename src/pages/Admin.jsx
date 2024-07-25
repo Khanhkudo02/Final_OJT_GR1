@@ -18,6 +18,7 @@ function AdminPage() {
   const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
   const [editMode, setEditMode] = useState(false);
+
   const [editUserId, setEditUserId] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -277,7 +278,7 @@ function AdminPage() {
       <Button type="primary" onClick={() => setModalVisible(true)}>
         {t("addUser")}
       </Button>
-      <ExportExcel data={users} fileName="UsersData" />{" "}
+      <ExportExcel data={users} fileName="ExportExcel" />{" "}
       {/* Add ExportExcel component */}
       <Modal
         title={editMode ? t("editUser") : t("addUser")}
