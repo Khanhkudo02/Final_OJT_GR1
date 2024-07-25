@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import PropTypes from 'prop-types';
 import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 const { Option } = Select;
 
@@ -15,22 +14,21 @@ const ModalAddTechnology = ({ open, handleClose }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState("");
     const [uploading, setUploading] = useState(false);
-    const [imageUrl, setImageUrl] = useState(""); // Add state for image URL
 
     const handleAddTechnology = async () => {
         try {
             setUploading(true);
 
-            // Upload the image and get URL
+            // Upload the image if selected
             if (selectedFile) {
-                const fileRef = storageRef(getStorage(), `icons/${selectedFile.name}`);
+                const storage = getStorage();
+                const fileRef = storageRef(storage, `icons/${selectedFile.name}`);
                 await uploadBytes(fileRef, selectedFile);
-                const url = await getDownloadURL(fileRef);
-                setImageUrl(url); // Store image URL in state
+                toast.success("Image uploaded successfully!");
             }
 
             // Add technology to the database
-            await postCreateTechnology(name, description, status, imageUrl);
+            await postCreateTechnology(name, description, status);
 
             // Reset state
             handleClose();
@@ -40,7 +38,6 @@ const ModalAddTechnology = ({ open, handleClose }) => {
             setStatus("");
             setSelectedFile(null);
             setImagePreview("");
-            setImageUrl(""); // Clear image URL
         } catch (error) {
             toast.error("Failed to add technology.");
         } finally {

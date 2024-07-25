@@ -40,7 +40,7 @@ const TechnologyManagement = () => {
 
   const showDeleteModal = (record) => {
     if (record.status && record.status.toLowerCase() === "inactive") {
-      setTechnologyIdToDelete(record);
+      setTechnologyIdToDelete(record.key);  // Use key instead of record
       setIsDeleteModalVisible(true);
     } else {
       message.error("Only inactive technologies can be deleted.");
@@ -132,7 +132,7 @@ const TechnologyManagement = () => {
         <ModalDeleteTechnology
           open={isDeleteModalVisible}
           handleClose={handleCloseDeleteModal}
-          dataTechnologyDelete={technologyIdToDelete}
+          technologyId={technologyIdToDelete} // Pass only the ID
         />
       )}
     </div>

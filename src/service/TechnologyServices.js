@@ -1,6 +1,5 @@
-// TechnologyServices.js
 import { ref, set, push, update, get, remove } from "firebase/database";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import { database, storage } from '../firebaseConfig';
 
 const db = database;
@@ -13,8 +12,8 @@ const postCreateTechnology = async (name, description, status, imageFile) => {
 
         let imageUrl = null;
         if (imageFile) {
-            // Upload the image to Firebase Storage at the root level
-            const imageRef = storageRef(storageInstance, imageFile.name);
+            // Upload the image to Firebase Storage
+            const imageRef = storageRef(storageInstance, `images/${newTechnologyRef.key}/${imageFile.name}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
@@ -53,8 +52,7 @@ const putUpdateTechnology = async (id, name, description, status, imageFile) => 
 
         let imageUrl = null;
         if (imageFile) {
-            // Update the image in Firebase Storage at the root level
-            const imageRef = storageRef(storageInstance, imageFile.name);
+            const imageRef = storageRef(storageInstance, `images/${id}/${imageFile.name}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
@@ -83,7 +81,7 @@ const deleteTechnology = async (id) => {
         const imageUrl = technologySnapshot.val()?.imageUrl;
         if (imageUrl) {
             const imageName = imageUrl.split('/').pop().split('?')[0]; // Extract file name from URL
-            const imageRef = storageRef(storageInstance, imageName);
+            const imageRef = storageRef(storageInstance, `images/${id}/${imageName}`);
             await deleteObject(imageRef);
         }
 
