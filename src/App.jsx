@@ -1,13 +1,11 @@
 
+import { Layout, theme } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   Navigate,
   Route,
-  BrowserRouter as Router,
-  Routes,
+  Routes
 } from "react-router-dom";
-import { Layout, theme } from "antd";
-import AccountManagement from "./Components/AccountManagement";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import PositionManagement from "./Components/PositionManagement";
 import ProgramingLanguage from "./Components/ProgramingLanguage";
@@ -19,6 +17,7 @@ import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
+import ResetPasswordPage from "./pages/ResetPassword";
 
 const { Content } = Layout;
 
@@ -62,6 +61,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login setUser={handleLogin} />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/*"
           element={

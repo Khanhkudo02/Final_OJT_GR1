@@ -3,6 +3,7 @@
   "edit": "Edit",
   "delete": "Delete",
   "update": "Update",
+  "updateUser":"Update User",
   "errorFetchingUsers": "Error fetching users.",
   "pleaseFillAllFields": "Please fill all fields.",
   "invalidEmailFormat": "Invalid email format.",
@@ -27,10 +28,7 @@
   "add": "Add",
   "admin": "Admin",
   "employee": "Employee",
-  "password": "Password"
-  "admin": "Admin",
-  "edit": "Edit",
-
+  "password": "Password",
   "AllProject": "All Project",
   "Ongoing": "Ongoing",
   "NotStarted": "Not Started",
