@@ -1,10 +1,10 @@
 
-import React, { useState } from "react";
+import { Alert, Button, Form, Input, Typography } from "antd";
 import PropTypes from "prop-types";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Button, Typography, Alert } from "antd";
-import { loginUser, signUpUser } from "../service/authService.js";
 import styles from "../assets/style/Pages/Login.module.scss"; // Import SCSS file
+import { loginUser, signUpUser } from "../service/authService.js";
 
 const { Title } = Typography;
 

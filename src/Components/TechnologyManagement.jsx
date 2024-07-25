@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Table, message } from 'antd';
-import { Link } from 'react-router-dom';
-import ModalEditTechnology from './ModalEditTechnology';
-import ModalDeleteTechnology from './ModalDeleteTechnology';
+import React, { useState, useEffect } from "react";
+import { Button, Table, message } from "antd";
+import { Link } from "react-router-dom";
+import ModalEditTechnology from "./ModalEditTechnology";
+import ModalDeleteTechnology from "./ModalDeleteTechnology";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
@@ -33,11 +33,11 @@ const TechnologyManagement = () => {
   };
 
   const showDeleteModal = (record) => {
-    if (record.status.toLowerCase() === 'inactive') {
+    if (record.status.toLowerCase() === "inactive") {
       setTechnologyIdToDelete(record.key);
       setIsDeleteModalVisible(true);
     } else {
-      message.error('Only inactive technologies can be deleted.');
+      message.error("Only inactive technologies can be deleted.");
     }
   };
 
@@ -86,7 +86,11 @@ const TechnologyManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
-              <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
+              <Button
+                type="primary"
+                style={{ marginRight: 8 }}
+                onClick={() => showEditModal(record)}
+              >
                 Edit
               </Button>
               <Button type="danger" onClick={() => showDeleteModal(record)}>
