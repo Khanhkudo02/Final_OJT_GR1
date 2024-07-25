@@ -3,8 +3,8 @@ import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { putUpdateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { database, storage } from "../firebaseConfig";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebaseConfig";
 
 const { Option } = Select;
 
@@ -12,55 +12,67 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async () => {
+    if (image) {
+      try {
+        const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
+        const snapshot = await uploadBytes(imageRef, image);
+        const url = await getDownloadURL(snapshot.ref);
+        return url;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error("Failed to upload image.");
+        throw error;
+      }
+    }
+    return ""; // Nếu không có ảnh mới, trả về chuỗi rỗng
+  };
+
 
   useEffect(() => {
     if (dataTechnologyEdit) {
       setName(dataTechnologyEdit.name);
       setDescription(dataTechnologyEdit.description);
       setStatus(dataTechnologyEdit.status);
-      setImagePreview(dataTechnologyEdit.imageURL); // Update imagePreview with current imageURL
+      setImagePreview(dataTechnologyEdit.imageURL); // Cập nhật preview ảnh
     }
   }, [dataTechnologyEdit]);
 
-  // Handle image upload and return the new image URL
-  const handleImage = async (file) => {
-    const imageRef = storageRef(storage, `images/${dataTechnologyEdit.key}/${file.name}`);
-    const snapshot = await uploadBytes(imageRef, file);
-    const imageUrl = await getDownloadURL(snapshot.ref);
-    return imageUrl;
-  };
-
-  // Delete the old image from Firebase Storage
-  const deleteOldImage = async () => {
-    const oldImageRef = storageRef(storage, `images/${dataTechnologyEdit.key}/${dataTechnologyEdit.imageURL.split('/').pop().split('?')[0]}`);
-    await deleteObject(oldImageRef);
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+      setImagePreview(URL.createObjectURL(e.target.files[0]));
+    }
   };
 
   const handleSubmit = async () => {
     try {
       setUploading(true);
 
-      let imageUrl = imagePreview; // Use the existing image if no new image is selected
-      if (selectedFile) {
-        // Delete the old image before uploading the new one
-        await deleteOldImage();
-        imageUrl = await handleImage(selectedFile);
+      // Tải lên ảnh mới và lấy URL nếu có ảnh mới
+      let uploadedImageURL = imagePreview;
+      if (image) {
+        uploadedImageURL = await handleUpload(); // Tải lên ảnh mới và lấy URL
         toast.success("Image uploaded successfully!");
       }
 
+      // Cập nhật dữ liệu công nghệ với URL ảnh mới
       await putUpdateTechnology(
         dataTechnologyEdit.key,
         name,
         description,
         status,
-        imageUrl // Pass the new image URL (or existing if no new image)
+        uploadedImageURL, // URL mới hoặc cũ nếu không có ảnh mới
+        dataTechnologyEdit.imageURL // URL cũ để xóa sau
       );
 
-      handleClose();
       toast.success("Technology updated successfully!");
+
+      handleClose();
     } catch (error) {
       toast.error("Failed to update technology.");
       console.error("Error uploading image or updating technology:", error);
@@ -69,20 +81,14 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
     }
   };
 
-  const handleImageChange = (info) => {
-    if (info.file && info.file.originFileObj) {
-      const file = info.file.originFileObj;
-      setSelectedFile(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-    return false; // Prevent auto-upload
-  };
-
   return (
     <Modal
       title="Edit Technology"
       open={open}
-      onCancel={handleClose}
+      onCancel={() => {
+        handleClose();
+        setImagePreview("");
+      }}
       footer={[
         <Button key="back" onClick={handleClose}>
           Close
@@ -128,7 +134,10 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
         <div className="mb-3">
           <Upload
             accept=".jpg,.jpeg,.png"
-            beforeUpload={handleImageChange}
+            beforeUpload={(file) => {
+              handleImageChange({ target: { files: [file] } });
+              return false; // Ngăn tải ảnh tự động
+            }}
             listType="picture"
           >
             <Button>
