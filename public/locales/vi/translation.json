@@ -3,6 +3,7 @@
   "edit": "Chỉnh sửa",
   "delete": "Xóa",
   "update": "Cập nhật",
+  "updateUser":"Cập nhật người dùng",
   "errorFetchingUsers": "Lỗi khi lấy danh sách người dùng.",
   "pleaseFillAllFields": "Vui lòng điền tất cả các trường.",
   "invalidEmailFormat": "Định dạng email không hợp lệ.",
@@ -26,14 +27,12 @@
   "email": "Email",
   "add": "Thêm",
   "admin": "Quản trị viên",
-
   "AllProject": "Tất cả dự án",
   "Ongoing": "Đang diễn ra",
   "NotStarted": "Chưa bắt đầu",
   "Completed": "Hoàn thành",
   "Active": "Hoạt động",
   "Inactive": "Không hoạt động",
-
   "Client": "Khách",
   "Deadline": "Thời hạn",
   "CreatedDate": "Ngày tạo",
@@ -43,14 +42,12 @@
   "Description": "Mô tả",
   "Save": "Lưu",
   "Department": "Ban",
-
-  "NewProject": "Dự án mới",
+  "NewProject":"Dự án mới",
   "AddNewPosition": "Thêm mới vị trí",
   "AddNewTechnology": "Thêm mới công nghê",
   "AddNewEmployee": "Thêm mới nhân viên",
   "AddNewProgramLanguage": "Thêm mới ngôn ngứ",
   "DownloadPDF": "Tải PDF",
-
   "ManageAccounts": "Quản lý tài khoản",
   "AccountInfo": "Thông tin tài khoản",
   "ProjectManagement": "Quản lý dự án",
@@ -62,7 +59,6 @@
   "ProgrammingLanguageManagement": "Quản lý ngôn ngữ lập trình",
   "CV": "CV",
   "Log Out": "Đăng xuất",
-
   "Login": "Đăng nhập",
   "Email": "Email",
   "Password": "Mật khẩu",
