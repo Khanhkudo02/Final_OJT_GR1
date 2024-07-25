@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Select, Checkbox, DatePicker, InputNumber } from "antd";
-import { Link } from "react-router-dom";
+import { Form, Input, Button, Select, Checkbox, DatePicker, InputNumber, message, Upload } from "antd";
+import { useNavigate } from "react-router-dom";
+import { postCreateProject } from "../service/Project";
+import { UploadOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -8,13 +10,30 @@ const { TextArea } = Input;
 const NewProject = () => {
   const [form] = Form.useForm();
   const [agreement, setAgreement] = useState(false);
+  const navigate = useNavigate();
+  const [imageFile, setImageFile] = useState(null);
 
-  const onFinish = (values) => {
-    console.log('Form Values:', values);
+  const onFinish = async (values) => {
+    try {
+      const projectData = {
+        ...values,
+        startDate: values.startDate.format('YYYY-MM-DD'),
+        endDate: values.endDate.format('YYYY-MM-DD')
+      };
+      await postCreateProject(projectData, imageFile);
+      message.success('Project added successfully');
+      navigate('/project-management');
+    } catch (error) {
+      message.error('Failed to add project');
+    }
   };
 
   const handleAgreementChange = (e) => {
     setAgreement(e.target.checked);
+  };
+
+  const handleImageChange = (info) => {
+    setImageFile(info.file.originFileObj);
   };
 
   return (
@@ -90,7 +109,9 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item label="Attachments" name="attachments">
-          <Input type="file" />
+          <Upload beforeUpload={() => false} onChange={handleImageChange}>
+            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+          </Upload>
         </Form.Item>
 
         <Form.Item>
