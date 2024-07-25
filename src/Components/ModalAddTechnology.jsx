@@ -1,11 +1,12 @@
+// ModalAddTechnology.jsx
 import React, { useState } from "react";
 import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebaseConfig"; // import storage from firebaseConfig.js
-import { useNavigate } from 'react-router-dom'; // useNavigate instead of useHistory
+import { storage } from "../firebaseConfig";
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -14,7 +15,7 @@ const ModalAddTechnology = () => {
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState("");
     const [imageFile, setImageFile] = useState(null);
-    const navigate = useNavigate(); // useNavigate hook
+    const navigate = useNavigate();
 
     const handleAddTechnology = async () => {
         try {

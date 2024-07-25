@@ -1,113 +1,258 @@
-import React, { useState } from "react";
-import { Modal, Button, Input, Upload, Select } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { postCreateTechnology } from "../service/TechnologyServices";
-import { toast } from "react-toastify";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebaseConfig"; // import storage from firebaseConfig.js
-import { useNavigate } from 'react-router-dom'; // useNavigate instead of useHistory
+import React, { useEffect, useState } from "react";
+import { Button, Table, Input, Select, Modal, Form, Drawer, Avatar, Col, Divider, Row } from "antd";
+import { database } from "../firebaseConfig"; // Ensure you have created and exported the database from firebaseConfig.js
+import { utils, writeFile } from 'xlsx';
+import { saveAs } from 'file-saver';
+import { Document, Packer, Paragraph, TextRun } from 'docx';
 
+const { Column } = Table;
 const { Option } = Select;
 
-const ModalAddTechnology = () => {
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const [status, setStatus] = useState("");
-    const [imageFile, setImageFile] = useState(null);
-    const navigate = useNavigate(); // useNavigate hook
+const DescriptionItem = ({ title, content }) => (
+  <div className="site-description-item-profile-wrapper">
+    <p className="site-description-item-profile-p-label">{title}:</p>
+    {content}
+  </div>
+);
 
-    const handleAddTechnology = async () => {
-        try {
-            let imageUrl = "";
-            if (imageFile) {
-                const storageRef = ref(storage, `technologies/${imageFile.name}`);
-                const snapshot = await uploadBytes(storageRef, imageFile);
-                imageUrl = await getDownloadURL(snapshot.ref);
-            }
-            await postCreateTechnology(name, description, status, imageUrl);
-            toast.success("Technology added successfully!");
-            // Clear the form fields and the image file after successfully adding
-            setName("");
-            setDescription("");
-            setStatus("");
-            setImageFile(null); // Reset image file
-            navigate('/technology-management'); // Navigate back to technology management
-        } catch (error) {
-            toast.error("Failed to add technology.");
-        }
-    };
+const EmployeeManagement = () => {
+  const [data, setData] = useState([]);
+  const [filter, setFilter] = useState({ name: '', position: '', status: '' });
+  const [visible, setVisible] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [form] = Form.useForm();
 
-    const handleImageChange = ({ file }) => {
-        if (file.type === "image/png" || file.type === "image/svg+xml") {
-            setImageFile(file.originFileObj);
-        } else {
-            toast.error("Only PNG and SVG images are allowed.");
-        }
-    };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    const beforeUpload = (file) => {
-        handleImageChange({ file });
-        return false;
-    };
+  const fetchData = async () => {
+    const snapshot = await database.ref('/employees').once('value');
+    const data = snapshot.val();
+    const formattedData = Object.keys(data).map(key => ({
+      key: key,
+      ...data[key]
+    }));
+    setData(formattedData);
+  };
 
+  const handleFilterChange = (field, value) => {
+    setFilter({ ...filter, [field]: value });
+  };
+
+  const filteredData = data.filter(employee => {
     return (
-        <div>
-            <Button onClick={() => navigate('/technology-management')} style={{ marginBottom: 16 }}>
-                Back
-            </Button>
-            <Modal
-                title="Add New Technology"
-                open={true}
-                onCancel={() => navigate('/technology-management')}
-                footer={[
-                    <Button key="back" onClick={() => navigate('/technology-management')}>
-                        Close
-                    </Button>,
-                    <Button key="submit" type="primary" onClick={handleAddTechnology}>
-                        Save
-                    </Button>,
-                ]}
-            >
-                <div className="body-add">
-                    <div className="mb-3">
-                        <label className="form-label">Name</label>
-                        <Input
-                            type="text"
-                            value={name}
-                            onChange={(event) => setName(event.target.value)}
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Description</label>
-                        <Input
-                            type="text"
-                            value={description}
-                            onChange={(event) => setDescription(event.target.value)}
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Status</label>
-                        <Select
-                            value={status}
-                            onChange={(value) => setStatus(value)}
-                            placeholder="Select Status"
-                        >
-                            <Option value="active">Active</Option>
-                            <Option value="inactive">Inactive</Option>
-                        </Select>
-                    </div>
-                    <div className="mb-3">
-                        <Upload
-                            accept=".png,.svg"
-                            beforeUpload={beforeUpload}
-                        >
-                            <Button icon={<PlusOutlined />}>Select Image (PNG/SVG only)</Button>
-                        </Upload>
-                    </div>
-                </div>
-            </Modal>
-        </div>
+      (filter.name ? employee.name.includes(filter.name) : true) &&
+      (filter.position ? employee.position.includes(filter.position) : true) &&
+      (filter.status ? employee.status.includes(filter.status) : true)
     );
+  });
+
+  const addItem = () => {
+    form.validateFields().then(values => {
+      database.ref('/employees').push(values).then(() => {
+        fetchData();
+        form.resetFields();
+        setVisible(false);
+      });
+    });
+  };
+
+  const editItem = (key) => {
+    form.validateFields().then(values => {
+      database.ref(`/employees/${key}`).update(values).then(() => {
+        fetchData();
+        setVisible(false);
+      });
+    });
+  };
+
+  const deleteItem = (key) => {
+    database.ref(`/employees/${key}`).remove().then(() => {
+      fetchData();
+    });
+  };
+
+  const openEditModal = (employee) => {
+    setCurrentEmployee(employee);
+    form.setFieldsValue(employee);
+    setVisible(true);
+  };
+
+  const closeModal = () => {
+    form.resetFields();
+    setVisible(false);
+    setCurrentEmployee(null);
+  };
+
+  const handleExportToExcel = () => {
+    const worksheet = utils.json_to_sheet(filteredData);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, "Employees");
+    writeFile(workbook, "EmployeeList.xlsx");
+  };
+
+  const handleExportToWord = (employee) => {
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun(`ID: ${employee.id}`),
+                new TextRun(`Name: ${employee.name}`),
+                new TextRun(`Position: ${employee.position}`),
+                new TextRun(`Status: ${employee.status}`),
+              ],
+            }),
+          ],
+        },
+      ],
+    });
+
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, `${employee.name}_CV.docx`);
+    });
+  };
+
+  const showDrawer = (employee) => {
+    setCurrentEmployee(employee);
+    setDrawerVisible(true);
+  };
+
+  const closeDrawer = () => {
+    setDrawerVisible(false);
+    setCurrentEmployee(null);
+  };
+
+  return (
+    <main>
+      <div>
+        <h2>Employee Management</h2>
+      </div>
+      <section className="employee-profile">
+        <Input
+          placeholder="Search by name"
+          value={filter.name}
+          onChange={(e) => handleFilterChange('name', e.target.value)}
+          style={{ width: 200, marginRight: 10 }}
+        />
+        <Select
+          placeholder="Filter by position"
+          value={filter.position}
+          onChange={(value) => handleFilterChange('position', value)}
+          style={{ width: 200, marginRight: 10 }}
+        >
+          <Option value="">All Positions</Option>
+          {/* Add options based on your data */}
+        </Select>
+        <Select
+          placeholder="Filter by status"
+          value={filter.status}
+          onChange={(value) => handleFilterChange('status', value)}
+          style={{ width: 200 }}
+        >
+          <Option value="">All Statuses</Option>
+          <Option value="Available">Available</Option>
+          <Option value="Inactive">Inactive</Option>
+          <Option value="Assigned">Assigned</Option>
+        </Select>
+        <Button type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(true)}>
+          Add New Employee
+        </Button>
+        <Button onClick={handleExportToExcel} style={{ marginLeft: 10 }}>
+          Export to Excel
+        </Button>
+        <Table dataSource={filteredData} pagination={false}>
+          <Column title="ID" dataIndex="id" key="id" />
+          <Column title="Name" dataIndex="name" key="name" />
+          <Column title="Position" dataIndex="position" key="position" />
+          <Column title="Status" dataIndex="status" key="status" />
+          <Column
+            title="Actions"
+            key="actions"
+            render={(text, record) => (
+              <span>
+                <Button type="primary" style={{ marginRight: 8 }} onClick={() => openEditModal(record)}>
+                  Edit
+                </Button>
+                <Button type="danger" onClick={() => deleteItem(record.key)}>Delete</Button>
+                <Button onClick={() => handleExportToWord(record)} style={{ marginLeft: 10 }}>
+                  Export CV
+                </Button>
+                <Button onClick={() => showDrawer(record)} style={{ marginLeft: 10 }}>
+                  View Profile
+                </Button>
+              </span>
+            )}
+          />
+        </Table>
+        <Modal
+          title={currentEmployee ? "Edit Employee" : "Add Employee"}
+          visible={visible}
+          onCancel={closeModal}
+          onOk={currentEmployee ? () => editItem(currentEmployee.key) : addItem}
+        >
+          <Form form={form} layout="vertical">
+            <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please input the name!' }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="position" label="Position" rules={[{ required: true, message: 'Please input the position!' }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="status" label="Status" rules={[{ required: true, message: 'Please select the status!' }]}>
+              <Select>
+                <Option value="Available">Available</Option>
+                <Option value="Inactive">Inactive</Option>
+                <Option value="Assigned">Assigned</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </Modal>
+        <Drawer
+          width={640}
+          placement="right"
+          closable={false}
+          onClose={closeDrawer}
+          open={drawerVisible}
+        >
+          {currentEmployee && (
+            <>
+              <p className="site-description-item-profile-p" style={{ marginBottom: 24 }}>
+                Employee Profile
+              </p>
+              <Row>
+                <Col span={12}>
+                  <DescriptionItem title="Full Name" content={currentEmployee.name} />
+                </Col>
+                <Col span={12}>
+                  <DescriptionItem title="Position" content={currentEmployee.position} />
+                </Col>
+              </Row>
+              <Row>
+                <Col span={12}>
+                  <DescriptionItem title="Status" content={currentEmployee.status} />
+                </Col>
+              </Row>
+              {/* Add more fields as necessary */}
+              <Divider />
+              <p className="site-description-item-profile-p">Contact</p>
+              <Row>
+                <Col span={12}>
+                  <DescriptionItem title="Email" content="example@example.com" />
+                </Col>
+                <Col span={12}>
+                  <DescriptionItem title="Phone Number" content="+123 456 789" />
+                </Col>
+              </Row>
+            </>
+          )}
+        </Drawer>
+      </section>
+    </main>
+  );
 };
 
-export default ModalAddTechnology;
+export default EmployeeManagement;
