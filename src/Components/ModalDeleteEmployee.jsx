@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal, Button } from "antd";
+import PropTypes from 'prop-types';
 import { deleteEmployee } from "../service/EmployeeServices";
 import { toast } from "react-toastify";
 
@@ -33,6 +34,14 @@ const ModalDeleteEmployee = ({ open, handleClose, employee }) => {
             </div>
         </Modal>
     );
+};
+
+ModalDeleteEmployee.propTypes = {
+    open: PropTypes.bool.isRequired,
+    handleClose: PropTypes.func.isRequired,
+    employee: PropTypes.shape({
+        key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+    }).isRequired
 };
 
 export default ModalDeleteEmployee;

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import PropTypes from 'prop-types';
 import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebaseConfig"; // import storage from firebaseConfig.js
+import { storage } from "../firebaseConfig";
 
 const { Option } = Select;
 
@@ -12,46 +12,65 @@ const ModalAddTechnology = ({ open, handleClose }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState("");
-    const [imageFile, setImageFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
 
     const handleAddTechnology = async () => {
         try {
-            let imageUrl = "";
-            if (imageFile) {
-                const storageRef = ref(storage, `technologies/${imageFile.name}`);
-                const snapshot = await uploadBytes(storageRef, imageFile);
-                imageUrl = await getDownloadURL(snapshot.ref);
+            if (selectedFile) {
+                const uploadTask = storage.ref(`images/${selectedFile.name}`).put(selectedFile);
+                uploadTask.on(
+                    "state_changed",
+                    snapshot => { },
+                    error => {
+                        console.log(error);
+                        toast.error("Failed to upload image.");
+                    },
+                    () => {
+                        storage
+                            .ref("images")
+                            .child(selectedFile.name)
+                            .getDownloadURL()
+                            .then(async (url) => {
+                                setImageUrl(url);
+                                await postCreateTechnology(name, description, status, url);
+                                handleClose();
+                                toast.success("Technology added successfully!");
+                                setName("");
+                                setDescription("");
+                                setStatus("");
+                                setSelectedFile(null);
+                                setImagePreview("");
+                                setImageUrl("");
+                            });
+                    }
+                );
+            } else {
+                await postCreateTechnology(name, description, status, "");
+                handleClose();
+                toast.success("Technology added successfully!");
+                setName("");
+                setDescription("");
+                setStatus("");
+                setSelectedFile(null);
+                setImagePreview("");
+                setImageUrl("");
             }
-            await postCreateTechnology(name, description, status, imageUrl);
-            handleClose();
-            toast.success("Technology added successfully!");
-            // Clear the form fields and the image file after successfully adding
-            setName("");
-            setDescription("");
-            setStatus("");
-            setImageFile(null); // Reset image file
         } catch (error) {
             toast.error("Failed to add technology.");
         }
     };
 
-    const handleImageChange = ({ file }) => {
-        if (file.type === "image/png" || file.type === "image/svg+xml") {
-            setImageFile(file.originFileObj);
-        } else {
-            toast.error("Only PNG and SVG images are allowed.");
-        }
+    const handleImageChange = (info) => {
+        const file = info.file.originFileObj;
+        setSelectedFile(file);
+        setImagePreview(URL.createObjectURL(file));
     };
 
     const beforeUpload = (file) => {
         handleImageChange({ file });
         return false;
-    };
-
-    const formatStatus = (status) => {
-        if (status === "active") return "Active";
-        if (status === "inactive") return "Inactive";
-        return "";
     };
 
     return (
@@ -60,7 +79,9 @@ const ModalAddTechnology = ({ open, handleClose }) => {
             open={open}
             onCancel={() => {
                 handleClose();
-                setImageFile(null);
+                setSelectedFile(null);
+                setImagePreview("");
+                setImageUrl("");
             }}
             footer={[
                 <Button key="back" onClick={handleClose}>
@@ -101,11 +122,17 @@ const ModalAddTechnology = ({ open, handleClose }) => {
                 </div>
                 <div className="mb-3">
                     <Upload
-                        accept=".png,.svg"
+                        accept="image/*"
                         beforeUpload={beforeUpload}
+                        showUploadList={false}
                     >
-                        <Button icon={<PlusOutlined />}>Select Image (PNG/SVG only)</Button>
+                        <Button icon={<PlusOutlined />}>Select Image</Button>
                     </Upload>
+                    {imagePreview && (
+                        <div style={{ marginTop: 10 }}>
+                            <img src={imagePreview} alt="preview" style={{ width: '100%', maxHeight: 200, objectFit: 'contain' }} />
+                        </div>
+                    )}
                 </div>
             </div>
         </Modal>
