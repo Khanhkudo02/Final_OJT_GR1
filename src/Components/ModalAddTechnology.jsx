@@ -3,55 +3,73 @@ import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
-import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as databaseRef, set } from "firebase/database";
+import { database, storage } from "../firebaseConfig";
 
 const { Option } = Select;
 
 const ModalAddTechnology = ({ open, handleClose }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [status, setStatus] = useState("");
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [status, setStatus] = useState("active");
+    const [image, setImage] = useState(null);
+    const [imageURL, setImageURL] = useState("");
     const [imagePreview, setImagePreview] = useState("");
     const [uploading, setUploading] = useState(false);
 
-    const handleAddTechnology = async () => {
+    const handleImageChange = (e) => {
+        if (e.target.files[0]) {
+            setImage(e.target.files[0]);
+            setImagePreview(URL.createObjectURL(e.target.files[0]));
+        }
+    };
+
+    const handleUpload = () => {
+        if (image) {
+            const storageReference = storageRef(storage, `images/${image.name}`);
+            uploadBytes(storageReference, image).then((snapshot) => {
+                getDownloadURL(snapshot.ref).then((url) => {
+                    setImageURL(url);
+                    saveImageURLToDatabase(url);
+                });
+            });
+        }
+    };
+
+    const saveImageURLToDatabase = (url) => {
+        const productRef = databaseRef(database, "products/" + Date.now());
+        set(productRef, {
+            imageURL: url,
+            createdAt: Date.now(),
+        });
+    };
+
+    const handleSubmit = async () => {
         try {
             setUploading(true);
 
-            // Upload the image if selected
-            if (selectedFile) {
-                const storage = getStorage();
-                const fileRef = storageRef(storage, `icons/${selectedFile.name}`);
-                await uploadBytes(fileRef, selectedFile);
-                toast.success("Image uploaded successfully!");
+            let uploadedImageURL = imageURL;
+            if (image) {
+                await handleUpload();
+                uploadedImageURL = imageURL;
             }
 
-            // Add technology to the database
-            await postCreateTechnology(name, description, status);
+            await postCreateTechnology(name, description, status, uploadedImageURL);
 
-            // Reset state
             handleClose();
             toast.success("Technology added successfully!");
             setName("");
             setDescription("");
-            setStatus("");
-            setSelectedFile(null);
+            setStatus("active");
+            setImage(null);
             setImagePreview("");
         } catch (error) {
             toast.error("Failed to add technology.");
+            console.error("Error uploading image or adding technology:", error);
         } finally {
             setUploading(false);
         }
-    };
-
-    const handleImageChange = (info) => {
-        if (info.file && info.file.originFileObj) {
-            const file = info.file.originFileObj;
-            setSelectedFile(file);
-            setImagePreview(URL.createObjectURL(file));
-        }
-        return false; // Prevent auto-upload
     };
 
     return (
@@ -60,8 +78,8 @@ const ModalAddTechnology = ({ open, handleClose }) => {
             open={open}
             onCancel={() => {
                 handleClose();
-                setSelectedFile(null);
                 setImagePreview("");
+                setStatus("active");
             }}
             footer={[
                 <Button key="back" onClick={handleClose}>
@@ -70,7 +88,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
                 <Button
                     key="submit"
                     type="primary"
-                    onClick={handleAddTechnology}
+                    onClick={handleSubmit}
                     disabled={uploading}
                 >
                     Save
@@ -108,7 +126,10 @@ const ModalAddTechnology = ({ open, handleClose }) => {
                 <div className="mb-3">
                     <Upload
                         accept=".jpg,.jpeg,.png"
-                        beforeUpload={handleImageChange}
+                        beforeUpload={(file) => {
+                            handleImageChange({ target: { files: [file] } });
+                            return false;
+                        }}
                         listType="picture"
                     >
                         <Button>

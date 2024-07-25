@@ -132,7 +132,7 @@ const TechnologyManagement = () => {
         <ModalDeleteTechnology
           open={isDeleteModalVisible}
           handleClose={handleCloseDeleteModal}
-          technologyId={technologyIdToDelete} // Pass only the ID
+          technologyId={technologyIdToDelete}
         />
       )}
     </div>
