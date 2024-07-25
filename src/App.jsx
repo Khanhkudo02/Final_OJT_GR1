@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import { Layout, theme } from "antd";
 import AccountManagement from "./Components/AccountManagement";
-import RestartPassword from './Components/RestartPassword'; 
+import ResetPassword from './Components/ResetPassword'; 
 import EmployeeManagement from "./Components/EmployeeManagement";
 import PositionManagement from "./Components/PositionManagement";
 import ProgramingLanguage from "./Components/ProgramingLanguage";
@@ -81,7 +81,7 @@ const App = () => {
                         <Route path="/employee" element={<Employee />} />
                         <Route path="/cv" element={<PageCV />} />
                         <Route path="/account-management" element={<Admin />} />
-                        <Route path="/restart-password" element={<RestartPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
                         <Route
                           path="/employee-management"
                           element={<EmployeeManagement />}

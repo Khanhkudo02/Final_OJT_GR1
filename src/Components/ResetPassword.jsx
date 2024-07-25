@@ -3,7 +3,7 @@ import { Table, Button } from "antd";
 import axios from "axios";
 import { RestartAlt } from "@mui/icons-material";
 
-const RestartPassword = () => {
+const ResetPassword = () => {
   return (
     <main>
       <div>
@@ -22,4 +22,4 @@ const RestartPassword = () => {
   );
 };
 
-export default RestartPassword;
+export default ResetPassword;
