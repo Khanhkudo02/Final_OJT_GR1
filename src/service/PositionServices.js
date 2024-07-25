@@ -100,9 +100,11 @@ const deletePosition = async (id) => {
 };
 const fetchPositionById = async (id) => {
     try {
+        console.log(`Fetching position with ID: ${id}`); // Debug
         const positionRef = ref(database, `positions/${id}`);
         const snapshot = await get(positionRef);
-        return snapshot.val(); // Trả về thông tin vị trí
+        console.log('Position data:', snapshot.val()); // Debug
+        return snapshot.val();
     } catch (error) {
         console.error("Failed to fetch position by ID:", error);
         throw error;

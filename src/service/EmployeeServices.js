@@ -116,4 +116,5 @@ const deleteEmployee = async (id) => {
     }
 };
 
+
 export { fetchAllEmployees, postCreateEmployee, putUpdateEmployee, deleteEmployee };

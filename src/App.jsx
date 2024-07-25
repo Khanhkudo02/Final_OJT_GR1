@@ -16,6 +16,7 @@ import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
 import NewProject from "./Components/NewProject";
 import AddPosition from "./Components/AddPosition.jsx";
+import EditPosition from "./Components/EditPosition";
 
 const { Content } = Layout;
 
@@ -97,6 +98,10 @@ const App = () => {
                         <Route
                         path="/positions/add" 
                         element={<AddPosition />}
+                        />
+                        <Route 
+                        path="/position-management/edit/:id" 
+                        element={<EditPosition />} 
                         />
                         <Route
                           path="/technology-management"
