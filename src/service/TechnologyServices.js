@@ -3,20 +3,9 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObjec
 import { database, storage } from "../firebaseConfig";
 
 // Create new technology
-const postCreateTechnology = async (name, description, status, imageFile) => {
+const postCreateTechnology = async (name, description, status, imageUrl) => {
     try {
         const newTechnologyRef = push(ref(database, "technologies"));
-
-        let imageUrl = null;
-        if (imageFile) {
-            // Upload the image to Firebase Storage
-            const imageRef = storageRef(
-                storage,
-                `images/${newTechnologyRef.key}/${imageFile.name}`
-            );
-            const snapshot = await uploadBytes(imageRef, imageFile);
-            imageUrl = await getDownloadURL(snapshot.ref);
-        }
 
         // Save the technology data along with image URL (if available)
         await set(newTechnologyRef, {
@@ -55,26 +44,38 @@ const putUpdateTechnology = async (
     name,
     description,
     status,
-    imageFile
+    imageFile,
+    oldImageURL
 ) => {
     try {
         const technologyRef = ref(database, `technologies/${id}`);
 
         let imageUrl = null;
         if (imageFile) {
+            // Delete old image from Firebase Storage
+            if (oldImageURL) {
+                const oldImageRef = storageRef(storage, `images/${id}/${oldImageURL.split('/').pop().split('?')[0]}`);
+                await deleteObject(oldImageRef);
+            }
+
+            // Upload new image
             const imageRef = storageRef(
                 storage,
                 `images/${id}/${imageFile.name}`
             );
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
+        } else {
+            // Use the old image URL if no new image is uploaded
+            imageUrl = oldImageURL;
         }
 
+        // Update technology data
         await update(technologyRef, {
             name,
             description,
             status,
-            imageURL: imageUrl || null,
+            imageURL: imageUrl,
         });
 
         return id;

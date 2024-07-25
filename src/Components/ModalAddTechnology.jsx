@@ -4,7 +4,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { database, storage } from "../firebaseConfig";
+import { storage } from "../firebaseConfig";
 
 const { Option } = Select;
 
@@ -26,7 +26,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
     const handleUpload = async () => {
         if (image) {
             try {
-                const imageRef = storageRef(storage, `images/${Date.now()}_${image.name}`);
+                const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
                 const snapshot = await uploadBytes(imageRef, image);
                 const url = await getDownloadURL(snapshot.ref);
                 return url;

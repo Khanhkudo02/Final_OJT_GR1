@@ -3,7 +3,8 @@ import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { putUpdateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { database, storage } from "../firebaseConfig";
 
 const { Option } = Select;
 
@@ -20,29 +21,43 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
       setName(dataTechnologyEdit.name);
       setDescription(dataTechnologyEdit.description);
       setStatus(dataTechnologyEdit.status);
-      setImagePreview(dataTechnologyEdit.imageUrl);
+      setImagePreview(dataTechnologyEdit.imageURL); // Update imagePreview with current imageURL
     }
   }, [dataTechnologyEdit]);
 
+  // Handle image upload and return the new image URL
   const handleImage = async (file) => {
-    const storage = getStorage();
-    const fileRef = storageRef(storage, `images/${file.name}`);
-    const snapshot = await uploadBytes(fileRef, file);
+    const imageRef = storageRef(storage, `images/${dataTechnologyEdit.key}/${file.name}`);
+    const snapshot = await uploadBytes(imageRef, file);
     const imageUrl = await getDownloadURL(snapshot.ref);
     return imageUrl;
+  };
+
+  // Delete the old image from Firebase Storage
+  const deleteOldImage = async () => {
+    const oldImageRef = storageRef(storage, `images/${dataTechnologyEdit.key}/${dataTechnologyEdit.imageURL.split('/').pop().split('?')[0]}`);
+    await deleteObject(oldImageRef);
   };
 
   const handleSubmit = async () => {
     try {
       setUploading(true);
 
-      let imageUrl = imagePreview;
+      let imageUrl = imagePreview; // Use the existing image if no new image is selected
       if (selectedFile) {
+        // Delete the old image before uploading the new one
+        await deleteOldImage();
         imageUrl = await handleImage(selectedFile);
         toast.success("Image uploaded successfully!");
       }
 
-      await putUpdateTechnology(dataTechnologyEdit.key, name, description, status, imageUrl);
+      await putUpdateTechnology(
+        dataTechnologyEdit.key,
+        name,
+        description,
+        status,
+        imageUrl // Pass the new image URL (or existing if no new image)
+      );
 
       handleClose();
       toast.success("Technology updated successfully!");
