@@ -1,13 +1,8 @@
-
-import React, { useEffect, useState } from "react";
-import {
-  Navigate,
-  Route,
-  BrowserRouter as Router,
-  Routes,
-} from "react-router-dom";
 import { Layout, theme } from "antd";
+import React, { useEffect, useState } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import AccountManagement from "./Components/AccountManagement";
+import ResetPassword from "../src/pages/ResetPassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import PositionManagement from "./Components/PositionManagement";
 import ProgramingLanguage from "./Components/ProgramingLanguage";
@@ -19,6 +14,8 @@ import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
+import NewProject from "./Components/NewProject";
+import AddPosition from "./Components/AddPosition.jsx";
 
 const { Content } = Layout;
 
@@ -62,6 +59,8 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login setUser={handleLogin} />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
         <Route
           path="/*"
           element={
@@ -80,6 +79,10 @@ const App = () => {
                         <Route path="/cv" element={<PageCV />} />
                         <Route path="/account-management" element={<Admin />} />
                         <Route
+                          path="/reset-password"
+                          element={<ResetPassword />}
+                        />
+                        <Route
                           path="/employee-management"
                           element={<EmployeeManagement />}
                         />
@@ -92,6 +95,10 @@ const App = () => {
                           element={<PositionManagement />}
                         />
                         <Route
+                        path="/positions/add" 
+                        element={<AddPosition />}
+                        />
+                        <Route
                           path="/technology-management"
                           element={<TechnologyManagement />}
                         />
@@ -99,6 +106,8 @@ const App = () => {
                           path="/programing-language"
                           element={<ProgramingLanguage />}
                         />
+                        <Route path="/new-project" element={<NewProject />} />{" "}
+                        {/* Add the NewProject route */}
                         <Route path="/" element={<Navigate to="/login" />} />
                       </Routes>
                     </div>
