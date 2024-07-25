@@ -1,13 +1,8 @@
-
-import React, { useEffect, useState } from "react";
-import {
-  Navigate,
-  Route,
-  BrowserRouter as Router,
-  Routes,
-} from "react-router-dom";
 import { Layout, theme } from "antd";
+import React, { useEffect, useState } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import AccountManagement from "./Components/AccountManagement";
+import ResetPassword from "../src/pages/ResetPassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import PositionManagement from "./Components/PositionManagement";
 import ProgramingLanguage from "./Components/ProgramingLanguage";
@@ -63,6 +58,8 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login setUser={handleLogin} />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
         <Route
           path="/*"
           element={
@@ -80,6 +77,10 @@ const App = () => {
                         <Route path="/employee" element={<Employee />} />
                         <Route path="/cv" element={<PageCV />} />
                         <Route path="/account-management" element={<Admin />} />
+                        <Route
+                          path="/reset-password"
+                          element={<ResetPassword />}
+                        />
                         <Route
                           path="/employee-management"
                           element={<EmployeeManagement />}
@@ -100,7 +101,8 @@ const App = () => {
                           path="/programing-language"
                           element={<ProgramingLanguage />}
                         />
-                        <Route path="/new-project" element={<NewProject />} /> {/* Add the NewProject route */}
+                        <Route path="/new-project" element={<NewProject />} />{" "}
+                        {/* Add the NewProject route */}
                         <Route path="/" element={<Navigate to="/login" />} />
                       </Routes>
                     </div>
