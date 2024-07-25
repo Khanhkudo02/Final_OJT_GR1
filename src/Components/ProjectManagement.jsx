@@ -75,7 +75,10 @@ const ProjectManagement = () => {
     return item.status === filteredStatus.toUpperCase();
   });
 
-  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const columns = [
     {

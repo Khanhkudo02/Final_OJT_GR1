@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
-import ExportExcel from "../Components/ExportExcel"; // Import ExportExcel
 
 const { Option } = Select;
 
@@ -18,6 +17,7 @@ function AdminPage() {
   const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
   const [editMode, setEditMode] = useState(false);
+
   const [editUserId, setEditUserId] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -35,9 +35,7 @@ function AdminPage() {
             id,
             ...data,
           }));
-          usersArray.sort(
-            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-          );
+          usersArray.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
           setUsers(usersArray);
         }
       } catch (error) {
@@ -79,9 +77,7 @@ function AdminPage() {
       const usersData = snapshot.val();
 
       if (!editMode && usersData) {
-        const emailExists = Object.values(usersData).some(
-          (user) => user.email === email
-        );
+        const emailExists = Object.values(usersData).some(user => user.email === email);
         if (emailExists) {
           message.error(t("emailAlreadyExists"));
           return;
@@ -143,12 +139,10 @@ function AdminPage() {
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
-        const usersArray = Object.entries(updatedUserData).map(
-          ([id, data]) => ({
-            id,
-            ...data,
-          })
-        );
+        const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
+          id,
+          ...data,
+        }));
         setUsers(usersArray);
       }
     } catch (error) {
@@ -157,8 +151,6 @@ function AdminPage() {
   };
 
   const handleDeleteUser = async (userId) => {
-    console.log(userId);
-
     if (!userId) {
       message.error(t("userDoesNotExist"));
       return;
@@ -184,12 +176,10 @@ function AdminPage() {
         const updatedSnapshot = await get(ref(db, "users"));
         const updatedUserData = updatedSnapshot.val();
         if (updatedUserData) {
-          const usersArray = Object.entries(updatedUserData).map(
-            ([id, data]) => ({
-              id,
-              ...data,
-            })
-          );
+          const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
+            id,
+            ...data,
+          }));
           setUsers(usersArray);
         } else {
           setUsers([]);
@@ -265,6 +255,7 @@ function AdminPage() {
           <Button onClick={() => handleDeleteUser(record.id)}>
             {t("delete")}
           </Button>
+          {/* Đã loại bỏ nút reset mật khẩu */}
         </div>
       ),
     },
@@ -277,8 +268,6 @@ function AdminPage() {
       <Button type="primary" onClick={() => setModalVisible(true)}>
         {t("addUser")}
       </Button>
-      <ExportExcel data={users} fileName="UsersData" />{" "}
-      {/* Add ExportExcel component */}
       <Modal
         title={editMode ? t("editUser") : t("addUser")}
         open={modalVisible}
@@ -309,8 +298,6 @@ function AdminPage() {
           >
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </Form.Item>
-
-          {/* Ẩn trường mật khẩu khi ở chế độ chỉnh sửa */}
           {!editMode && (
             <Form.Item
               label={t("password")}
@@ -326,22 +313,27 @@ function AdminPage() {
               />
             </Form.Item>
           )}
-
-          <Form.Item label={t("role")} name="role">
-            <Select value={role} onChange={(value) => setRole(value)}>
+          <Form.Item
+            label={t("role")}
+            name="role"
+            rules={[{ required: true, message: t("pleaseSelectRole") }]}
+          >
+            <Select
+              value={role}
+              onChange={(value) => setRole(value)}
+            >
               <Option value="admin">{t("admin")}</Option>
               <Option value="employee">{t("employee")}</Option>
             </Select>
           </Form.Item>
-
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              {editMode ? t("update") : t("add")}
+              {editMode ? t("updateUser") : t("addUser")}
             </Button>
           </Form.Item>
         </Form>
       </Modal>
-      <Table dataSource={users} columns={columns} rowKey="id" />
+      <Table columns={columns} dataSource={users} rowKey="id" />
     </div>
   );
 }
