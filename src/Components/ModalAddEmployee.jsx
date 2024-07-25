@@ -23,6 +23,7 @@ const ModalAddEmployee = ({ open, handleClose }) => {
             await postCreateEmployee(name, email, password, dateOfBirth, address, phoneNumber, skills, status, imageFile);
             handleClose();
             toast.success("Employee added successfully!");
+    
             // Clear the form fields and the image file after successfully adding
             setName("");
             setEmail("");
@@ -31,8 +32,8 @@ const ModalAddEmployee = ({ open, handleClose }) => {
             setAddress("");
             setPhoneNumber("");
             setSkills([]);
-            setStatus(""); // Reset status
-            setImageFile(null); // Reset image file
+            setStatus("");
+            setImageFile(null);
         } catch (error) {
             toast.error("Failed to add employee.");
         }
@@ -159,4 +160,10 @@ const ModalAddEmployee = ({ open, handleClose }) => {
     );
 };
 
+ModalAddEmployee.propTypes = {
+    open: PropTypes.bool.isRequired,
+    handleClose: PropTypes.func.isRequired,
+};
+
 export default ModalAddEmployee;
+

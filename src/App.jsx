@@ -15,6 +15,7 @@ import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
+import AddPosition from "./Components/AddPosition.jsx";
 
 const { Content } = Layout;
 
@@ -92,6 +93,10 @@ const App = () => {
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
+                        />
+                        <Route
+                          path="/positions/add"
+                          element={<AddPosition />}
                         />
                         <Route
                           path="/technology-management"

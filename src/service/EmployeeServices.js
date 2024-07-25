@@ -21,7 +21,6 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
             imageUrl = await getDownloadURL(snapshot.ref);
         }
 
-        // Format dateOfBirth if provided
         const formattedDateOfBirth = dateOfBirth ? moment(dateOfBirth).format('YYYY-MM-DD') : null;
 
         await set(newEmployeeRef, {
@@ -36,7 +35,6 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
             imageUrl,
             isAdmin: false,
             role: "employee",
-            status,
         });
 
         return newEmployeeRef.key;
@@ -45,6 +43,7 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
         throw error;
     }
 };
+
 
 const fetchAllEmployees = async () => {
     try {
