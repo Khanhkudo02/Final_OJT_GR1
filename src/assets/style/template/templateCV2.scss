@@ -1,0 +1,85 @@
+.cv-container {
+  display: flex;
+  max-width: 900px;
+  margin: auto;
+  font-family: "Arial", sans-serif;
+}
+
+.cv-left {
+  width: 30%;
+  background-color: #16222a;
+  color: #fff;
+  padding: 20px;
+}
+
+.cv-right {
+  width: 70%;
+  padding: 20px;
+  background-color: #fff;
+  color: #000;
+}
+
+.cv-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.cv-name {
+  font-size: 2em;
+  margin: 0;
+}
+
+.cv-title {
+  font-size: 1.2em;
+  margin: 0;
+  color: #00aaff;
+}
+
+.cv-image-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.cv-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cv-section {
+  margin-bottom: 20px;
+}
+
+.cv-section-title {
+  font-size: 1.5em;
+  border-bottom: 2px solid #00aaff;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+
+.cv-section ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.cv-experience-item,
+.cv-education-item {
+  margin-bottom: 10px;
+}
+
+.cv-experience-date,
+.cv-education-date {
+  font-weight: bold;
+}
+
+.cv-experience-title,
+.cv-education-degree {
+  font-weight: bold;
+}
+
+.cv-experience-company,
+.cv-education-school {
+  font-style: italic;
+}
