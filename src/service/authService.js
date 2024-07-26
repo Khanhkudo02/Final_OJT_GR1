@@ -70,7 +70,6 @@ export const loginUser = async (
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
-        localStorage.setItem("userId", userId);
         localStorage.setItem("user", JSON.stringify(user)); // Save the entire user object
         setUser(user);
 

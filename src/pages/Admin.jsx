@@ -36,9 +36,7 @@ function AdminPage() {
             id,
             ...data,
           }));
-          usersArray.sort(
-            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-          );
+          usersArray.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
           setUsers(usersArray);
         }
       } catch (error) {
@@ -80,9 +78,7 @@ function AdminPage() {
       const usersData = snapshot.val();
 
       if (!editMode && usersData) {
-        const emailExists = Object.values(usersData).some(
-          (user) => user.email === email
-        );
+        const emailExists = Object.values(usersData).some(user => user.email === email);
         if (emailExists) {
           message.error(t("emailAlreadyExists"));
           return;
@@ -151,12 +147,10 @@ function AdminPage() {
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
-        const usersArray = Object.entries(updatedUserData).map(
-          ([id, data]) => ({
-            id,
-            ...data,
-          })
-        );
+        const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
+          id,
+          ...data,
+        }));
         setUsers(usersArray);
       }
     } catch (error) {
@@ -194,12 +188,10 @@ function AdminPage() {
         const updatedSnapshot = await get(ref(db, "users"));
         const updatedUserData = updatedSnapshot.val();
         if (updatedUserData) {
-          const usersArray = Object.entries(updatedUserData).map(
-            ([id, data]) => ({
-              id,
-              ...data,
-            })
-          );
+          const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
+            id,
+            ...data,
+          }));
           setUsers(usersArray);
         } else {
           setUsers([]);
@@ -296,7 +288,6 @@ function AdminPage() {
       <Button type="primary" onClick={() => setModalVisible(true)}>
         {t("addUser")}
       </Button>
-      <ExportExcel data={users} fileName="File Excel" />
       <Modal
         title={editMode ? t("editUser") : t("addUser")}
         open={modalVisible}
@@ -347,7 +338,10 @@ function AdminPage() {
             name="role"
             rules={[{ required: true, message: t("pleaseSelectRole") }]}
           >
-            <Select value={role} onChange={(value) => setRole(value)}>
+            <Select
+              value={role}
+              onChange={(value) => setRole(value)}
+            >
               <Option value="admin">{t("admin")}</Option>
               <Option value="employee">{t("employee")}</Option>
             </Select>

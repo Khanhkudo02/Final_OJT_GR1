@@ -3,7 +3,8 @@ import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { putUpdateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { storage } from "../firebaseConfig";
 
 const { Option } = Select;
 
@@ -11,7 +12,7 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [uploading, setUploading] = useState(false);
 
@@ -20,32 +21,71 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
       setName(dataTechnologyEdit.name);
       setDescription(dataTechnologyEdit.description);
       setStatus(dataTechnologyEdit.status);
-      setImagePreview(dataTechnologyEdit.imageUrl);
+      setImagePreview(dataTechnologyEdit.imageURL); // Cập nhật preview ảnh
     }
   }, [dataTechnologyEdit]);
 
-  const handleImage = async (file) => {
-    const storage = getStorage();
-    const fileRef = storageRef(storage, `images/${file.name}`);
-    const snapshot = await uploadBytes(fileRef, file);
-    const imageUrl = await getDownloadURL(snapshot.ref);
-    return imageUrl;
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
   };
 
+  // Hàm để tải lên ảnh và lấy URL của ảnh đó
+  const handleUpload = async () => {
+    if (image) {
+      try {
+        const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
+        const snapshot = await uploadBytes(imageRef, image);
+        const url = await getDownloadURL(snapshot.ref);
+        return url;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error("Failed to upload image.");
+        throw error;
+      }
+    }
+    return imagePreview; // Trả về URL hiện tại nếu không có ảnh mới
+  };
+
+  // Hàm để xóa ảnh cũ nếu có
+  const deleteOldImage = async () => {
+    if (dataTechnologyEdit.imageURL) {
+      try {
+        const oldImagePath = dataTechnologyEdit.imageURL.split("/o/")[1].split("?")[0];
+        const decodedOldImagePath = decodeURIComponent(oldImagePath);
+        const oldImageRef = storageRef(storage, decodedOldImagePath);
+        await deleteObject(oldImageRef);
+      } catch (error) {
+        console.error("Error deleting old image:", error);
+        toast.error("Failed to delete old image.");
+      }
+    }
+  };
+
+  // Hàm để xử lý việc gửi dữ liệu cập nhật
   const handleSubmit = async () => {
     try {
       setUploading(true);
 
-      let imageUrl = imagePreview;
-      if (selectedFile) {
-        imageUrl = await handleImage(selectedFile);
-        toast.success("Image uploaded successfully!");
-      }
+      // Tải lên ảnh mới và lấy URL nếu có ảnh mới
+      let uploadedImageURL = await handleUpload(); // URL của ảnh mới hoặc hiện tại nếu không có ảnh mới
 
-      await putUpdateTechnology(dataTechnologyEdit.key, name, description, status, imageUrl);
+      // Cập nhật dữ liệu công nghệ với URL ảnh mới
+      await putUpdateTechnology(
+        dataTechnologyEdit.key,
+        name,
+        description,
+        status,
+        uploadedImageURL, // URL mới hoặc cũ nếu không có ảnh mới
+        dataTechnologyEdit.imageURL // URL cũ để xóa sau
+      );
+
+      toast.success("Technology updated successfully!");
 
       handleClose();
-      toast.success("Technology updated successfully!");
     } catch (error) {
       toast.error("Failed to update technology.");
       console.error("Error uploading image or updating technology:", error);
@@ -54,20 +94,14 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
     }
   };
 
-  const handleImageChange = (info) => {
-    if (info.file && info.file.originFileObj) {
-      const file = info.file.originFileObj;
-      setSelectedFile(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-    return false; // Prevent auto-upload
-  };
-
   return (
     <Modal
       title="Edit Technology"
       open={open}
-      onCancel={handleClose}
+      onCancel={() => {
+        handleClose();
+        setImagePreview("");
+      }}
       footer={[
         <Button key="back" onClick={handleClose}>
           Close
@@ -113,7 +147,10 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
         <div className="mb-3">
           <Upload
             accept=".jpg,.jpeg,.png"
-            beforeUpload={handleImageChange}
+            beforeUpload={(file) => {
+              handleImageChange({ target: { files: [file] } });
+              return false; // Ngăn tải ảnh tự động
+            }}
             listType="picture"
           >
             <Button>

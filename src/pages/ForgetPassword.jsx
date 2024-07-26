@@ -1,9 +1,11 @@
+// src/pages/ResetPassword.js
+
 import { Alert, Button, Form, Input, Typography } from "antd";
 import emailjs from "emailjs-com";
-import { get, getDatabase, ref } from "firebase/database";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
 import "../assets/style/Pages/ForgetPassword.scss";
+// Import SCSS file
 
 const { Title } = Typography;
 
@@ -53,7 +55,6 @@ function ForgetPassword() {
       setError("Failed to send password reset instructions.");
     }
   };
-
   const handleLogout = () => {
     // Clear any authentication tokens or user data
     // Redirect to login page
@@ -61,8 +62,8 @@ function ForgetPassword() {
   };
 
   return (
-    <div className="forget-password-container">
-      <div className="forget-password-form">
+    <div className="reset-password-container">
+      <div className="reset-password-form">
         <Title level={2} className="title">
           Reset Password
         </Title>
@@ -75,19 +76,21 @@ function ForgetPassword() {
             <Input type="email" placeholder="Enter your email address" />
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
-          {successMessage && (
-            <Alert message={successMessage} type="success" showIcon />
-          )}
+          {successMessage && <Alert message={successMessage} type="success" showIcon />}
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               Send Email
             </Button>
           </Form.Item>
         </Form>
-        <Form onFinish={handleLogout} className="logout-form" layout="vertical">
+        <Form
+          onFinish={handleLogout}
+          className="logout-form"
+          layout="vertical"
+        >
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Back
+              Log Out
             </Button>
           </Form.Item>
         </Form>

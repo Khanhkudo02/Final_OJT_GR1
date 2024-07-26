@@ -2,7 +2,7 @@ import React from "react";
 
 import "../assets/style/template/templateCV2.scss";
 
-function templateCV2 ({ data }) {
+function templateCV2({ data }) {
   return (
     <div className="App">
       <div className="header">
