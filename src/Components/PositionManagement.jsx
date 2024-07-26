@@ -37,6 +37,7 @@ const PositionManagement = () => {
     setCurrentPage(pagination.current);
     setPageSize(pagination.pageSize);
   };
+ 
 
   const showEditModal = (record) => {
     setDataPositionEdit(record);
@@ -49,10 +50,12 @@ const PositionManagement = () => {
   const handleDelete = (record) => {
     if (record.status !== 'inactive') {
       message.error('Only inactive positions can be deleted.');
+    
       return;
     }
 
     confirm({
+      title: 'Are you sure you want to delete this position?',
       title: 'Are you sure you want to delete this position?',
       onOk: async () => {
         try {
@@ -64,6 +67,7 @@ const PositionManagement = () => {
         }
       },
       onCancel() {
+        console.log('Cancel');
         console.log('Cancel');
       },
     });
