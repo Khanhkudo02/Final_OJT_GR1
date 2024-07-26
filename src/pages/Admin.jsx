@@ -280,10 +280,16 @@ function AdminPage() {
       key: "actions",
       render: (_, record) => (
         <div key={record.id}>
-          <Button className="edit-button" onClick={() => handleEditUser(record)}>
+          <Button
+            className="edit-button"
+            onClick={() => handleEditUser(record)}
+          >
             {t("edit")}
           </Button>
-          <Button className="delete-button" onClick={() => handleDeleteUser(record.id)}>
+          <Button
+            className="delete-button"
+            onClick={() => handleDeleteUser(record.id)}
+          >
             {t("delete")}
           </Button>
           {/* Đã loại bỏ nút reset mật khẩu */}
@@ -291,7 +297,6 @@ function AdminPage() {
       ),
     },
   ];
-  
 
   return (
     <div className="admin-page-container">
