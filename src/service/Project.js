@@ -33,7 +33,8 @@ const fetchAllProjects = async () => {
         const projectsRef = ref(db, 'projects');
         const snapshot = await get(projectsRef);
         const data = snapshot.val();
-        return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
+        if (!data) return [];
+        return Object.entries(data).map(([key, value]) => ({ key, ...value }));
     } catch (error) {
         console.error("Failed to fetch projects:", error);
         throw error;

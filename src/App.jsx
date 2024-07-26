@@ -17,6 +17,7 @@ import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
 import ProjectDetail from "./Components/ProjectDetail";
 import AddPosition from "./Components/AddPosition"; 
+import ProjectEdit from "./Components/ProjectEdit"; 
 
 const { Content } = Layout;
 
@@ -91,8 +92,14 @@ const App = () => {
                           path="/project-management"
                           element={<ProjectManagement />}
                         />
-                          <Route path="/project/:id" 
-                          element={<ProjectDetail />} />
+                        <Route 
+                          path="/project/:id" 
+                          element={<ProjectDetail />} 
+                        />
+                        <Route 
+                          path="/project-edit/:id" 
+                          element={<ProjectEdit />} />  
+
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
