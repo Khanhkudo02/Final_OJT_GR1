@@ -1,80 +1,72 @@
-// ModalAddTechnology.jsx
 import React, { useState } from "react";
 import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { postCreateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebaseConfig";
-import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
 const ModalAddTechnology = ({ open, handleClose }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [status, setStatus] = useState("active");
+  const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
 
-  const handleAddTechnology = async () => {
-    try {
-      if (selectedFile) {
-        const uploadTask = storage
-          .ref(`images/${selectedFile.name}`)
-          .put(selectedFile);
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {},
-          (error) => {
-            console.log(error);
-            toast.error("Failed to upload image.");
-          },
-          () => {
-            storage
-              .ref("images")
-              .child(selectedFile.name)
-              .getDownloadURL()
-              .then(async (url) => {
-                setImageUrl(url);
-                await postCreateTechnology(name, description, status, url);
-                handleClose();
-                toast.success("Technology added successfully!");
-                setName("");
-                setDescription("");
-                setStatus("");
-                setSelectedFile(null);
-                setImagePreview("");
-                setImageUrl("");
-              });
-          }
-        );
-      } else {
-        await postCreateTechnology(name, description, status, "");
-        handleClose();
-        toast.success("Technology added successfully!");
-        setName("");
-        setDescription("");
-        setStatus("");
-        setSelectedFile(null);
-        setImagePreview("");
-        setImageUrl("");
-      }
-    } catch (error) {
-      toast.error("Failed to add technology.");
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+      setImagePreview(URL.createObjectURL(e.target.files[0]));
     }
   };
 
-  const handleImageChange = (info) => {
-    const file = info.file.originFileObj;
-    setSelectedFile(file);
-    setImagePreview(URL.createObjectURL(file));
+  const handleUpload = async () => {
+    if (image) {
+      try {
+        const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
+        const snapshot = await uploadBytes(imageRef, image);
+        const url = await getDownloadURL(snapshot.ref);
+        return url;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error("Failed to upload image.");
+        throw error;
+      }
+    }
+    return "";
   };
 
-  const beforeUpload = (file) => {
-    handleImageChange({ file });
-    return false;
+  const handleSubmit = async () => {
+    try {
+      setUploading(true);
+
+      let uploadedImageURL = "";
+      if (image) {
+        uploadedImageURL = await handleUpload();
+        toast.success("Image uploaded successfully!");
+      }
+
+      await postCreateTechnology(name, description, status, uploadedImageURL);
+
+      toast.success("Technology added successfully!");
+
+      // Reset form fields to default values
+      setName("");
+      setDescription("");
+      setStatus("active");
+      setImage(null);
+      setImagePreview(null);
+
+      handleClose();
+    } catch (error) {
+      toast.error("Failed to add technology.");
+      console.error("Error adding technology:", error);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -83,15 +75,19 @@ const ModalAddTechnology = ({ open, handleClose }) => {
       open={open}
       onCancel={() => {
         handleClose();
-        setSelectedFile(null);
         setImagePreview("");
-        setImageUrl("");
+        setStatus("active");
       }}
       footer={[
         <Button key="back" onClick={handleClose}>
           Close
         </Button>,
-        <Button key="submit" type="primary" onClick={handleAddTechnology}>
+        <Button
+          key="submit"
+          type="primary"
+          onClick={handleSubmit}
+          disabled={uploading}
+        >
           Save
         </Button>,
       ]}
@@ -126,20 +122,20 @@ const ModalAddTechnology = ({ open, handleClose }) => {
         </div>
         <div className="mb-3">
           <Upload
-            accept="image/*"
-            beforeUpload={beforeUpload}
-            showUploadList={false}
+            accept=".jpg,.jpeg,.png"
+            beforeUpload={(file) => {
+              handleImageChange({ target: { files: [file] } });
+              return false; // Prevent automatic upload
+            }}
+            listType="picture"
           >
-            <Button icon={<PlusOutlined />}>Select Image</Button>
+            <Button>
+              <PlusOutlined />
+              Upload Image
+            </Button>
           </Upload>
           {imagePreview && (
-            <div style={{ marginTop: 10 }}>
-              <img
-                src={imagePreview}
-                alt="preview"
-                style={{ width: "100%", maxHeight: 200, objectFit: "contain" }}
-              />
-            </div>
+            <img src={imagePreview} alt="Image Preview" width="100%" />
           )}
         </div>
       </div>

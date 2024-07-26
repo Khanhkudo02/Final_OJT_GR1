@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ResetPassword from "../src/pages/ResetPassword";
 import AccountInfo from "./Components/AccountInfo.jsx";
-import AddPosition from "./Components/AddPosition.jsx";
 import ChangePassword from "./Components/ChangePassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import NewProject from "./Components/NewProject";
@@ -17,6 +16,9 @@ import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
+import AddPosition from "./Components/AddPosition.jsx";
+import EditPosition from "./Components/EditPosition";
+import PositionDetails from "./Components/PositionDetails";
 
 const { Content } = Layout;
 
@@ -87,6 +89,14 @@ const App = () => {
                         <Route
                           path="/positions/add"
                           element={<AddPosition />}
+                        />
+                        <Route
+                          path="/position-management/edit/:id"
+                          element={<EditPosition />}
+                        />
+                        <Route
+                          path="/position-management/view/:id"
+                          element={<PositionDetails />}
                         />
                         <Route
                           path="/technology-management"

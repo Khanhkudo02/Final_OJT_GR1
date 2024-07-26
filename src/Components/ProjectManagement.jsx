@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import { fetchAllProjects } from "../service/Project";
 import "../assets/style/Pages/ProjectManagement.scss";
 
@@ -17,7 +17,7 @@ const ProjectManagement = () => {
   const [filteredStatus, setFilteredStatus] = useState("All Projects");
   const [data, setData] = useState([]);
   const pageSize = 10;
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,7 +66,7 @@ const ProjectManagement = () => {
     {
       title: "End Date",
       dataIndex: "endDate",
-      key: "endDate", 
+      key: "endDate",
     },
     {
       title: "Client Name",
