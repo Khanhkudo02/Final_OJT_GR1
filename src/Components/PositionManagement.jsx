@@ -12,16 +12,15 @@ const { confirm } = Modal;
 
 const PositionManagement = () => {
   const [positions, setPositions] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const navigate = useNavigate();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [dataPositionEdit, setDataPositionEdit] = useState(null);
-  const [positionIdToDelete, setPositionIdToDelete] = useState(null);
 
   const loadPositions = async () => {
     try {
       const data = await fetchAllPositions();
-      console.log(data); // Debugging: Check the data structure
       setPositions(data);
     } catch (error) {
       console.error("Failed to fetch positions:", error);
@@ -30,7 +29,17 @@ const PositionManagement = () => {
 
   useEffect(() => {
     loadPositions();
+
+    const positionAdded = localStorage.getItem("positionAdded");
+    if (positionAdded === "true") {
+      message.success("Position added successfully!");
+      localStorage.removeItem("positionAdded"); // Xóa thông báo sau khi đã hiển thị
+    }
   }, []);
+  const handleTableChange = (pagination) => {
+    setCurrentPage(pagination.current);
+    setPageSize(pagination.pageSize);
+  };
 
   const showEditModal = (record) => {
     setDataPositionEdit(record);
@@ -68,14 +77,20 @@ const PositionManagement = () => {
   );
   return (
     <div>
-      <Button
-        type="primary"
-        style={{ marginBottom: 16 }}
-        onClick={showAddModal}
-      >
+      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
         Add New Position
       </Button>
-      <Table dataSource={positions} rowKey="key" pagination={false}>
+      <Table
+        dataSource={paginatedData}
+        rowKey="key"
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          total: positions.length,
+          onChange: (page, pageSize) =>
+            handleTableChange({ current: page, pageSize }),
+        }}
+      >
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
         <Column title="Department" dataIndex="department" key="department" />
@@ -107,19 +122,8 @@ const PositionManagement = () => {
       {dataPositionEdit && (
         <ModalEditPosition
           open={isEditModalVisible}
-          handleClose={handleCloseEditModal}
+          handleClose={() => setIsEditModalVisible(false)}
           dataPositionEdit={dataPositionEdit}
-        />
-      )}
-      <ModalAddPosition
-        open={isAddModalVisible}
-        handleClose={handleCloseAddModal}
-      />
-      {positionIdToDelete && (
-        <ModalDeletePosition
-          open={isDeleteModalVisible}
-          handleClose={handleCloseDeleteModal}
-          positionId={positionIdToDelete}
         />
       )}
     </div>
