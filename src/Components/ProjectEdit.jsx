@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Select, DatePicker, InputNumber, message, Upload } from "antd";
+import { Form, Input, Button, Select, DatePicker, InputNumber, message, Upload, Modal } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
 import { UploadOutlined } from '@ant-design/icons';
@@ -8,20 +8,18 @@ import moment from "moment";
 const { Option } = Select;
 const { TextArea } = Input;
 
-const EditProject = () => {
+const ProjectEdit = () => {
   const { id } = useParams();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
+  const [fileList, setFileList] = useState([]);
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
         const allProjects = await fetchAllProjects();
-        console.log("All Projects:", allProjects); // Log all projects
         const projectData = allProjects.find(project => project.key === id);
-        console.log("Project Data:", projectData); // Log the specific project
         if (projectData) {
           setProject(projectData);
           form.setFieldsValue({
@@ -29,6 +27,18 @@ const EditProject = () => {
             startDate: moment(projectData.startDate),
             endDate: moment(projectData.endDate),
           });
+
+          // Set fileList for existing attachments
+          if (projectData.imageUrl) {
+            setFileList([
+              {
+                uid: '-1',
+                name: 'attachment',
+                status: 'done',
+                url: projectData.imageUrl,
+              },
+            ]);
+          }
         } else {
           message.error("Project not found");
           navigate("/project-management");
@@ -43,23 +53,31 @@ const EditProject = () => {
   }, [id, form, navigate]);
 
   const onFinish = async (values) => {
-    try {
-      const projectData = {
-        ...values,
-        startDate: values.startDate.format('YYYY-MM-DD'),
-        endDate: values.endDate.format('YYYY-MM-DD'),
-        imageUrl: project.imageUrl,
-      };
-      await putUpdateProject(id, projectData, imageFile);
-      message.success('Project updated successfully');
-      navigate(`/project/${id}`);
-    } catch (error) {
-      message.error('Failed to update project');
-    }
+    Modal.confirm({
+      title: "Confirm Changes",
+      content: "Do you agree with the changes you have made?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          const projectData = {
+            ...values,
+            startDate: values.startDate.format('YYYY-MM-DD'),
+            endDate: values.endDate.format('YYYY-MM-DD'),
+            imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl,
+          };
+          await putUpdateProject(id, projectData, fileList.length > 0 ? fileList[0].originFileObj : null);
+          message.success('Project updated successfully');
+          navigate(`/project/${id}`);
+        } catch (error) {
+          message.error('Failed to update project');
+        }
+      },
+    });
   };
 
-  const handleImageChange = (info) => {
-    setImageFile(info.file.originFileObj);
+  const handleImageChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
   if (!project) {
@@ -215,7 +233,12 @@ const EditProject = () => {
         </Form.Item>
 
         <Form.Item label="Attachments" name="attachments">
-          <Upload beforeUpload={() => false} onChange={handleImageChange}>
+          <Upload
+            fileList={fileList}
+            beforeUpload={() => false}
+            onChange={handleImageChange}
+            listType="picture"
+          >
             <Button icon={<UploadOutlined />}>Click to Upload</Button>
           </Upload>
         </Form.Item>
@@ -230,4 +253,4 @@ const EditProject = () => {
   );
 };
 
-export default EditProject;
+export default ProjectEdit;

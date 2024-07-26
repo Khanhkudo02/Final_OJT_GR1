@@ -88,9 +88,7 @@ const App = () => {
                           path="/project/:id" 
                           element={<ProjectDetail />} 
                         />
-                        <Route 
-                          path="/project-edit/:id" 
-                          element={<ProjectEdit />} />  
+                        <Route path="/edit-project/:id" element={<ProjectEdit />} /> 
 
                         <Route
                           path="/position-management"

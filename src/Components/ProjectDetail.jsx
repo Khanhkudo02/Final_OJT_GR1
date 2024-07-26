@@ -13,13 +13,20 @@ const ProjectDetail = () => {
       try {
         const allProjects = await fetchAllProjects();
         const projectData = allProjects.find(project => project.key === id);
-        setProject(projectData);
+        if (projectData) {
+          setProject(projectData);
+        } else {
+          message.error("Project not found");
+          navigate("/project-management");
+        }
       } catch (error) {
         console.error("Error fetching project:", error);
+        message.error("Error fetching project data");
+        navigate("/project-management");
       }
     };
     fetchProject();
-  }, [id]);
+  }, [id, navigate]);
 
   const handleDelete = async () => {
     try {
