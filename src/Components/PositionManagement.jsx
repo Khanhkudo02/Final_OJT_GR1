@@ -59,7 +59,7 @@ const PositionManagement = () => {
 
     confirm({
       title: "Are you sure you want to delete this position?",
-      title: "Are you sure you want to delete this position?",
+      // title: "Are you sure you want to delete this position?",
       onOk: async () => {
         try {
           await deletePositionById(record.key);
