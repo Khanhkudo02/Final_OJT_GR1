@@ -8,20 +8,22 @@ const storageInstance = storage;
 const postCreateProject = async (projectData, imageFile) => {
     try {
         const newProjectRef = push(ref(db, 'projects'));
+        const projectId = newProjectRef.key; // Firebase generated key
 
         let imageUrl = null;
         if (imageFile) {
-            const imageRef = storageRef(storageInstance, `images/${newProjectRef.key}/${imageFile.name}`);
+            const imageRef = storageRef(storageInstance, `images/${projectId}/${imageFile.name}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
 
         await set(newProjectRef, {
+            id: projectId,
             ...projectData,
             imageUrl,
         });
 
-        return newProjectRef.key;
+        return projectId;
     } catch (error) {
         console.error("Failed to create project:", error);
         throw error;
@@ -33,7 +35,8 @@ const fetchAllProjects = async () => {
         const projectsRef = ref(db, 'projects');
         const snapshot = await get(projectsRef);
         const data = snapshot.val();
-        return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
+        if (!data) return [];
+        return Object.entries(data).map(([key, value]) => ({ key, ...value }));
     } catch (error) {
         console.error("Failed to fetch projects:", error);
         throw error;

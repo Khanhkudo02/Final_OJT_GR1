@@ -1,53 +1,102 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Select, Checkbox, DatePicker, InputNumber, message, Upload } from "antd";
-import { useNavigate } from "react-router-dom";
-import { postCreateProject } from "../service/Project";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, Select, DatePicker, InputNumber, message, Upload, Modal } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchAllProjects, putUpdateProject } from "../service/Project";
 import { UploadOutlined } from '@ant-design/icons';
+import moment from "moment";
 
 const { Option } = Select;
 const { TextArea } = Input;
 
-const NewProject = () => {
+const ProjectEdit = () => {
+  const { id } = useParams();
   const [form] = Form.useForm();
-  const [agreement, setAgreement] = useState(false);
   const navigate = useNavigate();
-  const [imageFile, setImageFile] = useState(null);
+  const [project, setProject] = useState(null);
+  const [fileList, setFileList] = useState([]);
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const allProjects = await fetchAllProjects();
+        const projectData = allProjects.find(project => project.key === id);
+        if (projectData) {
+          setProject(projectData);
+          form.setFieldsValue({
+            ...projectData,
+            startDate: moment(projectData.startDate),
+            endDate: moment(projectData.endDate),
+          });
+
+          // Set fileList for existing attachments
+          if (projectData.imageUrl) {
+            setFileList([
+              {
+                uid: '-1',
+                name: 'attachment',
+                status: 'done',
+                url: projectData.imageUrl,
+              },
+            ]);
+          }
+        } else {
+          message.error("Project not found");
+          navigate("/project-management");
+        }
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        message.error("Error fetching project data");
+        navigate("/project-management");
+      }
+    };
+    fetchProject();
+  }, [id, form, navigate]);
 
   const onFinish = async (values) => {
-    try {
-      const projectData = {
-        ...values,
-        startDate: values.startDate.format('YYYY-MM-DD'),
-        endDate: values.endDate.format('YYYY-MM-DD')
-      };
-      await postCreateProject(projectData, imageFile);
-      message.success('Project added successfully');
-      navigate('/project-management');
-    } catch (error) {
-      message.error('Failed to add project');
-    }
+    Modal.confirm({
+      title: "Confirm Changes",
+      content: "Do you agree with the changes you have made?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          const projectData = {
+            ...values,
+            startDate: values.startDate.format('YYYY-MM-DD'),
+            endDate: values.endDate.format('YYYY-MM-DD'),
+            imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl,
+          };
+          await putUpdateProject(id, projectData, fileList.length > 0 ? fileList[0].originFileObj : null);
+          message.success('Project updated successfully');
+          navigate(`/project/${id}`);
+        } catch (error) {
+          message.error('Failed to update project');
+        }
+      },
+    });
   };
 
-  const handleAgreementChange = (e) => {
-    setAgreement(e.target.checked);
+  const handleImageChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
-  const handleImageChange = (info) => {
-    setImageFile(info.file.originFileObj);
-  };
+  if (!project) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div
       style={{
-        padding: "24px 0",
+        padding: "24px",
         background: "#fff",
-        maxWidth: "1000px",
-        margin: "auto"
-        // maxWidth: "600px",
-        // margin: "0 auto",
+        maxWidth: "600px",
+        margin: "0 auto",
       }}
     >
-      <h2>New Project</h2>
+      <Button type="default" onClick={() => navigate(`/project/${id}`)}>
+        Back
+      </Button>
+      <h2>Edit Project</h2>
       <Form form={form} onFinish={onFinish}>
         <Form.Item
           label="Project Name"
@@ -184,23 +233,19 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item label="Attachments" name="attachments">
-          <Upload beforeUpload={() => false} onChange={handleImageChange}>
+          <Upload
+            fileList={fileList}
+            beforeUpload={() => false}
+            onChange={handleImageChange}
+            listType="picture"
+          >
             <Button icon={<UploadOutlined />}>Click to Upload</Button>
           </Upload>
         </Form.Item>
 
         <Form.Item>
-          <Checkbox checked={agreement} onChange={handleAgreementChange}>
-            I have read the agreement
-          </Checkbox>
-          {!agreement && (
-            <div style={{ color: "red" }}>Should accept agreement</div>
-          )}
-        </Form.Item>
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit" disabled={!agreement}>
-            Register
+          <Button type="primary" htmlType="submit">
+            Update
           </Button>
         </Form.Item>
       </Form>
@@ -208,4 +253,4 @@ const NewProject = () => {
   );
 };
 
-export default NewProject;
+export default ProjectEdit;

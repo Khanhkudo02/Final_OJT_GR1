@@ -15,7 +15,9 @@ import Admin from "./pages/Admin";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
-import AddPosition from "./Components/AddPosition.jsx";
+import ProjectDetail from "./Components/ProjectDetail";
+import AddPosition from "./Components/AddPosition"; 
+import ProjectEdit from "./Components/ProjectEdit"; 
 import EditPosition from "./Components/EditPosition";
 import PositionDetails from "./Components/PositionDetails";
 
@@ -81,6 +83,12 @@ const App = () => {
                           path="/project-management"
                           element={<ProjectManagement />}
                         />
+                        <Route 
+                          path="/project/:id" 
+                          element={<ProjectDetail />} 
+                        />
+                        <Route path="/edit-project/:id" element={<ProjectEdit />} /> 
+
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
