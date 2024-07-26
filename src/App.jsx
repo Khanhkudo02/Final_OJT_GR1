@@ -2,6 +2,7 @@ import { Layout, theme } from "antd";
 import React, { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ResetPassword from "../src/pages/ResetPassword";
+import AccountInfo from "./Components/AccountInfo.jsx";
 import ChangePassword from "./Components/ChangePassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import NewProject from "./Components/NewProject";
@@ -18,6 +19,8 @@ import PageCV from "./pages/PageCV";
 import ProjectDetail from "./Components/ProjectDetail";
 import AddPosition from "./Components/AddPosition"; 
 import ProjectEdit from "./Components/ProjectEdit"; 
+import EditPosition from "./Components/EditPosition";
+import PositionDetails from "./Components/PositionDetails";
 
 const { Content } = Layout;
 
@@ -31,21 +34,9 @@ const App = () => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  const [role, setRole] = useState(user ? user.role : "");
-
-  // Update user state if local storage changes
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      setRole(userData.role);
-    }
-  }, []);
 
   const handleLogin = (userInfo) => {
     setUser(userInfo);
-    setRole(userInfo.role);
   };
 
   // eslint-disable-next-line react/prop-types
@@ -68,9 +59,9 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Layout style={{ minHeight: "100vh" }}>
-                {user && role === "admin" && <Sidebar />}
+                {user && <Sidebar role={user.role} />}
                 <Layout
-                  style={{ marginLeft: user && role === "admin" ? 0 : 0 }}
+                  style={{ marginLeft: user && user.role === "admin" ? 0 : 0 }}
                 >
                   <Content
                     style={{ margin: "24px 16px 0", overflow: "initial" }}
@@ -80,6 +71,7 @@ const App = () => {
                         <Route path="/employee" element={<Employee />} />
                         <Route path="/cv" element={<PageCV />} />
                         <Route path="/account-management" element={<Admin />} />
+                        <Route path="/account-info" element={<AccountInfo />} />
                         <Route
                           path="/change-password"
                           element={<ChangePassword />}
@@ -109,6 +101,14 @@ const App = () => {
                           element={<AddPosition />}
                         />
                         <Route
+                          path="/position-management/edit/:id"
+                          element={<EditPosition />}
+                        />
+                        <Route
+                          path="/position-management/view/:id"
+                          element={<PositionDetails />}
+                        />
+                        <Route
                           path="/technology-management"
                           element={<TechnologyManagement />}
                         />
@@ -116,8 +116,7 @@ const App = () => {
                           path="/programing-language"
                           element={<ProgramingLanguage />}
                         />
-                        <Route path="/new-project" element={<NewProject />} />{" "}
-                        {/* Add the NewProject route */}
+                        <Route path="/new-project" element={<NewProject />} />
                         <Route path="/" element={<Navigate to="/login" />} />
                       </Routes>
                     </div>

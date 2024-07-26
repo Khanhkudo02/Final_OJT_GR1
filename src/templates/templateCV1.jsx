@@ -1,7 +1,7 @@
 import React from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "../assets/style/template/templateCV1.scss";
+import "../templates/templateCV1.jsx";
 
 function templateCV1() {
   return (

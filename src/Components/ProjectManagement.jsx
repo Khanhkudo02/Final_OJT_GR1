@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
-import { Link, useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom"; 
 import { fetchAllProjects } from "../service/Project";
 import "../assets/style/Pages/ProjectManagement.scss";
 
@@ -51,7 +51,6 @@ const ProjectManagement = () => {
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => <Link to={`/project/${text}`}>{text}</Link>,
     },
     {
       title: "Project Name",
@@ -113,7 +112,16 @@ const ProjectManagement = () => {
         <TabPane tab="Not Started" key="Not Started" />
         <TabPane tab="Completed" key="Completed" />
       </Tabs>
-      <Table columns={columns} dataSource={paginatedData} pagination={false} />
+      <Table 
+        columns={columns} 
+        dataSource={paginatedData} 
+        pagination={false} 
+        onRow={(record) => {
+          return {
+            onClick: () => navigate(`/project/${record.key}`),
+          };
+        }}
+      />
       <div style={{ marginTop: "16px", textAlign: "right" }}>
         <Pagination
           current={currentPage}

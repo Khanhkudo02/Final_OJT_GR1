@@ -58,14 +58,6 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Project ID"
-          name="id"
-          rules={[{ required: true, message: "Please input the project ID!" }]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
           label="Description"
           name="description"
           rules={[

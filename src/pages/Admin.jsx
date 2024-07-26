@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import LanguageSwitcher from "../Components/LanguageSwitcher";
 import ExportExcel from "../Components/ExportExcel";
+import LanguageSwitcher from "../Components/LanguageSwitcher";
 
 const { Option } = Select;
 
@@ -18,7 +18,7 @@ function AdminPage() {
   const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
   const [editMode, setEditMode] = useState(false);
-
+  const [status, setStatus] = useState("active");
   const [editUserId, setEditUserId] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -36,9 +36,7 @@ function AdminPage() {
             id,
             ...data,
           }));
-          usersArray.sort(
-            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-          );
+          usersArray.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
           setUsers(usersArray);
         }
       } catch (error) {
@@ -57,7 +55,7 @@ function AdminPage() {
   }, [navigate]);
 
   const handleAddOrUpdateUser = async (values) => {
-    const { email, password, role, name } = values;
+    const { email, password, role, name, status } = values;
 
     if (!email || !name) {
       message.error(t("pleaseFillAllFields"));
@@ -80,9 +78,7 @@ function AdminPage() {
       const usersData = snapshot.val();
 
       if (!editMode && usersData) {
-        const emailExists = Object.values(usersData).some(
-          (user) => user.email === email
-        );
+        const emailExists = Object.values(usersData).some(user => user.email === email);
         if (emailExists) {
           message.error(t("emailAlreadyExists"));
           return;
@@ -106,10 +102,16 @@ function AdminPage() {
         createdAt: new Date().toISOString(),
         projetcIds: "",
         skill: "",
-        status: "active",
+        status: editMode ? status : "active",
       };
 
       if (editMode) {
+        const currentUser = usersData[editUserId];
+        if (currentUser.isAdmin && role !== currentUser.role) {
+          message.error(t("cannotChangeAdminRole"));
+          return;
+        }
+
         if (password) {
           const hashedPassword = await bcrypt.hash(password, 10);
           userData.password = hashedPassword;
@@ -137,6 +139,7 @@ function AdminPage() {
       setPassword("");
       setName("");
       setRole("employee");
+      setStatus("active");
       setEditMode(false);
       setEditUserId("");
       setModalVisible(false);
@@ -144,12 +147,10 @@ function AdminPage() {
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
-        const usersArray = Object.entries(updatedUserData).map(
-          ([id, data]) => ({
-            id,
-            ...data,
-          })
-        );
+        const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
+          id,
+          ...data,
+        }));
         setUsers(usersArray);
       }
     } catch (error) {
@@ -159,7 +160,7 @@ function AdminPage() {
 
   const handleDeleteUser = async (userId) => {
     if (!userId) {
-      message.error(t("userDoesNotExist"));
+      message.error(t("cannotDeleteAccount"));
       return;
     }
 
@@ -176,6 +177,10 @@ function AdminPage() {
           message.error(t("cannotDeleteOnlyAdminUser"));
           return;
         }
+        if (userData.status !== "inactive") {
+          message.error(t("onlyInactiveUsersCanBeDeleted"));
+          return;
+        }
 
         await remove(userRef);
         message.success(t("userDeletedSuccessfully"));
@@ -183,18 +188,16 @@ function AdminPage() {
         const updatedSnapshot = await get(ref(db, "users"));
         const updatedUserData = updatedSnapshot.val();
         if (updatedUserData) {
-          const usersArray = Object.entries(updatedUserData).map(
-            ([id, data]) => ({
-              id,
-              ...data,
-            })
-          );
+          const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
+            id,
+            ...data,
+          }));
           setUsers(usersArray);
         } else {
           setUsers([]);
         }
       } else {
-        message.error(t("userDoesNotExist"));
+        message.error(t("cannotDeleteAccount"));
       }
     } catch (error) {
       message.error(t("errorDeletingUser"));
@@ -206,6 +209,7 @@ function AdminPage() {
     setPassword(user.password);
     setName(user.name);
     setRole(user.role);
+    setStatus(user.status);
     setEditMode(true);
     setEditUserId(user.id);
     setModalVisible(true);
@@ -214,6 +218,7 @@ function AdminPage() {
       password: user.password,
       name: user.name,
       role: user.role,
+      status: user.status,
     });
   };
 
@@ -224,6 +229,7 @@ function AdminPage() {
     setPassword("");
     setName("");
     setRole("employee");
+    setStatus("active");
     setEditUserId("");
     form.resetFields();
   };
@@ -248,6 +254,11 @@ function AdminPage() {
       title: t("role"),
       dataIndex: "role",
       key: "role",
+    },
+    {
+      title: t("status"),
+      dataIndex: "status",
+      key: "status",
     },
     {
       title: t("createdAt"),
@@ -277,7 +288,6 @@ function AdminPage() {
       <Button type="primary" onClick={() => setModalVisible(true)}>
         {t("addUser")}
       </Button>
-      <ExportExcel data={users} fileName="File Excel" />
       <Modal
         title={editMode ? t("editUser") : t("addUser")}
         open={modalVisible}
@@ -328,11 +338,27 @@ function AdminPage() {
             name="role"
             rules={[{ required: true, message: t("pleaseSelectRole") }]}
           >
-            <Select value={role} onChange={(value) => setRole(value)}>
+            <Select
+              value={role}
+              onChange={(value) => setRole(value)}
+            >
               <Option value="admin">{t("admin")}</Option>
               <Option value="employee">{t("employee")}</Option>
             </Select>
           </Form.Item>
+
+          {editMode && (
+            <Form.Item
+              label={t("status")}
+              name="status"
+            >
+              <Select value={status} onChange={(value) => setStatus(value)}>
+                <Option value="active">{t("active")}</Option>
+                <Option value="inactive">{t("inactive")}</Option>
+              </Select>
+            </Form.Item>
+          )}
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               {editMode ? t("updateUser") : t("addUser")}

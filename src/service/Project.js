@@ -8,20 +8,22 @@ const storageInstance = storage;
 const postCreateProject = async (projectData, imageFile) => {
     try {
         const newProjectRef = push(ref(db, 'projects'));
+        const projectId = newProjectRef.key; // Firebase generated key
 
         let imageUrl = null;
         if (imageFile) {
-            const imageRef = storageRef(storageInstance, `images/${newProjectRef.key}/${imageFile.name}`);
+            const imageRef = storageRef(storageInstance, `images/${projectId}/${imageFile.name}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
 
         await set(newProjectRef, {
+            id: projectId,
             ...projectData,
             imageUrl,
         });
 
-        return newProjectRef.key;
+        return projectId;
     } catch (error) {
         console.error("Failed to create project:", error);
         throw error;

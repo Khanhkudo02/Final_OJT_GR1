@@ -1,5 +1,4 @@
 import React from "react";
-import jsPDF from "jspdf";
 
 import "../assets/style/template/templateCV2.scss";
 

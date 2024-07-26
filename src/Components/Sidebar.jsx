@@ -17,11 +17,11 @@ import { useTranslation } from "react-i18next";
 
 const { Sider } = Layout;
 
-const Sidebar = () => {
+const Sidebar = ({ role }) => {
   const [collapsed, setCollapsed] = useState(false);
   const { t } = useTranslation();
 
-  const menuItems = [
+  const adminMenuItems = [
     {
       key: "1",
       icon: <UserOutlined />,
@@ -33,7 +33,7 @@ const Sidebar = () => {
         },
         {
           key: "1-2",
-          label: <NavLink to="/change-password">Change Password </NavLink>,
+          label: <NavLink to="/change-password">Change Password</NavLink>,
         },
       ],
     },
@@ -44,7 +44,7 @@ const Sidebar = () => {
       children: [
         {
           key: "2-1",
-          label: <NavLink to="/new-project">New Project </NavLink>,
+          label: <NavLink to="/new-project">New Project</NavLink>,
         },
         {
           key: "2-2",
@@ -70,27 +70,48 @@ const Sidebar = () => {
     },
     {
       key: "5",
-      icon: (
-        <img
-          src="public\images\sidebar-employees.png"
-          alt="Employee Management"
-          style={{ width: "20px", height: "20px" }}
-        />
-      ),
-      label: <NavLink to="/employee-management">Employee Management</NavLink>,
-    },
-    {
-      key: "6",
       icon: <CodeOutlined />,
       label: <NavLink to="/programing-language">Programming Languages</NavLink>,
     },
     {
-      key: "7",
+      key: "6",
       icon: <FileTextOutlined />,
       label: <NavLink to="/cv">CV</NavLink>,
     },
     {
-      key: "8",
+      key: "7",
+      label: <LogoutButton collapsed={collapsed} />,
+    },
+  ];
+
+  const employeeMenuItems = [
+    {
+      key: "1",
+      icon: <UserOutlined />,
+      label: <NavLink to="/employee">Employee Account</NavLink>,
+      children: [
+        {
+          key: "1-1",
+          label: <NavLink to="/account-info">Account Info</NavLink>,
+        },
+        {
+          key: "1-2",
+          label: <NavLink to="/change-password">Change Password</NavLink>,
+        },
+      ],
+    },
+    {
+      key: "2",
+      icon: <ProjectOutlined />,
+      label: <NavLink to="/project-management">Project Management</NavLink>,
+    },
+    {
+      key: "3",
+      icon: <FileTextOutlined />,
+      label: <NavLink to="/cv">CV</NavLink>,
+    },
+    {
+      key: "4",
       label: <LogoutButton collapsed={collapsed} />,
     },
   ];
@@ -115,7 +136,7 @@ const Sidebar = () => {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={["1"]}
-        items={menuItems}
+        items={role === "admin" ? adminMenuItems : employeeMenuItems}
       />
     </Sider>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Select, Checkbox, DatePicker, InputNumber, message, Upload } from "antd";
+import { Form, Input, Button, Select, DatePicker, InputNumber, message, Upload } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
 import { UploadOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import moment from "moment";
 const { Option } = Select;
 const { TextArea } = Input;
 
-const ProjectEdit = () => {
+const EditProject = () => {
   const { id } = useParams();
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -17,17 +17,30 @@ const ProjectEdit = () => {
 
   useEffect(() => {
     const fetchProject = async () => {
-      const allProjects = await fetchAllProjects();
-      const projectData = allProjects.find(project => project.key === id);
-      setProject(projectData);
-      form.setFieldsValue({
-        ...projectData,
-        startDate: moment(projectData.startDate),
-        endDate: moment(projectData.endDate),
-      });
+      try {
+        const allProjects = await fetchAllProjects();
+        console.log("All Projects:", allProjects); // Log all projects
+        const projectData = allProjects.find(project => project.key === id);
+        console.log("Project Data:", projectData); // Log the specific project
+        if (projectData) {
+          setProject(projectData);
+          form.setFieldsValue({
+            ...projectData,
+            startDate: moment(projectData.startDate),
+            endDate: moment(projectData.endDate),
+          });
+        } else {
+          message.error("Project not found");
+          navigate("/project-management");
+        }
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        message.error("Error fetching project data");
+        navigate("/project-management");
+      }
     };
     fetchProject();
-  }, [id, form]);
+  }, [id, form, navigate]);
 
   const onFinish = async (values) => {
     try {
@@ -62,6 +75,9 @@ const ProjectEdit = () => {
         margin: "0 auto",
       }}
     >
+      <Button type="default" onClick={() => navigate(`/project/${id}`)}>
+        Back
+      </Button>
       <h2>Edit Project</h2>
       <Form form={form} onFinish={onFinish}>
         <Form.Item
@@ -70,14 +86,6 @@ const ProjectEdit = () => {
           rules={[
             { required: true, message: "Please input the project name!" },
           ]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="Project ID"
-          name="id"
-          rules={[{ required: true, message: "Please input the project ID!" }]}
         >
           <Input />
         </Form.Item>
@@ -222,4 +230,4 @@ const ProjectEdit = () => {
   );
 };
 
-export default ProjectEdit;
+export default EditProject;

@@ -12,9 +12,7 @@ const ProjectDetail = () => {
     const fetchProject = async () => {
       try {
         const allProjects = await fetchAllProjects();
-        console.log("All Projects:", allProjects); // Debugging log
         const projectData = allProjects.find(project => project.key === id);
-        console.log("Project Data:", projectData); // Debugging log
         setProject(projectData);
       } catch (error) {
         console.error("Error fetching project:", error);
@@ -50,6 +48,9 @@ const ProjectDetail = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
+      <Button type="default" onClick={() => navigate("/project-management")}>
+        Back
+      </Button>
       <h2>Project Detail</h2>
       {project.imageUrl && <img src={project.imageUrl} alt="Project" style={{ width: "100%", marginBottom: "20px" }} />}
       <p><strong>ID:</strong> {project.key}</p>
