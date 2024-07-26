@@ -1,8 +1,11 @@
-import { Button, message, Modal, Table } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { Button, Table, message, Modal } from "antd";
+import {
+  fetchAllPositions,
+  deletePositionById,
+} from "../service/PositionServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/PositionManagement.scss";
-import { deletePositionById, fetchAllPositions } from "../service/PositionServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -47,28 +50,34 @@ const PositionManagement = () => {
     navigate("/positions/add");
   };
   const handleDelete = (record) => {
-    if (record.status !== 'inactive') {
-      message.error('Only inactive positions can be deleted.');
+    if (record.status !== "inactive") {
+      message.error("Only inactive positions can be deleted.");
+
       return;
     }
 
     confirm({
-      title: 'Are you sure you want to delete this position?',
+      title: "Are you sure you want to delete this position?",
+      title: "Are you sure you want to delete this position?",
       onOk: async () => {
         try {
           await deletePositionById(record.key);
-          message.success('Position deleted successfully!');
+          message.success("Position deleted successfully!");
           loadPositions();
         } catch (error) {
-          message.error('Failed to delete position.');
+          message.error("Failed to delete position.");
         }
       },
       onCancel() {
-        console.log('Cancel');
+        console.log("Cancel");
+        console.log("Cancel");
       },
     });
   };
-  const paginatedData = positions.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedData = positions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
   return (
     <div>
       <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
@@ -94,10 +103,28 @@ const PositionManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
-              <Button type="primary" onClick={() => navigate(`/position-management/view/${record.key}`)}>
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/position-management/view/${record.key}`)
+                }
+              >
                 Detail
               </Button>
-              <Button type="danger" onClick={() => handleDelete(record)} style={{ marginLeft: 8 }}>
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/position-management/edit/${record.key}`)
+                }
+                style={{ marginLeft: 8 }}
+              >
+                Edit
+              </Button>
+              <Button
+                type="danger"
+                onClick={() => handleDelete(record)}
+                style={{ marginLeft: 8 }}
+              >
                 Delete
               </Button>
             </span>
