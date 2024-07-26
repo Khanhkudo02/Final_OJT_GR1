@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import LanguageSwitcher from "../Components/LanguageSwitcher";
 import ExportExcel from "../Components/ExportExcel";
+import LanguageSwitcher from "../Components/LanguageSwitcher";
 
 const { Option } = Select;
 
@@ -18,7 +18,7 @@ function AdminPage() {
   const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
   const [editMode, setEditMode] = useState(false);
-
+  const [status, setStatus] = useState("active");
   const [editUserId, setEditUserId] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -57,7 +57,7 @@ function AdminPage() {
   }, [navigate]);
 
   const handleAddOrUpdateUser = async (values) => {
-    const { email, password, role, name } = values;
+    const { email, password, role, name, status } = values;
 
     if (!email || !name) {
       message.error(t("pleaseFillAllFields"));
@@ -106,10 +106,16 @@ function AdminPage() {
         createdAt: new Date().toISOString(),
         projetcIds: "",
         skill: "",
-        status: "active",
+        status: editMode ? status : "active",
       };
 
       if (editMode) {
+        const currentUser = usersData[editUserId];
+        if (currentUser.isAdmin && role !== currentUser.role) {
+          message.error(t("cannotChangeAdminRole"));
+          return;
+        }
+
         if (password) {
           const hashedPassword = await bcrypt.hash(password, 10);
           userData.password = hashedPassword;
@@ -137,6 +143,7 @@ function AdminPage() {
       setPassword("");
       setName("");
       setRole("employee");
+      setStatus("active");
       setEditMode(false);
       setEditUserId("");
       setModalVisible(false);
@@ -159,7 +166,7 @@ function AdminPage() {
 
   const handleDeleteUser = async (userId) => {
     if (!userId) {
-      message.error(t("userDoesNotExist"));
+      message.error(t("cannotDeleteAccount"));
       return;
     }
 
@@ -174,6 +181,10 @@ function AdminPage() {
 
         if (userData.role === "admin" && adminUsers.length === 1) {
           message.error(t("cannotDeleteOnlyAdminUser"));
+          return;
+        }
+        if (userData.status !== "inactive") {
+          message.error(t("onlyInactiveUsersCanBeDeleted"));
           return;
         }
 
@@ -194,7 +205,7 @@ function AdminPage() {
           setUsers([]);
         }
       } else {
-        message.error(t("userDoesNotExist"));
+        message.error(t("cannotDeleteAccount"));
       }
     } catch (error) {
       message.error(t("errorDeletingUser"));
@@ -206,6 +217,7 @@ function AdminPage() {
     setPassword(user.password);
     setName(user.name);
     setRole(user.role);
+    setStatus(user.status);
     setEditMode(true);
     setEditUserId(user.id);
     setModalVisible(true);
@@ -214,6 +226,7 @@ function AdminPage() {
       password: user.password,
       name: user.name,
       role: user.role,
+      status: user.status,
     });
   };
 
@@ -224,6 +237,7 @@ function AdminPage() {
     setPassword("");
     setName("");
     setRole("employee");
+    setStatus("active");
     setEditUserId("");
     form.resetFields();
   };
@@ -248,6 +262,11 @@ function AdminPage() {
       title: t("role"),
       dataIndex: "role",
       key: "role",
+    },
+    {
+      title: t("status"),
+      dataIndex: "status",
+      key: "status",
     },
     {
       title: t("createdAt"),
@@ -333,6 +352,19 @@ function AdminPage() {
               <Option value="employee">{t("employee")}</Option>
             </Select>
           </Form.Item>
+
+          {editMode && (
+            <Form.Item
+              label={t("status")}
+              name="status"
+            >
+              <Select value={status} onChange={(value) => setStatus(value)}>
+                <Option value="active">{t("active")}</Option>
+                <Option value="inactive">{t("inactive")}</Option>
+              </Select>
+            </Form.Item>
+          )}
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               {editMode ? t("updateUser") : t("addUser")}

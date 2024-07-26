@@ -1,9 +1,9 @@
 import React from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "../assets/style/template/templateCV1.scss";
+import "../assets/style/template/TemplateCV1.scss";
 
-function templateCV1() {
+function templateCV1 () {
   return (
     <div className="container" id="cv-page">
       <div className="left">

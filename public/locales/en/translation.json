@@ -12,7 +12,7 @@
   "userUpdatedSuccessfully": "User updated successfully.",
   "userAddedSuccessfully": "User added successfully.",
   "errorAddingOrUpdatingUser": "Error adding or updating user.",
-  "userDoesNotExist": "User does not exist.",
+  "cannotDeleteAccount": "Can not Delete Account.",
   "cannotDeleteOnlyAdminUser": "Cannot delete the only admin user.",
   "userDeletedSuccessfully": "User deleted successfully.",
   "pleaseInputEmail": "Please input email.",
@@ -69,5 +69,11 @@
   "Email": "Email",
   "Password": "Password",
   "LOGIN": "LOGIN",
-  "ForgotPassword": "Forgot Password"
+  "ForgotPassword": "Forgot Password",
+
+  "userProfile":"Account Information",
+  "onlyInactiveUsersCanBeDeleted": "Only Inactive Users Can Be Deleted",
+  "status": "Status",
+  "active": "Active",
+  "inactive": "Inactive"
 }

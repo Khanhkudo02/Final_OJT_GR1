@@ -75,7 +75,7 @@ export const loginUser = async (
         setUser(user);
 
         // Điều hướng dựa trên vai trò người dùng
-        navigate(user.role === "admin" ? "/account-management" : "/employee");
+        navigate(user.role === "admin" ? "/account-management" : "/account-info");
         return { user, error: null };
       } else {
         return { user: null, error: "Invalid password" };
