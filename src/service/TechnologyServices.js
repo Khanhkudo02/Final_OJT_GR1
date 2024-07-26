@@ -1,22 +1,6 @@
-import {
-  ref as dbRef,
-  set,
-  push,
-  update,
-  get,
-  remove,
-} from "firebase/database";
-import {
-  getStorage,
-  ref as storageRef,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
+import { ref as dbRef, set, push, update, get, remove } from "firebase/database";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { database, storage } from "../firebaseConfig";
-
-const db = database;
-const storageInstance = storage;
 
 // Create new technology
 const postCreateTechnology = async (name, description, status, imageUrl) => {
@@ -28,7 +12,7 @@ const postCreateTechnology = async (name, description, status, imageUrl) => {
       name,
       description,
       status,
-      imageUrl, // Correct key name to match your data structure
+      imageURL: imageUrl,
       createdAt: Date.now(),
     });
 
@@ -55,14 +39,7 @@ const fetchAllTechnology = async () => {
 };
 
 // Update existing technology
-const putUpdateTechnology = async (
-  id,
-  name,
-  description,
-  status,
-  imageURL,
-  oldImageURL
-) => {
+const putUpdateTechnology = async (id, name, description, status, imageURL, oldImageURL) => {
   try {
     const technologyRef = dbRef(database, `technologies/${id}`);
 
@@ -117,24 +94,4 @@ const deleteTechnology = async (id) => {
   }
 };
 
-// Fetch technology by ID
-const fetchTechnologyById = async (id) => {
-  try {
-    console.log(`Fetching technology with ID: ${id}`); // Debug
-    const technologyRef = ref(db, `technologies/${id}`);
-    const snapshot = await get(technologyRef);
-    console.log("Technology data:", snapshot.val()); // Debug
-    return snapshot.val();
-  } catch (error) {
-    console.error("Failed to fetch technology by ID:", error);
-    throw error;
-  }
-};
-
-export {
-  fetchAllTechnology,
-  postCreateTechnology,
-  putUpdateTechnology,
-  deleteTechnology,
-  fetchTechnologyById,
-};
+export { fetchAllTechnology, postCreateTechnology, putUpdateTechnology, deleteTechnology };
