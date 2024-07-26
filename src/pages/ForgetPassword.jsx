@@ -17,21 +17,39 @@ function ForgetPassword() {
 
   const handleForgetPassword = async (values) => {
     const { email } = values;
-    const resetLink = `http://localhost:5173/reset-password?email=${encodeURIComponent(email)}`; 
 
     try {
-      const response = await emailjs.send(
-        'service_38z8rf8',      // Service ID của bạn
-        'template_yh7totx',     // Template ID của bạn
-        { 
-          user_email: email,    // Tên biến khớp với template
-          reset_link: resetLink 
-        },  
-        'BLOiZZ22_oSBTDilA'     // User ID của bạn
+      const db = getDatabase();
+      const userRef = ref(db, `users`);
+      const snapshot = await get(userRef);
+      const usersData = snapshot.val();
+
+      // Tìm người dùng với email đã cho
+      const user = Object.entries(usersData).find(
+        ([id, data]) => data.email === email
       );
-      console.log("Email sent successfully:", response);
-      setSuccessMessage("Password reset instructions sent to your email.");
-      form.resetFields(); // Reset form fields after success
+
+      if (user) {
+        const [userId] = user;
+        const resetLink = `http://localhost:5173/reset-password?userId=${encodeURIComponent(
+          userId
+        )}`;
+
+        const response = await emailjs.send(
+          "service_38z8rf8", // Service ID của bạn
+          "template_yh7totx", // Template ID của bạn
+          {
+            user_email: email, // Tên biến khớp với template
+            reset_link: resetLink,
+          },
+          "BLOiZZ22_oSBTDilA" // User ID của bạn
+        );
+        console.log("Email sent successfully:", response);
+        setSuccessMessage("Password reset instructions sent to your email.");
+        form.resetFields(); // Reset form fields after success
+      } else {
+        setError("User does not exist.");
+      }
     } catch (error) {
       console.error("Failed to send email:", error);
       setError("Failed to send password reset instructions.");
@@ -55,7 +73,7 @@ function ForgetPassword() {
             name="email"
             rules={[{ required: true, message: "Please input your email!" }]}
           >
-            <Input type="email" placeholder="Enter your email address"/>
+            <Input type="email" placeholder="Enter your email address" />
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
           {successMessage && <Alert message={successMessage} type="success" showIcon />}
