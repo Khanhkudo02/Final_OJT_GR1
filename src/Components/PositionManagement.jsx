@@ -6,6 +6,7 @@ import {
 } from "../service/PositionServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/PositionManagement.scss";
+import "../assets/style/Global.scss";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -104,6 +105,7 @@ const PositionManagement = () => {
           render={(text, record) => (
             <span>
               <Button
+                className="detail-button"
                 type="primary"
                 onClick={() =>
                   navigate(`/position-management/view/${record.key}`)
@@ -112,6 +114,7 @@ const PositionManagement = () => {
                 Detail
               </Button>
               <Button
+                className="edit-button" 
                 type="primary"
                 onClick={() =>
                   navigate(`/position-management/edit/${record.key}`)
@@ -121,6 +124,7 @@ const PositionManagement = () => {
                 Edit
               </Button>
               <Button
+                className="delete-button" 
                 type="danger"
                 onClick={() => handleDelete(record)}
                 style={{ marginLeft: 8 }}

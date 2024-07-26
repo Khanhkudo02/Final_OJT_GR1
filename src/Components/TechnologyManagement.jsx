@@ -5,6 +5,7 @@ import ModalEditTechnology from "./ModalEditTechnology";
 import ModalDeleteTechnology from "./ModalDeleteTechnology";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import "../assets/style/Pages/TechnologyManagement.scss";
+import "../assets/style/Global.scss";
 
 const { Column } = Table;
 
@@ -101,13 +102,18 @@ const TechnologyManagement = () => {
       render: (text, record) => (
         <span>
           <Button
+            className="edit-button"
             type="primary"
             style={{ marginRight: 8 }}
             onClick={() => showEditModal(record)}
           >
             Edit
           </Button>
-          <Button type="danger" onClick={() => showDeleteModal(record)}>
+          <Button
+            className="delete-button" 
+            type="danger" 
+            onClick={() => showDeleteModal(record)}
+          >
             Delete
           </Button>
         </span>
