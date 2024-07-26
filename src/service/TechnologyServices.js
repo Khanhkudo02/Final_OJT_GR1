@@ -44,41 +44,27 @@ const putUpdateTechnology = async (
     name,
     description,
     status,
-    imageFile,
+    imageURL,
     oldImageURL
 ) => {
     try {
         const technologyRef = dbRef(database, `technologies/${id}`);
 
-        let imageUrl = null;
-        if (imageFile) {
-            // Delete old image from Firebase Storage
-            if (oldImageURL) {
-                const oldImagePath = oldImageURL.split("/o/")[1].split("?")[0];
-                const decodedOldImagePath = decodeURIComponent(oldImagePath);
-                const oldImageRef = storageRef(storage, decodedOldImagePath);
-                await deleteObject(oldImageRef);
-            }
-
-            // Upload new image
-            const imageRef = storageRef(
-                storage,
-                `technology/${id}/${imageFile.name}`
-            );
-            const snapshot = await uploadBytes(imageRef, imageFile);
-            imageUrl = await getDownloadURL(snapshot.ref);
-        } else {
-            // Use the old image URL if no new image is uploaded
-            imageUrl = oldImageURL;
-        }
-
-        // Update technology data
+        // Cập nhật dữ liệu công nghệ
         await update(technologyRef, {
             name,
             description,
             status,
-            imageURL: imageUrl,
+            imageURL,
         });
+
+        // Xóa ảnh cũ khỏi Firebase Storage nếu cần
+        if (imageURL !== oldImageURL && oldImageURL) {
+            const oldImagePath = oldImageURL.split("/o/")[1].split("?")[0];
+            const decodedOldImagePath = decodeURIComponent(oldImagePath);
+            const oldImageRef = storageRef(storage, decodedOldImagePath);
+            await deleteObject(oldImageRef);
+        }
 
         return id;
     } catch (error) {
@@ -86,6 +72,8 @@ const putUpdateTechnology = async (
         throw error;
     }
 };
+
+
 
 // Delete technology
 const deleteTechnology = async (id) => {

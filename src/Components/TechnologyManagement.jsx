@@ -16,6 +16,7 @@ const TechnologyManagement = () => {
   const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
   const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
 
+  // Function to fetch technologies and update state
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
@@ -25,39 +26,46 @@ const TechnologyManagement = () => {
     }
   };
 
+  // Load technologies when component mounts
   useEffect(() => {
     loadTechnologies();
   }, []);
 
+  // Show edit modal with technology data
   const showEditModal = (record) => {
     setDataTechnologyEdit(record);
     setIsEditModalVisible(true);
   };
 
+  // Show add modal
   const showAddModal = () => {
     setIsAddModalVisible(true);
   };
 
+  // Show delete modal if technology is inactive
   const showDeleteModal = (record) => {
     if (record.status && record.status.toLowerCase() === "inactive") {
-      setTechnologyIdToDelete(record.key);  // Use key instead of record
+      setTechnologyIdToDelete(record.key); // Use key instead of record
       setIsDeleteModalVisible(true);
     } else {
       message.error("Only inactive technologies can be deleted.");
     }
   };
 
+  // Close edit modal and reload technologies
   const handleCloseEditModal = () => {
     setIsEditModalVisible(false);
     setDataTechnologyEdit(null);
     setTimeout(loadTechnologies, 100);
   };
 
+  // Close add modal and reload technologies
   const handleCloseAddModal = () => {
     setIsAddModalVisible(false);
     setTimeout(loadTechnologies, 100);
   };
 
+  // Close delete modal and reload technologies
   const handleCloseDeleteModal = () => {
     setIsDeleteModalVisible(false);
     setTechnologyIdToDelete(null);
@@ -76,12 +84,12 @@ const TechnologyManagement = () => {
       <Table dataSource={technologies} pagination={false}>
         <Column
           title="Image"
-          dataIndex="imageUrl"
-          key="imageUrl"
-          render={(text, record) => (
+          dataIndex="imageURL"
+          key="imageURL"
+          render={(text) => (
             <img
-              src={record.imageUrl}
-              alt={record.name}
+              src={text}
+              alt="Technology"
               style={{ width: 50, height: 50 }}
             />
           )}

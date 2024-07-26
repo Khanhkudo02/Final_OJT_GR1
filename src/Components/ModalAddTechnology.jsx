@@ -1,146 +1,150 @@
-import React, { useState } from "react";
-import { Modal, Button, Input, Upload, Select } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { postCreateTechnology } from "../service/TechnologyServices";
-import { toast } from "react-toastify";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebaseConfig";
+import React, { useState, useEffect } from "react";
+import { Button, Table, message } from "antd";
+import ModalAddTechnology from "./ModalAddTechnology";
+import ModalEditTechnology from "./ModalEditTechnology";
+import ModalDeleteTechnology from "./ModalDeleteTechnology";
+import { fetchAllTechnology } from "../service/TechnologyServices";
+import "../assets/style/Pages/TechnologyManagement.scss";
 
-const { Option } = Select;
+const { Column } = Table;
 
-const ModalAddTechnology = ({ open, handleClose }) => {
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const [status, setStatus] = useState("active");
-    const [image, setImage] = useState(null);
-    const [imagePreview, setImagePreview] = useState("");
-    const [uploading, setUploading] = useState(false);
+const TechnologyManagement = () => {
+  const [technologies, setTechnologies] = useState([]);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
+  const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
 
-    const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            setImage(e.target.files[0]);
-            setImagePreview(URL.createObjectURL(e.target.files[0]));
-        }
-    };
+  // Function to fetch technologies and update state
+  const loadTechnologies = async () => {
+    try {
+      const data = await fetchAllTechnology();
+      setTechnologies(data);
+    } catch (error) {
+      console.error("Failed to fetch technologies:", error);
+    }
+  };
 
-    const handleUpload = async () => {
-        if (image) {
-            try {
-                const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
-                const snapshot = await uploadBytes(imageRef, image);
-                const url = await getDownloadURL(snapshot.ref);
-                return url;
-            } catch (error) {
-                console.error("Error uploading image:", error);
-                toast.error("Failed to upload image.");
-                throw error;
-            }
-        }
-        return "";
-    };
+  // Load technologies when component mounts
+  useEffect(() => {
+    loadTechnologies();
+  }, []);
 
-    const handleSubmit = async () => {
-        try {
-            setUploading(true);
+  // Show edit modal with technology data
+  const showEditModal = (record) => {
+    setDataTechnologyEdit(record);
+    setIsEditModalVisible(true);
+  };
 
-            let uploadedImageURL = "";
-            if (image) {
-                uploadedImageURL = await handleUpload();
-                toast.success("Image uploaded successfully!");
-            }
+  // Show add modal
+  const showAddModal = () => {
+    setIsAddModalVisible(true);
+  };
 
-            await postCreateTechnology(name, description, status, uploadedImageURL);
+  // Show delete modal if technology is inactive
+  const showDeleteModal = (record) => {
+    if (record.status && record.status.toLowerCase() === "inactive") {
+      setTechnologyIdToDelete(record.key); // Use key instead of record
+      setIsDeleteModalVisible(true);
+    } else {
+      message.error("Only inactive technologies can be deleted.");
+    }
+  };
 
-            toast.success("Technology added successfully!");
+  // Close edit modal and reload technologies
+  const handleCloseEditModal = () => {
+    setIsEditModalVisible(false);
+    setDataTechnologyEdit(null);
+    setTimeout(loadTechnologies, 100);
+  };
 
-            // Reset form fields to default values
-            setName("");
-            setDescription("");
-            setStatus("active");
-            setImage(null);
-            setImagePreview(null);
+  // Close add modal and reload technologies
+  const handleCloseAddModal = () => {
+    setIsAddModalVisible(false);
+    setTimeout(loadTechnologies, 100);
+  };
 
-            handleClose();
-        } catch (error) {
-            toast.error("Failed to add technology.");
-            console.error("Error adding technology:", error);
-        } finally {
-            setUploading(false);
-        }
-    };
+  // Close delete modal and reload technologies
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalVisible(false);
+    setTechnologyIdToDelete(null);
+    setTimeout(loadTechnologies, 100);
+  };
 
-    return (
-        <Modal
-            title="Add New Technology"
-            open={open}
-            onCancel={() => {
-                handleClose();
-                setImagePreview("");
-                setStatus("active");
-            }}
-            footer={[
-                <Button key="back" onClick={handleClose}>
-                    Close
-                </Button>,
-                <Button
-                    key="submit"
-                    type="primary"
-                    onClick={handleSubmit}
-                    disabled={uploading}
-                >
-                    Save
-                </Button>,
-            ]}
-        >
-            <div className="body-add">
-                <div className="mb-3">
-                    <label className="form-label">Name</label>
-                    <Input
-                        type="text"
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label">Description</label>
-                    <Input
-                        type="text"
-                        value={description}
-                        onChange={(event) => setDescription(event.target.value)}
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label">Status</label>
-                    <Select
-                        value={status}
-                        onChange={(value) => setStatus(value)}
-                        placeholder="Select Status"
-                    >
-                        <Option value="active">Active</Option>
-                        <Option value="inactive">Inactive</Option>
-                    </Select>
-                </div>
-                <div className="mb-3">
-                    <Upload
-                        accept=".jpg,.jpeg,.png"
-                        beforeUpload={(file) => {
-                            handleImageChange({ target: { files: [file] } });
-                            return false; // Prevent automatic upload
-                        }}
-                        listType="picture"
-                    >
-                        <Button>
-                            <PlusOutlined />
-                            Upload Image
-                        </Button>
-                    </Upload>
-                    {imagePreview && (
-                        <img src={imagePreview} alt="Image Preview" width="100%" />
-                    )}
-                </div>
-            </div>
-        </Modal>
-    );
+  return (
+    <div>
+      <Button
+        type="primary"
+        style={{ marginBottom: 16 }}
+        onClick={showAddModal}
+      >
+        Add New Technology
+      </Button>
+      <Table dataSource={technologies} pagination={false}>
+        <Column
+          title="Image"
+          dataIndex="imageURL"
+          key="imageURL"
+          render={(text) => (
+            <img
+              src={text}
+              alt="Technology"
+              style={{ width: 50, height: 50 }}
+            />
+          )}
+        />
+        <Column title="Name" dataIndex="name" key="name" />
+        <Column title="Description" dataIndex="description" key="description" />
+        <Column
+          title="Status"
+          dataIndex="status"
+          key="status"
+          render={(text) => text.charAt(0).toUpperCase() + text.slice(1)}
+        />
+        <Column
+          title="Actions"
+          key="actions"
+          render={(text, record) => (
+            <span>
+              <Button
+                type="primary"
+                style={{ marginRight: 8 }}
+                onClick={() => showEditModal(record)}
+              >
+                Edit
+              </Button>
+              <Button
+                type="danger"
+                className="delete-button"
+                onClick={() => showDeleteModal(record)}
+              >
+                Delete
+              </Button>
+            </span>
+          )}
+        />
+      </Table>
+      {dataTechnologyEdit && (
+        <ModalEditTechnology
+          open={isEditModalVisible}
+          handleClose={handleCloseEditModal}
+          dataTechnologyEdit={dataTechnologyEdit}
+        />
+      )}
+      <ModalAddTechnology
+        open={isAddModalVisible}
+        handleClose={handleCloseAddModal}
+      />
+      {technologyIdToDelete && (
+        <ModalDeleteTechnology
+          open={isDeleteModalVisible}
+          handleClose={handleCloseDeleteModal}
+          technologyId={technologyIdToDelete}
+        />
+      )}
+    </div>
+  );
 };
 
-export default ModalAddTechnology;
+export default TechnologyManagement;
