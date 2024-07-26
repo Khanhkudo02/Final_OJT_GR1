@@ -1,9 +1,10 @@
 import { Layout, theme } from "antd";
 import React, { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import AccountManagement from "./Components/AccountManagement";
 import ResetPassword from "../src/pages/ResetPassword";
+import ChangePassword from "./Components/ChangePassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
+import NewProject from "./Components/NewProject";
 import PositionManagement from "./Components/PositionManagement";
 import ProgramingLanguage from "./Components/ProgramingLanguage";
 import ProjectManagement from "./Components/ProjectManagement";
@@ -14,8 +15,7 @@ import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
-import ProjectDetail from "./Components/ProjectDetail";
-import AddPosition from "./Components/AddPosition";
+import AddPosition from "./Components/AddPosition.jsx";
 
 const { Content } = Layout;
 
@@ -29,21 +29,9 @@ const App = () => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  const [role, setRole] = useState(user ? user.role : "");
-
-  // Update user state if local storage changes
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      setRole(userData.role);
-    }
-  }, []);
 
   const handleLogin = (userInfo) => {
     setUser(userInfo);
-    setRole(userInfo.role);
   };
 
   // eslint-disable-next-line react/prop-types
@@ -66,9 +54,9 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Layout style={{ minHeight: "100vh" }}>
-                {user && role === "admin" && <Sidebar />}
+                {user && <Sidebar role={user.role} />}
                 <Layout
-                  style={{ marginLeft: user && role === "admin" ? 0 : 0 }}
+                  style={{ marginLeft: user && user.role === "admin" ? 0 : 0 }}
                 >
                   <Content
                     style={{ margin: "24px 16px 0", overflow: "initial" }}
@@ -79,8 +67,8 @@ const App = () => {
                         <Route path="/cv" element={<PageCV />} />
                         <Route path="/account-management" element={<Admin />} />
                         <Route
-                          path="/reset-password"
-                          element={<ResetPassword />}
+                          path="/change-password"
+                          element={<ChangePassword />}
                         />
                         <Route
                           path="/employee-management"
@@ -90,11 +78,13 @@ const App = () => {
                           path="/project-management"
                           element={<ProjectManagement />}
                         />
-                        <Route path="/project/:id"
-                          element={<ProjectDetail />} />
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
+                        />
+                        <Route
+                          path="/positions/add"
+                          element={<AddPosition />}
                         />
                         <Route
                           path="/technology-management"
@@ -104,8 +94,7 @@ const App = () => {
                           path="/programing-language"
                           element={<ProgramingLanguage />}
                         />
-                        <Route path="/new-project" element={<NewProject />} />{" "}
-                        {/* Add the NewProject route */}
+                        <Route path="/new-project" element={<NewProject />} />
                         <Route path="/" element={<Navigate to="/login" />} />
                       </Routes>
                     </div>
