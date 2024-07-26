@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "antd";
 import * as XLSX from "xlsx";
+import "../assets/style/Global.scss"
 
 const ExportExcel = ({ data, fileName }) => {
   const exportToExcel = () => {
@@ -118,7 +119,7 @@ const ExportExcel = ({ data, fileName }) => {
   };
 
   return (
-    <Button type="primary" onClick={exportToExcel}>
+    <Button className="btn" type="primary" onClick={exportToExcel}>
       Export to Excel
     </Button>
   );
