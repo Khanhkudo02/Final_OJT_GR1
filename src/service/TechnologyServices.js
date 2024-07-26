@@ -66,7 +66,6 @@ const putUpdateTechnology = async (id, name, description, status, imageURL, oldI
     }
 };
 
-
 // Delete technology
 const deleteTechnology = async (id) => {
     try {
