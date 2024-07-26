@@ -81,7 +81,7 @@ const PositionManagement = () => {
   );
   return (
     <div>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
+      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
         Add New Position
       </Button>
       <Table

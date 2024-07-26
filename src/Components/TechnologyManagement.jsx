@@ -123,7 +123,7 @@ const TechnologyManagement = () => {
 
   return (
     <div>
-      <Button type="primary" onClick={showAddModal}>
+      <Button className="btn" type="primary" onClick={showAddModal}>
         Add Technology
       </Button>
       <Table
