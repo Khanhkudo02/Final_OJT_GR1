@@ -3,7 +3,7 @@ import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { putUpdateTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "../firebaseConfig";
 
 const { Option } = Select;
@@ -25,20 +25,47 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
     }
   }, [dataTechnologyEdit]);
 
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-      setImagePreview(URL.createObjectURL(e.target.files[0]));
+  // Hàm để tải lên ảnh và lấy URL của ảnh đó
+  const handleUpload = async () => {
+    if (image) {
+      try {
+        const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
+        const snapshot = await uploadBytes(imageRef, image);
+        const url = await getDownloadURL(snapshot.ref);
+        return url;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error("Failed to upload image.");
+        throw error;
+      }
+    }
+    return ""; // Nếu không có ảnh mới, trả về chuỗi rỗng
+  };
+
+  // Hàm để xóa ảnh cũ nếu có
+  const deleteOldImage = async () => {
+    if (dataTechnologyEdit.imageURL) {
+      try {
+        const oldImagePath = dataTechnologyEdit.imageURL.split("/o/")[1].split("?")[0];
+        const decodedOldImagePath = decodeURIComponent(oldImagePath);
+        const oldImageRef = storageRef(storage, decodedOldImagePath);
+        await deleteObject(oldImageRef);
+      } catch (error) {
+        console.error("Error deleting old image:", error);
+        toast.error("Failed to delete old image.");
+      }
     }
   };
 
+  // Hàm để xử lý việc gửi dữ liệu cập nhật
   const handleSubmit = async () => {
     try {
       setUploading(true);
 
       // Tải lên ảnh mới và lấy URL nếu có ảnh mới
-      let uploadedImageURL = imagePreview;
+      let uploadedImageURL = imagePreview; // URL của ảnh hiện tại nếu không có ảnh mới
       if (image) {
+        await deleteOldImage(); // Xóa ảnh cũ trước khi tải lên ảnh mới
         uploadedImageURL = await handleUpload(); // Tải lên ảnh mới và lấy URL
         toast.success("Image uploaded successfully!");
       }

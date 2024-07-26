@@ -73,8 +73,6 @@ const putUpdateTechnology = async (
     }
 };
 
-
-
 // Delete technology
 const deleteTechnology = async (id) => {
     try {
