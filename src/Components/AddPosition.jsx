@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Table } from "antd";
-import { postCreatePosition, fetchAllPositions } from "../service/PositionServices";
+import { Button, Input, Select, Table, Modal } from "antd";
+import { postCreatePosition, fetchAllPositions, deletePositionById } from "../service/PositionServices";
 import { PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,8 @@ const AddPosition = () => {
     const [department, setDepartment] = useState("");
     const [status, setStatus] = useState("active");
     const [positions, setPositions] = useState([]);
+    const [viewModalVisible, setViewModalVisible] = useState(false);
+    const [selectedPosition, setSelectedPosition] = useState(null);
 
     const navigate = useNavigate();
 
@@ -45,7 +47,20 @@ const AddPosition = () => {
             toast.error("Failed to add position.");
         }
     };
-    
+    const handleViewPosition = (position) => {
+        setSelectedPosition(position);
+        setViewModalVisible(true);
+    };
+
+    const handleDeletePosition = async (id) => {
+        try {
+            await deletePositionById(id);
+            toast.success("Position deleted successfully!");
+            loadPositions(); // Reload the positions list
+        } catch (error) {
+            toast.error("Failed to delete position.");
+        }
+    };
 
     return (
         <div className="add-position">
@@ -98,11 +113,46 @@ const AddPosition = () => {
 
             <h2>Existing Positions</h2>
             <Table dataSource={positions} rowKey="key" pagination={false}>
-                <Column title="Name" dataIndex="name" key="name" />
-                <Column title="Description" dataIndex="description" key="description" />
-                <Column title="Department" dataIndex="department" key="department" />
-                <Column title="Status" dataIndex="status" key="status" />
+            <Column title="Name" dataIndex="name" key="name" />
+            <Column title="Description" dataIndex="description" key="description" />
+            <Column title="Department" dataIndex="department" key="department" />
+            <Column title="Status" dataIndex="status" key="status" />
+            <Column
+                title="Actions"
+                key="actions"
+                render={(text, record) => (
+                    <div>
+                        <Button onClick={() => handleViewPosition(record)}>View</Button>
+                        <Button
+                            onClick={() => handleDeletePosition(record.key)}
+                            disabled={record.status !== "inactive"}
+                            style={{ marginLeft: 8 }}
+                        >
+                            Delete
+                        </Button>
+                    </div>
+                )}
+            />
             </Table>
+            <Modal
+                title="View Position"
+                visible={viewModalVisible}
+                onCancel={() => setViewModalVisible(false)}
+                footer={[
+                    <Button key="close" onClick={() => setViewModalVisible(false)}>
+                        Close
+                    </Button>
+                ]}
+            >
+                {selectedPosition && (
+                    <div>
+                        <p><strong>Name:</strong> {selectedPosition.name}</p>
+                        <p><strong>Description:</strong> {selectedPosition.description}</p>
+                        <p><strong>Department:</strong> {selectedPosition.department}</p>
+                        <p><strong>Status:</strong> {selectedPosition.status}</p>
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 };

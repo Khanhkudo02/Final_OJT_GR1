@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Input, Select, Upload, Button, PageHeader } from "antd";
+import { Input, Select, Upload, Button, Layout } from "antd"; // Changed import here
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 import { putUpdatePosition, fetchPositionById } from "../service/PositionServices";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
+const { Header } = Layout;
 
 const EditPosition = () => {
     const { id } = useParams(); // Lấy ID từ URL
@@ -40,10 +41,9 @@ const EditPosition = () => {
     }, [id]);
 
     const handleUpdatePosition = async () => {
-        // Kiểm tra xem tất cả các trường có được nhập hay không
         if (!name || !description || !department || !status) {
             toast.error("Please fill in all fields.");
-            return; // Dừng việc thực hiện hàm nếu có trường bị bỏ trống
+            return;
         }
     
         try {
@@ -78,12 +78,8 @@ const EditPosition = () => {
 
     return (
         <div>
-            <PageHeader
-                className="site-page-header"
-                title="Edit Position"
-                onBack={() => navigate("/position-management")}
-                style={{ marginBottom: "1rem" }}
-            />
+        <h2>Edit Position</h2>
+           
             <div className="form-group">
                 <label>Name</label>
                 <Input
@@ -133,7 +129,7 @@ const EditPosition = () => {
             </div>
             <Button
                 type="primary"
-                onClick={handleAddPosition}
+                onClick={handleUpdatePosition}
                 disabled={!name || !description || !department || !status}
             >
                 Save
