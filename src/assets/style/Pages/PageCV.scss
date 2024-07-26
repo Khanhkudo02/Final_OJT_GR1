@@ -135,3 +135,23 @@
     background-color: #0056b3;
   }
   
+  
+.select-CV {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+
+  &:focus {
+    border-color: #555;
+    outline: none;
+  }
+}
+
+.option-CV {
+  font-size: 16px;
+  padding: 10px 20px !important;
+  background-color: #fff;
+  color: #333;
+}
