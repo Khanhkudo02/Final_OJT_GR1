@@ -1,5 +1,5 @@
 import { ref, set, push, update, get, remove } from "firebase/database";
-import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
+import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
 import { database, storage } from '../firebaseConfig';
 
 const db = database;
@@ -78,7 +78,7 @@ const putUpdatePosition = async (id, name, description, department, status, sala
 };
 
 // Delete position
-const deletePosition = async (id) => {
+const deletePositionById = async (id) => {
     try {
         const positionRef = ref(db, `positions/${id}`);
         const positionSnapshot = await get(positionRef);
@@ -98,6 +98,7 @@ const deletePosition = async (id) => {
         throw error;
     }
 };
+
 const fetchPositionById = async (id) => {
     try {
         console.log(`Fetching position with ID: ${id}`); // Debug
@@ -111,4 +112,4 @@ const fetchPositionById = async (id) => {
     }
 };
 
-export { fetchAllPositions, postCreatePosition, putUpdatePosition, deletePosition, fetchPositionById};
+export { fetchAllPositions, postCreatePosition, putUpdatePosition, deletePositionById, fetchPositionById};
