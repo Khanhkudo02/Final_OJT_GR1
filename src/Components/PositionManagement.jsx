@@ -96,6 +96,9 @@ const PositionManagement = () => {
               <Button type="primary" onClick={() => navigate(`/position-management/view/${record.key}`)}>
                 Detail
               </Button>
+              <Button type="primary" onClick={() => navigate(`/position-management/edit/${record.key}`)} style={{ marginLeft: 8 }}>
+                Edit
+              </Button>
               <Button type="danger" onClick={() => handleDelete(record)} style={{ marginLeft: 8 }}>
                 Delete
               </Button>
