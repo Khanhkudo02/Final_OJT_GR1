@@ -4,6 +4,7 @@ import { get, getDatabase, ref, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import "../assets/style/Pages/ChangePassword.scss";
 
 function ChangePassword() {
   const { t } = useTranslation();

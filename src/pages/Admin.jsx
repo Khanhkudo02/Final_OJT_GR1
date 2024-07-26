@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
+import "../assets/style/Pages/Admin.scss";
+import "../assets/style/Global.scss";
 
 const { Option } = Select;
 
@@ -36,7 +38,9 @@ function AdminPage() {
             id,
             ...data,
           }));
-          usersArray.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          usersArray.sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          );
           setUsers(usersArray);
         }
       } catch (error) {
@@ -78,7 +82,9 @@ function AdminPage() {
       const usersData = snapshot.val();
 
       if (!editMode && usersData) {
-        const emailExists = Object.values(usersData).some(user => user.email === email);
+        const emailExists = Object.values(usersData).some(
+          (user) => user.email === email
+        );
         if (emailExists) {
           message.error(t("emailAlreadyExists"));
           return;
@@ -147,10 +153,12 @@ function AdminPage() {
       const updatedSnapshot = await get(ref(db, "users"));
       const updatedUserData = updatedSnapshot.val();
       if (updatedUserData) {
-        const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
-          id,
-          ...data,
-        }));
+        const usersArray = Object.entries(updatedUserData).map(
+          ([id, data]) => ({
+            id,
+            ...data,
+          })
+        );
         setUsers(usersArray);
       }
     } catch (error) {
@@ -188,10 +196,12 @@ function AdminPage() {
         const updatedSnapshot = await get(ref(db, "users"));
         const updatedUserData = updatedSnapshot.val();
         if (updatedUserData) {
-          const usersArray = Object.entries(updatedUserData).map(([id, data]) => ({
-            id,
-            ...data,
-          }));
+          const usersArray = Object.entries(updatedUserData).map(
+            ([id, data]) => ({
+              id,
+              ...data,
+            })
+          );
           setUsers(usersArray);
         } else {
           setUsers([]);
@@ -271,8 +281,16 @@ function AdminPage() {
       key: "actions",
       render: (_, record) => (
         <div key={record.id}>
-          <Button onClick={() => handleEditUser(record)}>{t("edit")}</Button>
-          <Button onClick={() => handleDeleteUser(record.id)}>
+          <Button
+            className="edit-button"
+            onClick={() => handleEditUser(record)}
+          >
+            {t("edit")}
+          </Button>
+          <Button
+            className="delete-button"
+            onClick={() => handleDeleteUser(record.id)}
+          >
             {t("delete")}
           </Button>
           {/* Đã loại bỏ nút reset mật khẩu */}
@@ -282,12 +300,15 @@ function AdminPage() {
   ];
 
   return (
-    <div>
+    <div className="admin-page-container">
       <LanguageSwitcher />
       <h1>{t("adminPage")}</h1>
-      <Button type="primary" onClick={() => setModalVisible(true)}>
-        {t("addUser")}
-      </Button>
+      <div className="admin-actions">
+        <Button className="btn" type="primary" onClick={() => setModalVisible(true)}>
+          {t("addUser")}
+        </Button>
+        <ExportExcel data={users} fileName="File Excel" />
+      </div>
       <Modal
         title={editMode ? t("editUser") : t("addUser")}
         open={modalVisible}
@@ -299,66 +320,53 @@ function AdminPage() {
           onFinish={handleAddOrUpdateUser}
           initialValues={{ email, role, name }} // Không đưa mật khẩu vào initialValues
           layout="vertical"
+          className="modal-form"
         >
           <Form.Item
             label={t("email")}
             name="email"
-            rules={[{ required: true, message: t("pleaseInputEmail") }]}
+            rules={[{ required: true, message: t("emailRequired") }]}
           >
-            <Input
-              disabled={editMode}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Item>
-          <Form.Item
-            label={t("name")}
-            name="name"
-            rules={[{ required: true, message: t("pleaseInputName") }]}
-          >
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <Input />
           </Form.Item>
           {!editMode && (
             <Form.Item
               label={t("password")}
               name="password"
-              rules={[
-                { required: true, message: t("pleaseInputPassword") },
-                { min: 6, message: t("passwordMinLength") },
-              ]}
+              rules={[{ required: true, message: t("passwordRequired") }]}
             >
-              <Input.Password
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <Input.Password />
             </Form.Item>
           )}
           <Form.Item
+            label={t("name")}
+            name="name"
+            rules={[{ required: true, message: t("nameRequired") }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
             label={t("role")}
             name="role"
-            rules={[{ required: true, message: t("pleaseSelectRole") }]}
+            rules={[{ required: true, message: t("roleRequired") }]}
           >
-            <Select
-              value={role}
-              onChange={(value) => setRole(value)}
-            >
+            <Select>
               <Option value="admin">{t("admin")}</Option>
               <Option value="employee">{t("employee")}</Option>
             </Select>
           </Form.Item>
-
           {editMode && (
             <Form.Item
               label={t("status")}
               name="status"
+              rules={[{ required: true, message: t("statusRequired") }]}
             >
-              <Select value={status} onChange={(value) => setStatus(value)}>
+              <Select>
                 <Option value="active">{t("active")}</Option>
                 <Option value="inactive">{t("inactive")}</Option>
               </Select>
             </Form.Item>
           )}
-
           <Form.Item>
             <Button type="primary" htmlType="submit">
               {editMode ? t("updateUser") : t("addUser")}
@@ -366,7 +374,12 @@ function AdminPage() {
           </Form.Item>
         </Form>
       </Modal>
-      <Table columns={columns} dataSource={users} rowKey="id" />
+      <Table
+        dataSource={users}
+        columns={columns}
+        rowKey={(record) => record.id}
+        className="user-table"
+      />
     </div>
   );
 }

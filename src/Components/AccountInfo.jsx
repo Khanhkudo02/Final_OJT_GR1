@@ -3,6 +3,7 @@ import { get, getDatabase, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import "../assets/style/Pages/AccountInfo.scss"; // Đảm bảo rằng đường dẫn này đúng
 
 function AccountInfo() {
   const { t } = useTranslation();
@@ -36,16 +37,18 @@ function AccountInfo() {
   }
 
   return (
-    <Card title={t("userProfile")}>
-    <Descriptions bordered column={1}>
-      <Descriptions.Item label={t("email")}>{userData.email}</Descriptions.Item>
-      <Descriptions.Item label={t("name")}>{userData.name}</Descriptions.Item>
-      <Descriptions.Item label={t("role")}>{userData.role}</Descriptions.Item>
-      <Descriptions.Item label={t("status")}>{userData.status}</Descriptions.Item>
-      <Descriptions.Item label={t("createdAt")}>{new Date(userData.createdAt).toLocaleDateString()}</Descriptions.Item>
-      {/* Hiển thị các thông tin khác của người dùng tại đây */}
-    </Descriptions>
-  </Card>
+    <div className="account-info-container">
+      <Card title={t("userProfile")}>
+        <Descriptions bordered column={1}>
+          <Descriptions.Item label={t("email")}>{userData.email}</Descriptions.Item>
+          <Descriptions.Item label={t("name")}>{userData.name}</Descriptions.Item>
+          <Descriptions.Item label={t("role")}>{userData.role}</Descriptions.Item>
+          <Descriptions.Item label={t("status")}>{userData.status}</Descriptions.Item>
+          <Descriptions.Item label={t("createdAt")}>{new Date(userData.createdAt).toLocaleDateString()}</Descriptions.Item>
+          {/* Hiển thị các thông tin khác của người dùng tại đây */}
+        </Descriptions>
+      </Card>
+    </div>
   );
 }
 

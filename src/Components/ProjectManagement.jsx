@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; 
 import { fetchAllProjects } from "../service/Project";
 import "../assets/style/Pages/ProjectManagement.scss";
+import "../assets/style/Global.scss"
 
 const { TabPane } = Tabs;
 
@@ -17,7 +18,7 @@ const ProjectManagement = () => {
   const [filteredStatus, setFilteredStatus] = useState("All Projects");
   const [data, setData] = useState([]);
   const pageSize = 10;
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,7 +52,6 @@ const ProjectManagement = () => {
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => <Link to={`/project/${text}`}>{text}</Link>,
     },
     {
       title: "Project Name",
@@ -66,7 +66,7 @@ const ProjectManagement = () => {
     {
       title: "End Date",
       dataIndex: "endDate",
-      key: "endDate",
+      key: "endDate", 
     },
     {
       title: "Client Name",
@@ -104,7 +104,7 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button type="primary" onClick={() => navigate("/new-project")}>
+      <Button className="btn" type="primary" onClick={() => navigate("/new-project")}>
         New Project
       </Button>
       <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} centered>
@@ -113,7 +113,16 @@ const ProjectManagement = () => {
         <TabPane tab="Not Started" key="Not Started" />
         <TabPane tab="Completed" key="Completed" />
       </Tabs>
-      <Table columns={columns} dataSource={paginatedData} pagination={false} />
+      <Table 
+        columns={columns} 
+        dataSource={paginatedData} 
+        pagination={false} 
+        onRow={(record) => {
+          return {
+            onClick: () => navigate(`/project/${record.key}`),
+          };
+        }}
+      />
       <div style={{ marginTop: "16px", textAlign: "right" }}>
         <Pagination
           current={currentPage}
