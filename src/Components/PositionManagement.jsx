@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Table, message } from 'antd';
+import ModalAddPosition from './ModalAddPosition';
+import ModalEditPosition from './ModalEditPosition';
+import ModalDeletePosition from './ModalDeletePosition';
 import { fetchAllPositions } from "../service/PositionServices";
-import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/PositionManagement.scss";
 
 const { Column } = Table;
 
 const PositionManagement = () => {
   const [positions, setPositions] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const navigate = useNavigate();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [dataPositionEdit, setDataPositionEdit] = useState(null);
+  const [positionIdToDelete, setPositionIdToDelete] = useState(null);
 
   const loadPositions = async () => {
     try {
       const data = await fetchAllPositions();
+      console.log(data); // Debugging: Check the data structure
       setPositions(data);
     } catch (error) {
       console.error("Failed to fetch positions:", error);
@@ -25,42 +28,49 @@ const PositionManagement = () => {
 
   useEffect(() => {
     loadPositions();
-
-    const positionAdded = localStorage.getItem('positionAdded');
-    if (positionAdded === 'true') {
-      message.success("Position added successfully!");
-      localStorage.removeItem('positionAdded'); // Xóa thông báo sau khi đã hiển thị
-    }
   }, []);
-  const handleTableChange = (pagination) => {
-    setCurrentPage(pagination.current);
-    setPageSize(pagination.pageSize);
-  };
 
   const showEditModal = (record) => {
     setDataPositionEdit(record);
     setIsEditModalVisible(true);
   };
 
-  const showAddPage = () => {
-    navigate("/positions/add");
+  const showAddModal = () => {
+    setIsAddModalVisible(true);
   };
-  const paginatedData = positions.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const showDeleteModal = (record) => {
+    if (record.status.toLowerCase() === 'inactive') {
+      setPositionIdToDelete(record.key);
+      setIsDeleteModalVisible(true);
+    } else {
+      message.error('Only inactive positions can be deleted.');
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalVisible(false);
+    setDataPositionEdit(null);
+    setTimeout(() => loadPositions(), 100);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalVisible(false);
+    setTimeout(() => loadPositions(), 100);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalVisible(false);
+    setPositionIdToDelete(null);
+    setTimeout(() => loadPositions(), 100);
+  };
+
   return (
     <div>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
+      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
         Add New Position
       </Button>
-      <Table
-        dataSource={paginatedData}
-        rowKey="key"
-        pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          total: positions.length,
-          onChange: (page, pageSize) => handleTableChange({ current: page, pageSize }),
-        }}
-      >
+      <Table dataSource={positions} rowKey="key" pagination={false}>
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
         <Column title="Department" dataIndex="department" key="department" />
@@ -70,9 +80,12 @@ const PositionManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
-            <Button type="primary" onClick={() => navigate(`/position-management/edit/${record.key}`)}>
+              <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
                 Edit
-            </Button>
+              </Button>
+              <Button type="danger" className="delete-button"  onClick={() => showDeleteModal(record)}>
+                Delete
+              </Button>
             </span>
           )}
         />
@@ -80,8 +93,19 @@ const PositionManagement = () => {
       {dataPositionEdit && (
         <ModalEditPosition
           open={isEditModalVisible}
-          handleClose={() => setIsEditModalVisible(false)}
+          handleClose={handleCloseEditModal}
           dataPositionEdit={dataPositionEdit}
+        />
+      )}
+      <ModalAddPosition
+        open={isAddModalVisible}
+        handleClose={handleCloseAddModal}
+      />
+      {positionIdToDelete && (
+        <ModalDeletePosition
+          open={isDeleteModalVisible}
+          handleClose={handleCloseDeleteModal}
+          positionId={positionIdToDelete}
         />
       )}
     </div>

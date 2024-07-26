@@ -39,14 +39,7 @@ const fetchAllTechnology = async () => {
 };
 
 // Update existing technology
-const putUpdateTechnology = async (
-    id,
-    name,
-    description,
-    status,
-    imageURL,
-    oldImageURL
-) => {
+const putUpdateTechnology = async (id, name, description, status, imageURL, oldImageURL) => {
     try {
         const technologyRef = dbRef(database, `technologies/${id}`);
 
@@ -72,6 +65,7 @@ const putUpdateTechnology = async (
         throw error;
     }
 };
+
 
 // Delete technology
 const deleteTechnology = async (id) => {

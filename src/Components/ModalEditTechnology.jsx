@@ -25,6 +25,14 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
     }
   }, [dataTechnologyEdit]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   // Hàm để tải lên ảnh và lấy URL của ảnh đó
   const handleUpload = async () => {
     if (image) {
@@ -39,7 +47,7 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
         throw error;
       }
     }
-    return ""; // Nếu không có ảnh mới, trả về chuỗi rỗng
+    return imagePreview; // Trả về URL hiện tại nếu không có ảnh mới
   };
 
   // Hàm để xóa ảnh cũ nếu có
@@ -63,12 +71,7 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
       setUploading(true);
 
       // Tải lên ảnh mới và lấy URL nếu có ảnh mới
-      let uploadedImageURL = imagePreview; // URL của ảnh hiện tại nếu không có ảnh mới
-      if (image) {
-        await deleteOldImage(); // Xóa ảnh cũ trước khi tải lên ảnh mới
-        uploadedImageURL = await handleUpload(); // Tải lên ảnh mới và lấy URL
-        toast.success("Image uploaded successfully!");
-      }
+      let uploadedImageURL = await handleUpload(); // URL của ảnh mới hoặc hiện tại nếu không có ảnh mới
 
       // Cập nhật dữ liệu công nghệ với URL ảnh mới
       await putUpdateTechnology(

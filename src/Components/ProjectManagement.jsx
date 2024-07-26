@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import "../assets/style/Pages/ProjectManagement.scss";
 
 const { TabPane } = Tabs;
@@ -13,7 +13,7 @@ const data = [
     createdDate: "Aug 18th, 2023",
     deadline: "Oct 15th, 2023",
     client: "Ava Williams",
-    personInCharge: "Mia Rodriggit uez",
+    personInCharge: "Mia Rodriguez",
     status: "COMPLETED",
   },
   {
@@ -59,6 +59,7 @@ const ProjectManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredStatus, setFilteredStatus] = useState("All Projects");
   const pageSize = 10;
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -137,7 +138,9 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button type="primary">New Project</Button>
+      <Button type="primary" onClick={() => navigate("/new-project")}>
+        New Project
+      </Button>
       <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} centered>
         <TabPane tab="All Projects" key="All Projects" />
         <TabPane tab="Ongoing" key="Ongoing" />

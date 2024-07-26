@@ -1,10 +1,9 @@
 import { Layout, theme } from "antd";
 import React, { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import AccountManagement from "./Components/AccountManagement";
 import ResetPassword from "../src/pages/ResetPassword";
-import ChangePassword from "./Components/ChangePassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
-import NewProject from "./Components/NewProject";
 import PositionManagement from "./Components/PositionManagement";
 import ProgramingLanguage from "./Components/ProgramingLanguage";
 import ProjectManagement from "./Components/ProjectManagement";
@@ -15,7 +14,7 @@ import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
-import AddPosition from "./Components/AddPosition.jsx";
+import NewProject from "./Components/NewProject";
 
 const { Content } = Layout;
 
@@ -79,8 +78,8 @@ const App = () => {
                         <Route path="/cv" element={<PageCV />} />
                         <Route path="/account-management" element={<Admin />} />
                         <Route
-                          path="/change-password"
-                          element={<ChangePassword />}
+                          path="/reset-password"
+                          element={<ResetPassword />}
                         />
                         <Route
                           path="/employee-management"
@@ -93,10 +92,6 @@ const App = () => {
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
-                        />
-                        <Route
-                          path="/positions/add"
-                          element={<AddPosition />}
                         />
                         <Route
                           path="/technology-management"

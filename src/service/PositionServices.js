@@ -5,9 +5,6 @@ import { database, storage } from '../firebaseConfig';
 const db = database;
 const storageInstance = storage;
 
-
-
-
 // Create new position
 const postCreatePosition = async (name, description, department, status, imageFile) => {
     try {
@@ -98,15 +95,5 @@ const deletePosition = async (id) => {
         throw error;
     }
 };
-const fetchPositionById = async (id) => {
-    try {
-        const positionRef = ref(database, `positions/${id}`);
-        const snapshot = await get(positionRef);
-        return snapshot.val(); // Trả về thông tin vị trí
-    } catch (error) {
-        console.error("Failed to fetch position by ID:", error);
-        throw error;
-    }
-};
 
-export { fetchAllPositions, postCreatePosition, putUpdatePosition, deletePosition, fetchPositionById};
+export { fetchAllPositions, postCreatePosition, putUpdatePosition, deletePosition };

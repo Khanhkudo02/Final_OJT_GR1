@@ -33,7 +33,7 @@ const Sidebar = () => {
         },
         {
           key: "1-2",
-          label: <NavLink to="/change-password">Change Password </NavLink>,
+          label: <NavLink to="/reset-password">Reset Password </NavLink>,
         },
       ],
     },
