@@ -12,7 +12,7 @@
   "userUpdatedSuccessfully": "Cập nhật người dùng thành công.",
   "userAddedSuccessfully": "Thêm người dùng thành công.",
   "errorAddingOrUpdatingUser": "Lỗi khi thêm hoặc cập nhật người dùng.",
-  "userDoesNotExist": "Người dùng không tồn tại.",
+  "cannotDeleteAccount": "không thể xóa tài khoản này.",
   "cannotDeleteOnlyAdminUser": "Không thể xóa người dùng admin duy nhất.",
   "userDeletedSuccessfully": "Xóa người dùng thành công.",
   "pleaseInputEmail": "Vui lòng nhập email.",
@@ -27,6 +27,7 @@
   "email": "Email",
   "add": "Thêm",
   "admin": "Quản trị viên",
+  "employee": "Nhân viên",
   "AllProject": "Tất cả dự án",
   "Ongoing": "Đang diễn ra",
   "NotStarted": "Chưa bắt đầu",
@@ -63,5 +64,11 @@
   "Email": "Email",
   "Password": "Mật khẩu",
   "LOGIN": "Đăng nhập",
-  "ForgotPassword": "Quên mật khẩu"
+  "ForgotPassword": "Quên mật khẩu",
+
+  "userProfile":"Thông tin tài khoản",
+  "onlyInactiveUsersCanBeDeleted": "Chỉ những người dùng không hoạt động mới có thể bị xóa",
+  "status": "Trạng thái",
+  "active": "Hoạt động",
+  "inactive": "Không hoạt động"
 }

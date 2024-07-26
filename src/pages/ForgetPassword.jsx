@@ -29,7 +29,7 @@ function ForgetPassword() {
 
       if (user) {
         const [userId] = user;
-        const resetLink = `http://localhost:5174/reset-password?userId=${encodeURIComponent(
+        const resetLink = `http://localhost:5173/reset-password?userId=${encodeURIComponent(
           userId
         )}`;
 

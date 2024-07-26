@@ -1,14 +1,8 @@
 import React, { useState } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  Checkbox,
-  DatePicker,
-  InputNumber,
-} from "antd";
-import { Link } from "react-router-dom";
+import { Form, Input, Button, Select, Checkbox, DatePicker, InputNumber, message, Upload } from "antd";
+import { useNavigate } from "react-router-dom";
+import { postCreateProject } from "../service/Project";
+import { UploadOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -16,13 +10,30 @@ const { TextArea } = Input;
 const NewProject = () => {
   const [form] = Form.useForm();
   const [agreement, setAgreement] = useState(false);
+  const navigate = useNavigate();
+  const [imageFile, setImageFile] = useState(null);
 
-  const onFinish = (values) => {
-    console.log("Form Values:", values);
+  const onFinish = async (values) => {
+    try {
+      const projectData = {
+        ...values,
+        startDate: values.startDate.format('YYYY-MM-DD'),
+        endDate: values.endDate.format('YYYY-MM-DD')
+      };
+      await postCreateProject(projectData, imageFile);
+      message.success('Project added successfully');
+      navigate('/project-management');
+    } catch (error) {
+      message.error('Failed to add project');
+    }
   };
 
   const handleAgreementChange = (e) => {
     setAgreement(e.target.checked);
+  };
+
+  const handleImageChange = (info) => {
+    setImageFile(info.file.originFileObj);
   };
 
   return (
@@ -38,7 +49,7 @@ const NewProject = () => {
       <Form form={form} onFinish={onFinish}>
         <Form.Item
           label="Project Name"
-          name="projectName"
+          name="name"
           rules={[
             { required: true, message: "Please input the project name!" },
           ]}
@@ -48,7 +59,7 @@ const NewProject = () => {
 
         <Form.Item
           label="Project ID"
-          name="projectID"
+          name="id"
           rules={[{ required: true, message: "Please input the project ID!" }]}
         >
           <Input />
@@ -140,9 +151,9 @@ const NewProject = () => {
           ]}
         >
           <Select>
-            <Option value="not started">Not Started</Option>
-            <Option value="ongoing">Ongoing</Option>
-            <Option value="completed">Completed</Option>
+            <Option value="NOT STARTED">Not Started</Option>
+            <Option value="ONGOING">Ongoing</Option>
+            <Option value="COMPLETED">Completed</Option>
           </Select>
         </Form.Item>
 
@@ -154,9 +165,9 @@ const NewProject = () => {
           ]}
         >
           <Select>
-            <Option value="high">High</Option>
-            <Option value="medium">Medium</Option>
-            <Option value="low">Low</Option>
+            <Option value="HIGH">High</Option>
+            <Option value="MEDIUM">Medium</Option>
+            <Option value="LOW">Low</Option>
           </Select>
         </Form.Item>
 
@@ -168,9 +179,9 @@ const NewProject = () => {
           ]}
         >
           <Select>
-            <Option value="web design">Web Design</Option>
-            <Option value="mobile app">Mobile App Development</Option>
-            <Option value="uiux">UI/UX</Option>
+            <Option value="WEB DESIGN">Web Design</Option>
+            <Option value="MOBILE APP">Mobile App Development</Option>
+            <Option value="UI/UX">UI/UX</Option>
           </Select>
         </Form.Item>
 
@@ -179,7 +190,9 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item label="Attachments" name="attachments">
-          <Input type="file" />
+          <Upload beforeUpload={() => false} onChange={handleImageChange}>
+            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+          </Upload>
         </Form.Item>
 
         <Form.Item>
