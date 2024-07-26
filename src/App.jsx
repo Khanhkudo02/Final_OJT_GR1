@@ -16,6 +16,7 @@ import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
 import ProjectDetail from "./Components/ProjectDetail";
+import AddPosition from "./Components/AddPosition"; 
 
 const { Content } = Layout;
 

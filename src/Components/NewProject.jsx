@@ -49,7 +49,7 @@ const NewProject = () => {
       <Form form={form} onFinish={onFinish}>
         <Form.Item
           label="Project Name"
-          name="projectName"
+          name="name"
           rules={[
             { required: true, message: "Please input the project name!" },
           ]}
@@ -59,7 +59,7 @@ const NewProject = () => {
 
         <Form.Item
           label="Project ID"
-          name="projectID"
+          name="id"
           rules={[{ required: true, message: "Please input the project ID!" }]}
         >
           <Input />
@@ -151,9 +151,9 @@ const NewProject = () => {
           ]}
         >
           <Select>
-            <Option value="not started">Not Started</Option>
-            <Option value="ongoing">Ongoing</Option>
-            <Option value="completed">Completed</Option>
+            <Option value="NOT STARTED">Not Started</Option>
+            <Option value="ONGOING">Ongoing</Option>
+            <Option value="COMPLETED">Completed</Option>
           </Select>
         </Form.Item>
 
@@ -165,9 +165,9 @@ const NewProject = () => {
           ]}
         >
           <Select>
-            <Option value="high">High</Option>
-            <Option value="medium">Medium</Option>
-            <Option value="low">Low</Option>
+            <Option value="HIGH">High</Option>
+            <Option value="MEDIUM">Medium</Option>
+            <Option value="LOW">Low</Option>
           </Select>
         </Form.Item>
 
@@ -179,9 +179,9 @@ const NewProject = () => {
           ]}
         >
           <Select>
-            <Option value="web design">Web Design</Option>
-            <Option value="mobile app">Mobile App Development</Option>
-            <Option value="uiux">UI/UX</Option>
+            <Option value="WEB DESIGN">Web Design</Option>
+            <Option value="MOBILE APP">Mobile App Development</Option>
+            <Option value="UI/UX">UI/UX</Option>
           </Select>
         </Form.Item>
 

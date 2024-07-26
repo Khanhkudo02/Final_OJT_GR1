@@ -22,10 +22,10 @@ const ProjectDetail = () => {
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <h2>Project Detail</h2>
-      <p><strong>ID:</strong> {project.key}</p>
+      <p><strong>ID:</strong> {project.id}</p>
       <p><strong>Name:</strong> {project.name}</p>
       <p><strong>Description:</strong> {project.description}</p>
-      <p><strong>Client:</strong> {project.client}</p>
+      <p><strong>Client:</strong> {project.clientName}</p>
       <p><strong>Project Manager:</strong> {project.projectManager}</p>
       <p><strong>Team Members:</strong> {project.teamMembers}</p>
       <p><strong>Budget:</strong> {project.budget}</p>

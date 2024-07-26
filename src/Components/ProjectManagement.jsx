@@ -55,23 +55,23 @@ const ProjectManagement = () => {
     },
     {
       title: "Project Name",
-      dataIndex: "project name",
-      key: "project name",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "Start Date",
-      dataIndex: "StartDate",
+      dataIndex: "startDate",
       key: "startDate",
     },
     {
       title: "End Date",
-      dataIndex: "end date",
-      key: "end date", 
+      dataIndex: "endDate",
+      key: "endDate", 
     },
     {
       title: "Client Name",
-      dataIndex: "client name",
-      key: "client name",
+      dataIndex: "clientName",
+      key: "clientName",
       render: (client) => (
         <Space>
           <Avatar src="path-to-client-avatar" />
@@ -81,8 +81,8 @@ const ProjectManagement = () => {
     },
     {
       title: "Project Manager",
-      dataIndex: "ProjectManager",
-      key: "ProjectManager",
+      dataIndex: "projectManager",
+      key: "projectManager",
       render: (personInCharge) => (
         <Space>
           <Avatar src="path-to-person-avatar" />
@@ -104,7 +104,9 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button type="primary">New Project</Button>
+      <Button type="primary" onClick={() => navigate("/new-project")}>
+        New Project
+      </Button>
       <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} centered>
         <TabPane tab="All Projects" key="All Projects" />
         <TabPane tab="Ongoing" key="Ongoing" />
