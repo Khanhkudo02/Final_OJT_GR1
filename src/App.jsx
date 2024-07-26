@@ -12,7 +12,6 @@ import ProjectManagement from "./Components/ProjectManagement";
 import Sidebar from "./Components/Sidebar";
 import TechnologyManagement from "./Components/TechnologyManagement";
 import Admin from "./pages/Admin";
-import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
@@ -66,7 +65,7 @@ const App = () => {
                   >
                     <div style={{ padding: 24, background: colorBgContainer }}>
                       <Routes>
-                        <Route path="/employee" element={<Employee />} />
+                        <Route path="/employee" element={<AccountInfo />} />
                         <Route path="/cv" element={<PageCV />} />
                         <Route path="/account-management" element={<Admin />} />
                         <Route path="/account-info" element={<AccountInfo />} />
