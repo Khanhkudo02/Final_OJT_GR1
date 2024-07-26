@@ -52,10 +52,12 @@ const PositionManagement = () => {
   const handleDelete = (record) => {
     if (record.status !== "inactive") {
       message.error("Only inactive positions can be deleted.");
+
       return;
     }
 
     confirm({
+      title: "Are you sure you want to delete this position?",
       title: "Are you sure you want to delete this position?",
       onOk: async () => {
         try {
@@ -67,6 +69,7 @@ const PositionManagement = () => {
         }
       },
       onCancel() {
+        console.log("Cancel");
         console.log("Cancel");
       },
     });
@@ -107,6 +110,15 @@ const PositionManagement = () => {
                 }
               >
                 Detail
+              </Button>
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/position-management/edit/${record.key}`)
+                }
+                style={{ marginLeft: 8 }}
+              >
+                Edit
               </Button>
               <Button
                 type="danger"
