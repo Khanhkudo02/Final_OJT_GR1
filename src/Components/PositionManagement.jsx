@@ -27,10 +27,10 @@ const PositionManagement = () => {
   useEffect(() => {
     loadPositions();
 
-    const positionAdded = localStorage.getItem('positionAdded');
-    if (positionAdded === 'true') {
+    const positionAdded = localStorage.getItem("positionAdded");
+    if (positionAdded === "true") {
       message.success("Position added successfully!");
-      localStorage.removeItem('positionAdded'); // Xóa thông báo sau khi đã hiển thị
+      localStorage.removeItem("positionAdded"); // Xóa thông báo sau khi đã hiển thị
     }
   }, []);
   const handleTableChange = (pagination) => {
@@ -81,7 +81,8 @@ const PositionManagement = () => {
           current: currentPage,
           pageSize: pageSize,
           total: positions.length,
-          onChange: (page, pageSize) => handleTableChange({ current: page, pageSize }),
+          onChange: (page, pageSize) =>
+            handleTableChange({ current: page, pageSize }),
         }}
       >
         <Column title="Name" dataIndex="name" key="name" />

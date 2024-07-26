@@ -9,7 +9,7 @@ import {
   set,
   update,
 } from "firebase/database";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 // Hàm cập nhật mật khẩu đã mã hóa cho tất cả người dùng hiện có
 const updateExistingPasswords = async () => {
@@ -44,7 +44,6 @@ const updateExistingPasswords = async () => {
   }
 };
 
-
 // Hàm đăng nhập người dùng
 export const loginUser = async (
   email,
@@ -70,11 +69,14 @@ export const loginUser = async (
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
+        localStorage.setItem("userId", userId);
         localStorage.setItem("user", JSON.stringify(user)); // Save the entire user object
         setUser(user);
 
         // Điều hướng dựa trên vai trò người dùng
-        navigate(user.role === "admin" ? "/account-management" : "/account-info");
+        navigate(
+          user.role === "admin" ? "/account-management" : "/account-info"
+        );
         return { user, error: null };
       } else {
         return { user: null, error: "Invalid password" };
@@ -87,8 +89,6 @@ export const loginUser = async (
     return { user: null, error: "An error occurred" };
   }
 };
-
-
 
 // Hàm đăng ký người dùng
 export const signUpUser = async (
