@@ -1,53 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom";
+import { fetchAllProjects } from "../service/Project";
 import "../assets/style/Pages/ProjectManagement.scss";
 
 const { TabPane } = Tabs;
-
-const data = [
-  {
-    key: "1",
-    id: "#PRJ2023-08-56789",
-    name: "Create Illustration For Website",
-    createdDate: "Aug 18th, 2023",
-    deadline: "Oct 15th, 2023",
-    client: "Ava Williams",
-    personInCharge: "Mia Rodriguez",
-    status: "COMPLETED",
-  },
-  {
-    key: "2",
-    id: "#PRJ2023-15-98765",
-    name: "Create Animation For App",
-    createdDate: "Aug 16th, 2023",
-    deadline: "Oct 11th, 2023",
-    client: "Isabella",
-    personInCharge: "Caleb Parker",
-    status: "ONGOING",
-  },
-  {
-    key: "3",
-    id: "#PRJ2023-15-98765",
-    name: "OJT",
-    createdDate: "Aug 16th, 2023",
-    deadline: "Oct 11th, 2023",
-    client: "Isabella",
-    personInCharge: "MR. Thuoc",
-    status: "ONGOING",
-  },
-  {
-    key: "4",
-    id: "#PRJ2023-15-12345",
-    name: "OJT",
-    createdDate: "Aug 16th, 2023",
-    deadline: "Oct 11th, 2023",
-    client: "Isabella",
-    personInCharge: "MR. Nguyen",
-    status: "NOT STARTED",
-  },
-  // Add more data as necessary
-];
 
 const statusColors = {
   COMPLETED: "green",
@@ -58,8 +15,17 @@ const statusColors = {
 const ProjectManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredStatus, setFilteredStatus] = useState("All Projects");
+  const [data, setData] = useState([]);
   const pageSize = 10;
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const projects = await fetchAllProjects();
+      setData(projects);
+    };
+    fetchData();
+  }, []);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -88,24 +54,24 @@ const ProjectManagement = () => {
       render: (text) => <Link to={`/project/${text}`}>{text}</Link>,
     },
     {
-      title: "Name",
+      title: "Project Name",
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "Created Date",
-      dataIndex: "createdDate",
-      key: "createdDate",
+      title: "Start Date",
+      dataIndex: "startDate",
+      key: "startDate",
     },
     {
-      title: "Deadline",
-      dataIndex: "deadline",
-      key: "deadline",
+      title: "End Date",
+      dataIndex: "endDate",
+      key: "endDate",
     },
     {
-      title: "Client",
-      dataIndex: "client",
-      key: "client",
+      title: "Client Name",
+      dataIndex: "clientName",
+      key: "clientName",
       render: (client) => (
         <Space>
           <Avatar src="path-to-client-avatar" />
@@ -114,9 +80,9 @@ const ProjectManagement = () => {
       ),
     },
     {
-      title: "Person in Charge",
-      dataIndex: "personInCharge",
-      key: "personInCharge",
+      title: "Project Manager",
+      dataIndex: "projectManager",
+      key: "projectManager",
       render: (personInCharge) => (
         <Space>
           <Avatar src="path-to-person-avatar" />

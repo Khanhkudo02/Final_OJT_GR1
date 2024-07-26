@@ -14,7 +14,8 @@ import Employee from "./pages/Employee";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
-import NewProject from "./Components/NewProject";
+import ProjectDetail from "./Components/ProjectDetail";
+import AddPosition from "./Components/AddPosition";
 
 const { Content } = Layout;
 
@@ -89,6 +90,8 @@ const App = () => {
                           path="/project-management"
                           element={<ProjectManagement />}
                         />
+                        <Route path="/project/:id"
+                          element={<ProjectDetail />} />
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
