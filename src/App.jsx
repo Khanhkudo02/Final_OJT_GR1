@@ -7,7 +7,7 @@ import ChangePassword from "./Components/ChangePassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import NewProject from "./Components/NewProject";
 import PositionManagement from "./Components/PositionManagement";
-import ProgramingLanguage from "./Components/ProgramingLanguage";
+import LanguageManagement from "./Components/LanguageManagement";
 import ProjectManagement from "./Components/ProjectManagement";
 import Sidebar from "./Components/Sidebar";
 import TechnologyManagement from "./Components/TechnologyManagement";
@@ -104,7 +104,7 @@ const App = () => {
                         />
                         <Route
                           path="/programing-language"
-                          element={<ProgramingLanguage />}
+                          element={<LanguageManagement />}
                         />
                         <Route path="/new-project" element={<NewProject />} />
                         <Route path="/" element={<Navigate to="/login" />} />
