@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
+import "../assets/style/Global.scss"
 
 const { Option } = Select;
 
@@ -293,7 +294,7 @@ function AdminPage() {
     <div>
       <LanguageSwitcher />
       <h1>{t("adminPage")}</h1>
-      <Button type="primary" onClick={() => setModalVisible(true)}>
+      <Button type="primary" className="btn btn-add" onClick={() => setModalVisible(true)}>
         {t("addUser")}
       </Button>
       <ExportExcel data={users} fileName="File Excel" />

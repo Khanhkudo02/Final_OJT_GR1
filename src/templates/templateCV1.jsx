@@ -3,7 +3,6 @@ import React from "react";
 import avt from "../../public/images/avatar.jpg";
 import "../assets/style/template/templateCV1.scss";
 
-
 const generatePDF = (doc) => {
   // Add background color to the left section
   doc.setFillColor(57, 64, 208); // #3940d0
