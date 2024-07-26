@@ -170,104 +170,138 @@ import avt from "../../public/images/avatar.jpg";
 // };
 
 const generatePDF = (doc) => {
+  // Add background color to the left section
+  doc.setFillColor(57, 64, 208); // #3940d0
+  doc.rect(0, 0, 100, doc.internal.pageSize.height, 'F'); // Fills the entire left section
+
   // Add avatar
   const img = new Image();
-  img.src = "/public/images/avatar.jpg"; // Adjust the path as needed
-  doc.addImage(img, "JPEG", 10, 10, 30, 30); // Adjust position and size
+  img.src = avt;
+  const x = 45; // Tọa độ x của hình tròn (tâm)
+  const y = 50; // Tọa độ y của hình tròn (tâm)
+  const radius = 30; // Bán kính của hình tròn
 
-  // Set up colors and fonts
-  const leftSectionMargin = 10;
-  const rightSectionMargin = 110; // Start position for right section
-  const sectionWidth = 90; // Width of each section
-  const sectionHeight = 290; // Height of the content area
+  doc.setFillColor("#3940d0");
+  doc.circle(x, y, radius, "F");
 
-  // Background colors
-  const leftBackgroundColor = [30, 115, 190]; // Blue
-  const rightBackgroundColor = [255, 255, 255]; // White
 
-  // Text colors
-  const leftTextColor = [255, 255, 255]; // White
-  const rightTextColor = [0, 0, 0]; // Black
+  doc.addImage(img, "JPEG", 15, 20, 60, 60);
 
-  // Add left section background
-  doc.setFillColor(...leftBackgroundColor);
-  doc.rect(leftSectionMargin, 50, sectionWidth, sectionHeight, "F");
+  // Add name and contact details
+  const startX = 105; // Adjusted x position
+  const startY = 20; // Adjusted y position
 
-  // Add right section background
-  doc.setFillColor(...rightBackgroundColor);
-  doc.rect(rightSectionMargin, 50, sectionWidth * 2, sectionHeight, "F");
-
-  // Add name and contact details to the left section
-  doc.setFont("Arial", "normal");
+  doc.setFont("Times", "normal");
   doc.setFontSize(24);
-  doc.setTextColor(...leftTextColor); // White color for name
-  doc.text("Michelle Robinson", leftSectionMargin + 5, 30);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Michelle Robinson", startX, startY + 10);
 
   doc.setFontSize(16);
-  doc.text("Graphic Designer", leftSectionMargin + 5, 40);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Graphic Designer", startX, startY + 20);
 
   doc.setFontSize(12);
-  doc.text("14585 10th Ave, Whitestone, NY", leftSectionMargin + 5, 50);
-  doc.text("+1 212-941-7824", leftSectionMargin + 5, 55);
-  doc.text("info@urmailaddress.com", leftSectionMargin + 5, 60);
+  doc.text("14585 10th Ave, Whitestone, NY", startX, startY + 30);
+  doc.text("+1 212-941-7824", startX, startY + 35);
+  doc.text("info@urmailaddress.com", startX, startY + 40);
 
-  // Add sections to the left section
-  const leftSections = [
-    { title: "About Me", content: "Motivated with 8 years of area of expertise...", y: 80 },
-    { title: "Website & Social Links", content: "Facebook: facebook.com/robinson\nBehance: behance.net/robinson\nTwitter: twitter.com/robinson", y: 110 },
-    { title: "References", content: "Mr. Michel Robinson\nGraphic and Web Designer\n+1 212-941-7824\ninfo@urmailname.com", y: 160 },
-    { title: "Languages", content: "English, UR Language", y: 200 },
-    { title: "Additional Details", content: "Driving License: Full", y: 220 },
+  // Add sections with titles and content
+  const sections = [
+    {
+      title: "About Me",
+      content: "Motivated with 8 years of area of expertise...",
+      y: 90,
+    },
+    {
+      title: "Website & Social Links",
+      content: "Facebook: facebook.com/robinson\nBehance: behance.net/robinson\nTwitter: twitter.com/robinson",
+      y: 120,
+    },
+    {
+      title: "References",
+      content: "Mr. Michel Robinson\nGraphic and Web Designer\n+1 212-941-7824\ninfo@urmailname.com",
+      y: 160,
+    },
+    {
+      title: "Languages",
+      content: "English, UR Language",
+      y: 200,
+    },
+    {
+      title: "Additional Details",
+      content: "Driving License: Full",
+      y: 220,
+    },
   ];
 
-  leftSections.forEach((section) => {
+  sections.forEach((section) => {
     doc.setFontSize(16);
-    doc.setTextColor(...leftTextColor); // White text
-    doc.text(section.title, leftSectionMargin + 5, section.y);
+    doc.setTextColor(255, 255, 255);
+    doc.text(section.title, 15, section.y);
 
     doc.setFontSize(12);
-    doc.text(section.content, leftSectionMargin + 5, section.y + 10);
+    doc.setTextColor(255, 255, 255); // White text color for the left section
+    doc.text(section.content, 15, section.y + 10);
   });
 
-  // Add sections to the right section
+  // Add Work Experience section
   doc.setFontSize(16);
-  doc.setTextColor(...rightTextColor); // Black text
-  doc.text("Work Experience", rightSectionMargin + 5, 80);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Work Experience", 105, 90);
 
   const workExperience = [
-    { title: "Senior Graphic Designer at GlowPixel Ltd, Orlando (2015 - 2016)", content: "Customer-oriented Graphic Designer with a strong history..." },
-    { title: "Graphic Designer at Lorem Ipsum, New York (2014 - 2015)", content: "Customer-oriented Graphic Designer with a strong history..." },
-    { title: "Graphic & Web Designer at Pixelate Agency, New Jersey (2013 - 2014)", content: "Customer-oriented Graphic Designer with a strong history..." },
+    {
+      title: "Senior Graphic Designer at GlowPixel Ltd, Orlando (2015 - 2016)",
+      content: "Customer-oriented Graphic Designer with a strong history...",
+    },
+    {
+      title: "Graphic Designer at Lorem Ipsum, New York (2014 - 2015)",
+      content: "Customer-oriented Graphic Designer with a strong history...",
+    },
+    {
+      title: "Graphic & Web Designer at Pixelate Agency, New Jersey (2013 - 2014)",
+      content: "Customer-oriented Graphic Designer with a strong history...",
+    },
   ];
 
-  let yPosition = 90;
+  let yPosition = 100;
   workExperience.forEach((job) => {
     doc.setFontSize(12);
-    doc.text(job.title, rightSectionMargin + 5, yPosition);
-    doc.text(job.content, rightSectionMargin + 5, yPosition + 10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(job.title, 105, yPosition);
+    doc.text(job.content, 105, yPosition + 10);
     yPosition += 20;
   });
 
   // Add Education section
   doc.setFontSize(16);
-  doc.text("Education", rightSectionMargin + 5, yPosition);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Education", 105, yPosition);
 
   const education = [
-    { title: "Master in Web Develop at University of UK, Toronto (2010 - 2012)", content: "Customer-oriented Graphic Designer with a strong history..." },
-    { title: "Bachelor in Graphic Design at College of Art, New Ark (2006 - 2010)", content: "Customer-oriented Graphic Designer with a strong history..." },
+    {
+      title: "Master in Web Develop at University of UK, Toronto (2010 - 2012)",
+      content: "Customer-oriented Graphic Designer with a strong history...",
+    },
+    {
+      title: "Bachelor in Graphic Design at College of Art, New Ark (2006 - 2010)",
+      content: "Customer-oriented Graphic Designer with a strong history...",
+    },
   ];
 
   yPosition += 10;
   education.forEach((edu) => {
     doc.setFontSize(12);
-    doc.text(edu.title, rightSectionMargin + 5, yPosition);
-    doc.text(edu.content, rightSectionMargin + 5, yPosition + 10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(edu.title, 105, yPosition);
+    doc.text(edu.content, 105, yPosition + 10);
     yPosition += 20;
   });
 
   // Add Skills section
   doc.setFontSize(16);
-  doc.text("Skills", rightSectionMargin + 5, yPosition);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Skills", 105, yPosition);
 
   const skills = [
     { name: "Adobe Photoshop", level: 80 },
@@ -280,36 +314,40 @@ const generatePDF = (doc) => {
   yPosition += 10;
   skills.forEach((skill) => {
     doc.setFontSize(12);
-    doc.text(skill.name, rightSectionMargin + 5, yPosition);
+    doc.setTextColor(0, 0, 0);
+    doc.text(skill.name, 105, yPosition);
 
     // Draw skill bar
-    doc.setFillColor(200, 200, 200); // Light gray
-    doc.rect(rightSectionMargin + 55, yPosition - 5, 50, 4, "F");
-    doc.setFillColor(0, 0, 255); // Blue
-    doc.rect(rightSectionMargin + 55, yPosition - 5, (50 * skill.level) / 100, 4, "F");
+    doc.setFillColor(200, 200, 200);
+    doc.rect(145, yPosition - 5, 50, 4, "F");
+    doc.setFillColor(0, 0, 255);
+    doc.rect(145, yPosition - 5, (50 * skill.level) / 100, 4, "F");
 
     yPosition += 10;
   });
 
   // Add Hobbies section
   doc.setFontSize(16);
-  doc.text("Hobbies", rightSectionMargin + 5, yPosition);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Hobbies", 105, yPosition);
 
   doc.setFontSize(12);
-  doc.text("Art, Traveling, Photography, Sports, Movie", rightSectionMargin + 5, yPosition + 10);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Art, Traveling, Photography, Sports, Movie", 105, yPosition + 10);
 
   // Add Publications section
   doc.setFontSize(16);
-  doc.text("Publications", rightSectionMargin + 5, yPosition + 30);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Publications", 105, yPosition + 30);
 
   doc.setFontSize(12);
-  doc.text("Complex cognition: The psychology of human thought, Oxford University Press, New York, NY, 2001", rightSectionMargin + 5, yPosition + 40);
-
-  // Save the PDF
-  doc.save("CV.pdf");
+  doc.setTextColor(0, 0, 0);
+  doc.text(
+    "Complex cognition: The psychology of human thought, Oxford University Press, New York, NY, 2001",
+    105,
+    yPosition + 40
+  );
 };
-
-
 
 function templateCV1() {
   return (
