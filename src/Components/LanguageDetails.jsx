@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchLanguageById } from "../service/LanguageServices";
 import { Button, Spin, message } from 'antd';
-import "../Components/LanguageDetails.scss";
+import "../Components/LanguageDetails.jsx";
 
 const LanguageDetails = () => {
     const { id } = useParams();
@@ -35,7 +35,7 @@ const LanguageDetails = () => {
                     <p><strong>Name:</strong> {language.name}</p>
                     <p><strong>Description:</strong> {language.description}</p>
                     <p><strong>Status:</strong> {language.status}</p>
-                    <Button type="primary" onClick={() => navigate("/language-management")}>
+                    <Button type="primary" onClick={() => navigate("/programing-language")}>
                         Back to Language Management
                     </Button>
                 </div>

@@ -5,26 +5,18 @@ const db = database;
 
 // Create new language
 const postCreateLanguage = async (name, description, status) => {
-    try {
-        const newLanguageRef = push(ref(db, 'languages'));
-
-        await set(newLanguageRef, {
-            name,
-            description,
-            status,
-        });
-
-        return newLanguageRef.key;
-    } catch (error) {
-        console.error("Failed to create language:", error);
-        throw error;
-    }
+    const languagesRef = push(ref(db, 'programmingLanguages'));
+    await set(languagesRef, {
+        name,
+        description,
+        status
+    });
 };
 
 // Fetch all languages
 const fetchAllLanguages = async () => {
     try {
-        const languagesRef = ref(db, 'languages');
+        const languagesRef = ref(db, 'programmingLanguages');
         const snapshot = await get(languagesRef);
         const data = snapshot.val();
         return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
@@ -37,7 +29,7 @@ const fetchAllLanguages = async () => {
 // Update existing language
 const putUpdateLanguage = async (id, name, description, status) => {
     try {
-        const languageRef = ref(db, `languages/${id}`);
+        const languageRef = ref(db, `programmingLanguages/${id}`);
 
         await update(languageRef, {
             name,
@@ -55,7 +47,9 @@ const putUpdateLanguage = async (id, name, description, status) => {
 // Delete language
 const deleteLanguageById = async (id) => {
     try {
-        const languageRef = ref(db, `languages/${id}`);
+        const languageRef = ref(db, `programmingLanguages/${id}`);
+
+        // Delete language from Realtime Database
         await remove(languageRef);
     } catch (error) {
         console.error("Failed to delete language:", error);
@@ -63,13 +57,12 @@ const deleteLanguageById = async (id) => {
     }
 };
 
-// Fetch language by ID
 const fetchLanguageById = async (id) => {
     try {
-        console.log(`Fetching language with ID: ${id}`);
-        const languageRef = ref(database, `languages/${id}`);
+        console.log(`Fetching language with ID: ${id}`); // Debug
+        const languageRef = ref(database, `programmingLanguages/${id}`);
         const snapshot = await get(languageRef);
-        console.log('Language data:', snapshot.val());
+        console.log('Language data:', snapshot.val()); // Debug
         return snapshot.val();
     } catch (error) {
         console.error("Failed to fetch language by ID:", error);

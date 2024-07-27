@@ -3,6 +3,7 @@ import { Button, Table, message, Modal } from 'antd';
 import { fetchAllLanguages, deleteLanguageById } from "../service/LanguageServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/LanguageManagement.scss";
+import "../assets/style/Global.scss";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -45,7 +46,7 @@ const LanguageManagement = () => {
   };
 
   const showAddPage = () => {
-    navigate("/languages/add");
+    navigate("/programming-language/add");
   };
 
   const handleDelete = (record) => {
@@ -97,10 +98,24 @@ const LanguageManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
-              <Button type="primary" onClick={() => navigate(`/language-management/view/${record.key}`)}>
+              <Button
+                type="primary"
+                onClick={() => navigate(`/programing-language/view/${record.key}`)}
+              >
                 Detail
               </Button>
-              <Button type="danger" onClick={() => handleDelete(record)} style={{ marginLeft: 8 }}>
+              <Button
+                type="primary"
+                onClick={() => navigate(`/programing-language/edit/${record.key}`)}
+                style={{ marginLeft: 8 }}
+              >
+                Edit
+              </Button>
+              <Button
+                type="danger"
+                onClick={() => handleDelete(record)}
+                style={{ marginLeft: 8 }}
+              >
                 Delete
               </Button>
             </span>
