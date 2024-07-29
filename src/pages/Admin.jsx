@@ -268,15 +268,21 @@ function AdminPage() {
       title: t("role"),
       dataIndex: "role",
       key: "role",
-      render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1) : '',
+      render: (text) =>
+        text ? text.charAt(0).toUpperCase() + text.slice(1) : "",
     },
     {
       title: t("status"),
       dataIndex: "status",
       key: "status",
       render: (text) => {
-        const className = text === 'active' ? 'status-active' : 'status-inactive';
-        return <span className={className}>{text ? text.charAt(0).toUpperCase() + text.slice(1) : ''}</span>;
+        const className =
+          text === "active" ? "status-active" : "status-inactive";
+        return (
+          <span className={className}>
+            {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+          </span>
+        );
       },
     },
     {
@@ -340,7 +346,7 @@ function AdminPage() {
             name="email"
             rules={[{ required: true, message: t("emailRequired") }]}
           >
-            <Input />
+            <Input disabled={editMode} />
           </Form.Item>
           {!editMode && (
             <Form.Item
