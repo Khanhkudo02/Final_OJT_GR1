@@ -5,14 +5,15 @@ import ModalEditTechnology from "./ModalEditTechnology";
 import ModalDeleteTechnology from "./ModalDeleteTechnology";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import "../assets/style/Pages/TechnologyManagement.scss";
+import "../assets/style/Global.scss";
 
 const { Column } = Table;
 
 const TechnologyManagement = () => {
   const [technologies, setTechnologies] = useState([]);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
   const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
 
@@ -34,19 +35,19 @@ const TechnologyManagement = () => {
   // Show edit modal with technology data
   const showEditModal = (record) => {
     setDataTechnologyEdit(record);
-    setIsEditModalVisible(true);
+    setIsEditModalOpen(true);
   };
 
   // Show add modal
   const showAddModal = () => {
-    setIsAddModalVisible(true);
+    setIsAddModalOpen(true);
   };
 
   // Show delete modal if technology is inactive
   const showDeleteModal = (record) => {
     if (record.status && record.status.toLowerCase() === "inactive") {
-      setTechnologyIdToDelete(record.key); // Use key instead of record
-      setIsDeleteModalVisible(true);
+      setTechnologyIdToDelete(record.key); // Make sure `record.key` is the correct ID
+      setIsDeleteModalOpen(true);
     } else {
       message.error("Only inactive technologies can be deleted.");
     }
@@ -54,95 +55,103 @@ const TechnologyManagement = () => {
 
   // Close edit modal and reload technologies
   const handleCloseEditModal = () => {
-    setIsEditModalVisible(false);
+    setIsEditModalOpen(false);
     setDataTechnologyEdit(null);
     setTimeout(loadTechnologies, 100);
   };
 
   // Close add modal and reload technologies
   const handleCloseAddModal = () => {
-    setIsAddModalVisible(false);
+    setIsAddModalOpen(false);
     setTimeout(loadTechnologies, 100);
   };
 
   // Close delete modal and reload technologies
   const handleCloseDeleteModal = () => {
-    setIsDeleteModalVisible(false);
+    setIsDeleteModalOpen(false);
     setTechnologyIdToDelete(null);
     setTimeout(loadTechnologies, 100);
   };
 
+  // Define columns for Table
+  const columns = [
+    {
+      title: "Image",
+      dataIndex: "imageURL",
+      key: "imageURL",
+      render: (text) => <img src={text} alt="Technology" style={{ width: 50, height: 50 }} />,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (text, record) => (
+        <span>
+          <Button
+            className="edit-button"
+            type="primary"
+            style={{ marginRight: 8 }}
+            onClick={() => showEditModal(record)}
+          >
+            Edit
+          </Button>
+          <Button
+            className="delete-button" 
+            type="danger" 
+            onClick={() => showDeleteModal(record)}
+          >
+            Delete
+          </Button>
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div>
-      <Button
-        type="primary"
-        style={{ marginBottom: 16 }}
-        onClick={showAddModal}
-      >
-        Add New Technology
+      <Button className="btn" type="primary" onClick={showAddModal}>
+        Add Technology
       </Button>
-      <Table dataSource={technologies} pagination={false}>
-        <Column
-          title="Image"
-          dataIndex="imageURL"
-          key="imageURL"
-          render={(text) => (
-            <img
-              src={text}
-              alt="Technology"
-              style={{ width: 50, height: 50 }}
-            />
-          )}
+      <Table
+        columns={columns}
+        dataSource={technologies}
+        rowKey={(record) => record.key}
+      />
+      {isAddModalOpen && (
+        <ModalAddTechnology
+          open={isAddModalOpen}
+          handleClose={handleCloseAddModal}
         />
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Description" dataIndex="description" key="description" />
-        <Column
-          title="Status"
-          dataIndex="status"
-          key="status"
-          render={(text) => text.charAt(0).toUpperCase() + text.slice(1)}
-        />
-        <Column
-          title="Actions"
-          key="actions"
-          render={(text, record) => (
-            <span>
-              <Button
-                type="primary"
-                style={{ marginRight: 8 }}
-                onClick={() => showEditModal(record)}
-              >
-                Edit
-              </Button>
-              <Button
-                type="danger"
-                className="delete-button"
-                onClick={() => showDeleteModal(record)}
-              >
-                Delete
-              </Button>
-            </span>
-          )}
-        />
-      </Table>
-      {dataTechnologyEdit && (
+      )}
+      {isEditModalOpen && (
         <ModalEditTechnology
-          open={isEditModalVisible}
+          open={isEditModalOpen}
           handleClose={handleCloseEditModal}
           dataTechnologyEdit={dataTechnologyEdit}
         />
       )}
-      <ModalAddTechnology
-        open={isAddModalVisible}
-        handleClose={handleCloseAddModal}
-      />
-      {technologyIdToDelete && (
+      {isDeleteModalOpen && (
         <ModalDeleteTechnology
-          open={isDeleteModalVisible}
+          open={isDeleteModalOpen}
           handleClose={handleCloseDeleteModal}
-          technologyId={technologyIdToDelete}
+          technologyIdToDelete={technologyIdToDelete}
         />
       )}
+
     </div>
   );
 };
