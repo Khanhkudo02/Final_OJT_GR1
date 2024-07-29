@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
 import "../assets/style/Pages/Admin.scss";
+import "../assets/style/Global.scss";
 
 const { Option } = Select;
 
@@ -303,7 +304,7 @@ function AdminPage() {
       <LanguageSwitcher />
       <h1>{t("adminPage")}</h1>
       <div className="admin-actions">
-        <Button type="primary" onClick={() => setModalVisible(true)}>
+        <Button className="btn" type="primary" onClick={() => setModalVisible(true)}>
           {t("addUser")}
         </Button>
         <ExportExcel data={users} fileName="File Excel" />

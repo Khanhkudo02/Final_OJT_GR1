@@ -3,6 +3,7 @@ import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
 import { useNavigate } from "react-router-dom"; 
 import { fetchAllProjects } from "../service/Project";
 import "../assets/style/Pages/ProjectManagement.scss";
+import "../assets/style/Global.scss"
 
 const { TabPane } = Tabs;
 
@@ -103,7 +104,7 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button type="primary" onClick={() => navigate("/new-project")}>
+      <Button className="btn" type="primary" onClick={() => navigate("/new-project")}>
         New Project
       </Button>
       <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} centered>
