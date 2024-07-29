@@ -87,10 +87,10 @@ const ProjectEdit = () => {
   return (
     <div
       style={{
-        padding: "24px",
+        padding: "24px 0",
         background: "#fff",
-        maxWidth: "600px",
-        margin: "0 auto",
+        maxWidth: "1000px",
+        margin: "auto"
       }}
     >
       <Button type="default" onClick={() => navigate(`/project/${id}`)}>
