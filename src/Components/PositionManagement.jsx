@@ -79,7 +79,12 @@ const PositionManagement = () => {
   );
   return (
     <div>
-      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
+      <Button
+        className="btn"
+        type="primary"
+        style={{ marginBottom: 16 }}
+        onClick={showAddPage}
+      >
         Add New Position
       </Button>
       <Table
@@ -96,7 +101,20 @@ const PositionManagement = () => {
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
         <Column title="Department" dataIndex="department" key="department" />
-        <Column title="Status" dataIndex="status" key="status" />
+        <Column
+          title="Status"
+          dataIndex="status"
+          key="status"
+          render={(text) => {
+            const className =
+              text === "active" ? "status-active" : "status-inactive";
+            return (
+              <span className={className}>
+                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+              </span>
+            );
+          }}
+        />
         <Column
           title="Actions"
           key="actions"
