@@ -62,32 +62,58 @@ const ProjectManagement = () => {
       title: "Start Date",
       dataIndex: "startDate",
       key: "startDate",
+      render: (date) => {
+        // Kiểm tra xem date có tồn tại không trước khi định dạng
+        if (!date) return '';
+    
+        // Tạo một đối tượng Date từ ngày
+        const dateObj = new Date(date);
+    
+        // Định dạng ngày theo dạng "dd/mm/yyyy"
+        return dateObj.toLocaleDateString('en-GB'); // 'en-GB' sẽ sử dụng định dạng "dd/mm/yyyy"
+      },
     },
     {
       title: "End Date",
       dataIndex: "endDate",
-      key: "endDate", 
+      key: "endDate",
+      render: (date) => {
+        // Kiểm tra xem date có tồn tại không trước khi định dạng
+        if (!date) return '';
+    
+        // Tạo một đối tượng Date từ ngày
+        const dateObj = new Date(date);
+    
+        // Định dạng ngày theo dạng "dd/mm/yyyy"
+        return dateObj.toLocaleDateString('en-GB'); // 'en-GB' sẽ sử dụng định dạng "dd/mm/yyyy"
+      },
     },
     {
       title: "Client Name",
       dataIndex: "clientName",
       key: "clientName",
+      className: "text-align-start",
       render: (client) => (
-        <Space>
-          <Avatar src="path-to-client-avatar" />
-          {client}
+        <div className="text-align-start">
+          <Space>
+            <Avatar src="path-to-client-avatar" />
+            {client}
         </Space>
+        </div>
       ),
     },
     {
       title: "Project Manager",
       dataIndex: "projectManager",
       key: "projectManager",
+      className: "text-align-start",
       render: (personInCharge) => (
-        <Space>
-          <Avatar src="path-to-person-avatar" />
-          {personInCharge}
+        <div className="text-align-start">
+          <Space>
+            <Avatar src="path-to-person-avatar" />
+            {personInCharge}
         </Space>
+        </div>
       ),
     },
     {

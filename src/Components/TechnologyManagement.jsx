@@ -95,6 +95,10 @@ const TechnologyManagement = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      render: (text) => {
+        const className = text === 'active' ? 'status-active' : 'status-inactive';
+        return <span className={className}>{text ? text.charAt(0).toUpperCase() + text.slice(1) : ''}</span>;
+      },
     },
     {
       title: "Action",

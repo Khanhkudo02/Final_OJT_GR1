@@ -22,10 +22,28 @@ body {
   margin: 0;
 }
 
+.text-align-start {
+  text-align: start !important;
+}
+
 .btn {
   font-weight: 500;
   color: white;
   margin-right: 5px;
+}
+
+.status-active {
+  color: green;
+  font-weight: 700;
+}
+
+.status-inactive {
+  color: red;
+  font-weight: 700;
+}
+
+.ant-table-cell {
+  text-align: center !important;
 }
 
 .detail-button {
