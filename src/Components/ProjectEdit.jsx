@@ -126,7 +126,7 @@ const ProjectEdit = () => {
           name="startDate"
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
-          <DatePicker />
+          <DatePicker format="DD/MM/YYYY" />
         </Form.Item>
 
         <Form.Item
@@ -134,7 +134,7 @@ const ProjectEdit = () => {
           name="endDate"
           rules={[{ required: true, message: "Please select the end date!" }]}
         >
-          <DatePicker />
+          <DatePicker format="DD/MM/YYYY" />
         </Form.Item>
 
         <Form.Item

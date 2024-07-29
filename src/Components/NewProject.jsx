@@ -77,7 +77,7 @@ const NewProject = () => {
           name="startDate"
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
-          <DatePicker />
+          <DatePicker format="DD/MM/YYYY" />
         </Form.Item>
 
         <Form.Item
@@ -85,7 +85,7 @@ const NewProject = () => {
           name="endDate"
           rules={[{ required: true, message: "Please select the end date!" }]}
         >
-          <DatePicker />
+          <DatePicker format="DD/MM/YYYY" />
         </Form.Item>
 
         <Form.Item
