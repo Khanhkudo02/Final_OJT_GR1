@@ -7,7 +7,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/PositionManagement.scss";
 import "../assets/style/Global.scss";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import {  EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -133,6 +133,7 @@ const PositionManagement = () => {
           dataPositionEdit={dataPositionEdit}
         />
       )}
+
     </div>
   );
 };

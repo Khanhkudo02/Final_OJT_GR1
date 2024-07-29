@@ -42,9 +42,6 @@ function PageCV() {
   return (
     <div>
       <div className="PDF-Button">
-        {/* <button className="download-btn" onClick={handleDownloadPdf}>
-          Download PDF
-        </button> */}
         <select
           className="select-CV"
           onChange={handleTemplateChange}
@@ -54,10 +51,10 @@ function PageCV() {
             Select a template
           </option>
           <option className="option-CV" value="Template1">
-            Template 1
+            Template CV1
           </option>
           <option className="option-CV" value="Template2">
-            Template 2
+            Template CV2
           </option>
         </select>
         <button className="download-btn" onClick={exportPDF}>

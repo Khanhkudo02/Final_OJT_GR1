@@ -13,7 +13,7 @@
   "userAddedSuccessfully": "Thêm người dùng thành công.",
   "errorAddingOrUpdatingUser": "Lỗi khi thêm hoặc cập nhật người dùng.",
   "cannotDeleteAccount": "không thể xóa tài khoản này.",
-  "cannotDeleteOnlyAdminUser": "Không thể xóa người dùng admin duy nhất.",
+  "cannotDeleteAdminUser": "Không thể xóa tài khoản admin này.",
   "userDeletedSuccessfully": "Xóa người dùng thành công.",
   "pleaseInputEmail": "Vui lòng nhập email.",
   "pleaseInputName": "Vui lòng nhập tên.",
