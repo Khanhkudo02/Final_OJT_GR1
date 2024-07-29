@@ -1,91 +1,83 @@
-import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal } from "antd";
-import {
-  fetchAllPositions,
-  deletePositionById,
-} from "../service/PositionServices";
+import React, { useState, useEffect } from 'react';
+import { Button, Table, message, Modal } from 'antd';
+import { fetchAllLanguages, deleteLanguageById } from "../service/LanguageServices";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Pages/PositionManagement.scss";
+import "../assets/style/Pages/LanguageManagement.scss";
 import "../assets/style/Global.scss";
 
 const { Column } = Table;
 const { confirm } = Modal;
 
-const PositionManagement = () => {
-  const [positions, setPositions] = useState([]);
+const LanguageManagement = () => {
+  const [languages, setLanguages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [dataPositionEdit, setDataPositionEdit] = useState(null);
+  const [dataLanguageEdit, setDataLanguageEdit] = useState(null);
 
-  const loadPositions = async () => {
+  const loadLanguages = async () => {
     try {
-      const data = await fetchAllPositions();
-      setPositions(data);
+      const data = await fetchAllLanguages();
+      setLanguages(data);
     } catch (error) {
-      console.error("Failed to fetch positions:", error);
+      console.error("Failed to fetch languages:", error);
     }
   };
 
   useEffect(() => {
-    loadPositions();
+    loadLanguages();
 
-    const positionAdded = localStorage.getItem("positionAdded");
-    if (positionAdded === "true") {
-      message.success("Position added successfully!");
-      localStorage.removeItem("positionAdded"); // Xóa thông báo sau khi đã hiển thị
+    const languageAdded = localStorage.getItem("languageAdded");
+    if (languageAdded === "true") {
+      message.success("Language added successfully!");
+      localStorage.removeItem("languageAdded"); // Remove notification after display
     }
   }, []);
+
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);
     setPageSize(pagination.pageSize);
   };
 
   const showEditModal = (record) => {
-    setDataPositionEdit(record);
+    setDataLanguageEdit(record);
     setIsEditModalVisible(true);
   };
 
   const showAddPage = () => {
-    navigate("/positions/add");
+    navigate("/programing-language/add");
   };
-  const handleDelete = (record) => {
-    if (record.status !== "inactive") {
-      message.error("Only inactive positions can be deleted.");
 
+  const handleDelete = (record) => {
+    if (record.status !== 'inactive') {
+      message.error('Only inactive languages can be deleted.');
       return;
     }
 
     confirm({
-      title: "Are you sure you want to delete this position?",
+      title: 'Are you sure you want to delete this language?',
       onOk: async () => {
         try {
-          await deletePositionById(record.key);
-          message.success("Position deleted successfully!");
-          loadPositions();
+          await deleteLanguageById(record.key);
+          message.success('Language deleted successfully!');
+          loadLanguages();
         } catch (error) {
-          message.error("Failed to delete position.");
+          message.error('Failed to delete language.');
         }
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
-  const paginatedData = positions.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+
+  const paginatedData = languages.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div>
-      <Button
-        className="btn"
-        type="primary"
-        style={{ marginBottom: 16 }}
-        onClick={showAddPage}
-      >
-        Add New Position
+      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
+        Add New Language
       </Button>
       <Table
         dataSource={paginatedData}
@@ -93,14 +85,13 @@ const PositionManagement = () => {
         pagination={{
           current: currentPage,
           pageSize: pageSize,
-          total: positions.length,
+          total: languages.length,
           onChange: (page, pageSize) =>
             handleTableChange({ current: page, pageSize }),
         }}
       >
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
-        <Column title="Department" dataIndex="department" key="department" />
         <Column
           title="Status"
           dataIndex="status"
@@ -123,18 +114,14 @@ const PositionManagement = () => {
               <Button
                 className="detail-button"
                 type="primary"
-                onClick={() =>
-                  navigate(`/position-management/view/${record.key}`)
-                }
+                onClick={() => navigate(`/programing-language/view/${record.key}`)}
               >
                 Detail
               </Button>
               <Button
                 className="edit-button"
                 type="primary"
-                onClick={() =>
-                  navigate(`/position-management/edit/${record.key}`)
-                }
+                onClick={() => navigate(`/programing-language/edit/${record.key}`)}
                 style={{ marginLeft: 8 }}
               >
                 Edit
@@ -151,15 +138,15 @@ const PositionManagement = () => {
           )}
         />
       </Table>
-      {dataPositionEdit && (
-        <ModalEditPosition
+      {dataLanguageEdit && (
+        <ModalEditLanguage
           open={isEditModalVisible}
           handleClose={() => setIsEditModalVisible(false)}
-          dataPositionEdit={dataPositionEdit}
+          dataLanguageEdit={dataLanguageEdit}
         />
       )}
     </div>
   );
 };
 
-export default PositionManagement;
+export default LanguageManagement;

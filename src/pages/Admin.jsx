@@ -264,11 +264,16 @@ function AdminPage() {
       title: t("role"),
       dataIndex: "role",
       key: "role",
+      render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1) : '',
     },
     {
       title: t("status"),
       dataIndex: "status",
       key: "status",
+      render: (text) => {
+        const className = text === 'active' ? 'status-active' : 'status-inactive';
+        return <span className={className}>{text ? text.charAt(0).toUpperCase() + text.slice(1) : ''}</span>;
+      },
     },
     {
       title: t("createdAt"),
@@ -304,7 +309,11 @@ function AdminPage() {
       <LanguageSwitcher />
       <h1>{t("adminPage")}</h1>
       <div className="admin-actions">
-        <Button className="btn" type="primary" onClick={() => setModalVisible(true)}>
+        <Button
+          className="btn"
+          type="primary"
+          onClick={() => setModalVisible(true)}
+        >
           {t("addUser")}
         </Button>
         <ExportExcel data={users} fileName="File Excel" />

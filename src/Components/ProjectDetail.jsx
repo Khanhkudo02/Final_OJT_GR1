@@ -8,6 +8,12 @@ const ProjectDetail = () => {
   const [project, setProject] = useState(null);
   const navigate = useNavigate();
 
+  const formatDate = (date) => {
+    if (!date) return '';
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString('en-GB'); // 'en-GB' cho định dạng "dd/mm/yyyy"
+  };
+
   useEffect(() => {
     const fetchProject = async () => {
       try {
@@ -70,8 +76,8 @@ const ProjectDetail = () => {
       <p><strong>Status:</strong> {project.status}</p>
       <p><strong>Priority:</strong> {project.priority}</p>
       <p><strong>Category:</strong> {project.category}</p>
-      <p><strong>Start Date:</strong> {project.startDate}</p>
-      <p><strong>End Date:</strong> {project.endDate}</p>
+      <p><strong>Start Date:</strong> {formatDate(project.startDate)}</p>
+      <p><strong>End Date:</strong> {formatDate(project.endDate)}</p>
       <p><strong>Technologies Used:</strong> {project.technologies}</p>
       <Button type="primary" onClick={() => navigate(`/edit-project/${project.key}`)} style={{ marginRight: "10px" }}>
         Edit

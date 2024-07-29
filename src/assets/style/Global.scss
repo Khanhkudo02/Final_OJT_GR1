@@ -9,7 +9,6 @@
 @import "../style/Pages/LogoutButton.scss";
 @import "../style/Pages/PageCV.scss";
 @import "../style/Pages/PositionManagement.scss";
-@import "../style/Pages/ProgramingLanguage.scss";
 @import "../style/Pages/ProjectManagement.scss";
 @import "../style/Pages/ResetPassword.scss";
 @import "../style/Pages/Sidebar.scss";
@@ -22,10 +21,28 @@ body {
   margin: 0;
 }
 
+.text-align-start {
+  text-align: start !important;
+}
+
 .btn {
   font-weight: 500;
   color: white;
   margin-right: 5px;
+}
+
+.status-active {
+  color: green;
+  font-weight: 700;
+}
+
+.status-inactive {
+  color: red;
+  font-weight: 700;
+}
+
+.ant-table-cell {
+  text-align: center !important;
 }
 
 .detail-button {
