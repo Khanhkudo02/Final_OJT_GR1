@@ -179,8 +179,33 @@ const NewProject = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Technologies Used" name="technologies">
-          <TextArea rows={2} />
+        <Form.Item
+          label="Technologies Used"
+          name="technologiesUsed"
+          rules={[
+            { required: true, message: "Please select the Technologies Used!" },
+          ]}
+        >
+          <Select>
+            <Option value="INTERNET OF THINGS">Internet of Things</Option>
+            <Option value="BIG DATA">Big Data</Option>
+            <Option value="REACT JS">ReactJs</Option>
+            <Option value="EHR">EHR</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          label="Programming Management"
+          name="programmingManagement"
+          rules={[
+            { required: true, message: "Please select the Programming Management!" },
+          ]}
+        >
+          <Select>
+            <Option value="JAVASCRIPT">Java Script</Option>
+            <Option value="C##">C##</Option>
+            <Option value="PHP">Php</Option>
+          </Select>
         </Form.Item>
 
         <Form.Item label="Attachments" name="attachments">

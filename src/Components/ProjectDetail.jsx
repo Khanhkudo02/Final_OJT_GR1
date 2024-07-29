@@ -72,7 +72,8 @@ const ProjectDetail = () => {
       <p><strong>Category:</strong> {project.category}</p>
       <p><strong>Start Date:</strong> {project.startDate}</p>
       <p><strong>End Date:</strong> {project.endDate}</p>
-      <p><strong>Technologies Used:</strong> {project.technologies}</p>
+      <p><strong>Technologies Used:</strong> {project.technologiesUsed}</p>
+      <p><strong>Programming Management:</strong> {project.programmingManagement}</p>
       <Button type="primary" onClick={() => navigate(`/edit-project/${project.key}`)} style={{ marginRight: "10px" }}>
         Edit
       </Button>
