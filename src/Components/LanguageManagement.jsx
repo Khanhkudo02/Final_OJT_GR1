@@ -76,7 +76,7 @@ const LanguageManagement = () => {
 
   return (
     <div>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
+      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
         Add New Language
       </Button>
       <Table
