@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchAllProjects, deleteProject } from "../service/Project";
+import { fetchAllTechnology } from "../service/TechnologyServices";
+import { fetchAllLanguages } from "../service/LanguageServices";
 import { Button, Modal, message } from "antd";
 
 const ProjectDetail = () => {
   const { id } = useParams();
   const [project, setProject] = useState(null);
+  const [technologies, setTechnologies] = useState([]);
+  const [languages, setLanguages] = useState([]);
   const navigate = useNavigate();
 
   const formatDate = (date) => {
     if (!date) return '';
     const dateObj = new Date(date);
-    return dateObj.toLocaleDateString('en-GB'); // 'en-GB' cho định dạng "dd/mm/yyyy"
+    return dateObj.toLocaleDateString('en-GB'); // 'en-GB' for "dd/mm/yyyy"
+  };
+
+  // Convert IDs to names using the provided list
+  const getNamesFromIds = (ids, options) => {
+    return options
+      .filter(option => ids.includes(option.value))
+      .map(option => option.label)
+      .join(', '); // Join names with a comma
   };
 
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchData = async () => {
       try {
-        const allProjects = await fetchAllProjects();
+        const [allProjects, allTechnologies, allLanguages] = await Promise.all([
+          fetchAllProjects(),
+          fetchAllTechnology(),
+          fetchAllLanguages(),
+        ]);
+
         const projectData = allProjects.find(project => project.key === id);
         if (projectData) {
           setProject(projectData);
@@ -25,13 +42,23 @@ const ProjectDetail = () => {
           message.error("Project not found");
           navigate("/project-management");
         }
+
+        setTechnologies(allTechnologies.map(tech => ({
+          label: tech.name,
+          value: tech.key,
+        })));
+        setLanguages(allLanguages.map(lang => ({
+          label: lang.name,
+          value: lang.key,
+        })));
       } catch (error) {
-        console.error("Error fetching project:", error);
+        console.error("Error fetching project or related data:", error);
         message.error("Error fetching project data");
         navigate("/project-management");
       }
     };
-    fetchProject();
+
+    fetchData();
   }, [id, navigate]);
 
   const handleDelete = async () => {
@@ -59,6 +86,9 @@ const ProjectDetail = () => {
     return <div>Loading...</div>;
   }
 
+  const displayedTechnologies = getNamesFromIds(project.technologies, technologies);
+  const displayedLanguages = getNamesFromIds(project.languages, languages);
+
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <Button type="default" onClick={() => navigate("/project-management")}>
@@ -78,7 +108,8 @@ const ProjectDetail = () => {
       <p><strong>Category:</strong> {project.category}</p>
       <p><strong>Start Date:</strong> {formatDate(project.startDate)}</p>
       <p><strong>End Date:</strong> {formatDate(project.endDate)}</p>
-      <p><strong>Technologies Used:</strong> {project.technologies}</p>
+      <p><strong>Technologies Used:</strong> {displayedTechnologies}</p>
+      <p><strong>Languages Used:</strong> {displayedLanguages}</p>
       <Button type="primary" onClick={() => navigate(`/edit-project/${project.key}`)} style={{ marginRight: "10px" }}>
         Edit
       </Button>
