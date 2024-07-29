@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
-import "../assets/style/Pages/Admin.scss";
 import "../assets/style/Global.scss";
+import "../assets/style/Pages/Admin.scss";
 
 const { Option } = Select;
 
@@ -179,6 +179,10 @@ function AdminPage() {
       const userData = snapshot.val();
 
       if (userData) {
+        if (userData.isAdmin) {
+          message.error(t("cannotDeleteAdminUser"));
+          return;
+        }
         const adminUsers = users.filter((user) => user.role === "admin");
 
         if (userData.role === "admin" && adminUsers.length === 1) {

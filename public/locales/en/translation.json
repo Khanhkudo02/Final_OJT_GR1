@@ -13,7 +13,7 @@
   "userAddedSuccessfully": "User added successfully.",
   "errorAddingOrUpdatingUser": "Error adding or updating user.",
   "cannotDeleteAccount": "Can not Delete Account.",
-  "cannotDeleteOnlyAdminUser": "Cannot delete the only admin user.",
+  "cannotDeleteAdminUser": "Cannot delete this admin.",
   "userDeletedSuccessfully": "User deleted successfully.",
   "pleaseInputEmail": "Please input email.",
   "pleaseInputName": "Please input name.",
