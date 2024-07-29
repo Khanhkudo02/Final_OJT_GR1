@@ -121,15 +121,6 @@ const PositionManagement = () => {
           render={(text, record) => (
             <span>
               <Button
-                className="detail-button"
-                type="primary"
-                onClick={() =>
-                  navigate(`/position-management/view/${record.key}`)
-                }
-              >
-                Detail
-              </Button>
-              <Button
                 className="edit-button"
                 type="primary"
                 onClick={() =>

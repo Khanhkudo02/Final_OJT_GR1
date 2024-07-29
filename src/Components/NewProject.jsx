@@ -1,13 +1,30 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Select, Checkbox, DatePicker, InputNumber, message, Upload } from "antd";
+import React, { useState, useEffect } from "react";
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  Checkbox,
+  DatePicker,
+  InputNumber,
+  message,
+  Upload,
+  Space,
+} from "antd";
 import { useNavigate } from "react-router-dom";
 import { postCreateProject } from "../service/Project";
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined } from "@ant-design/icons";
+import { fetchAllTechnology } from "../service/TechnologyServices";
+import { fetchAllLanguages } from "../service/LanguageServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 const NewProject = () => {
+  const [technologies, setTechnologies] = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [form] = Form.useForm();
   const [agreement, setAgreement] = useState(false);
   const navigate = useNavigate();
@@ -17,14 +34,16 @@ const NewProject = () => {
     try {
       const projectData = {
         ...values,
-        startDate: values.startDate.format('YYYY-MM-DD'),
-        endDate: values.endDate.format('YYYY-MM-DD')
+        startDate: values.startDate.format("DD-MM-YYYY"),
+        endDate: values.endDate.format("DD-MM-YYYY"),
+        technologies: values.technologies,
+        languages: values.languages,
       };
       await postCreateProject(projectData, imageFile);
-      message.success('Project added successfully');
-      navigate('/project-management');
+      message.success("Project added successfully");
+      navigate("/project-management");
     } catch (error) {
-      message.error('Failed to add project');
+      message.error("Failed to add project");
     }
   };
 
@@ -36,13 +55,60 @@ const NewProject = () => {
     setImageFile(info.file.originFileObj);
   };
 
+  // Load technologies
+  useEffect(() => {
+    const loadTechnologies = async () => {
+      try {
+        const data = await fetchAllTechnology();
+        // Convert data from Firebase to format for Select
+        const techOptions = data.map((tech) => ({
+          label: tech.name,
+          value: tech.key, // Use key as value for Option
+        }));
+        setTechnologies(techOptions);
+      } catch (err) {
+        setError("Failed to fetch technologies");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTechnologies();
+  }, []);
+
+  // Load languages
+  useEffect(() => {
+    const loadLanguages = async () => {
+      try {
+        const data = await fetchAllLanguages();
+        // Convert data from Firebase to format for Select
+        const languageOptions = data.map((lang) => ({
+          label: lang.name,
+          value: lang.key, // Use key as value for Option
+        }));
+        setLanguages(languageOptions);
+      } catch (err) {
+        setError("Failed to fetch languages");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadLanguages();
+  }, []);
+
+  const handleChange = (value) => {
+    console.log(`Selected technologies: ${value}`);
+  };
+
   return (
     <div
       style={{
         padding: "24px 0",
         background: "#fff",
         maxWidth: "1000px",
-        margin: "auto"
+        margin: "auto",
         // maxWidth: "600px",
         // margin: "0 auto",
       }}
@@ -179,32 +245,25 @@ const NewProject = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="Technologies Used"
-          name="technologiesUsed"
-          rules={[
-            { required: true, message: "Please select the Technologies Used!" },
-          ]}
-        >
-          <Select>
-            <Option value="INTERNET OF THINGS">Internet of Things</Option>
-            <Option value="BIG DATA">Big Data</Option>
-            <Option value="REACT JS">ReactJs</Option>
-            <Option value="EHR">EHR</Option>
+        {/* Select technologies */}
+        <Form.Item label="Technologies Used" name="technologies">
+          <Select mode="multiple" placeholder="Select technologies">
+            {technologies.map(tech => (
+              <Option key={tech.key} value={tech.value}>
+                {tech.label}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="Programming Management"
-          name="programmingManagement"
-          rules={[
-            { required: true, message: "Please select the Programming Management!" },
-          ]}
-        >
-          <Select>
-            <Option value="JAVASCRIPT">Java Script</Option>
-            <Option value="C##">C##</Option>
-            <Option value="PHP">Php</Option>
+        {/* Select programming languages */}
+        <Form.Item label="Programming Languages Used" name="languages">
+          <Select mode="multiple" placeholder="Select languages">
+            {languages.map(lang => (
+              <Option key={lang.key} value={lang.value}>
+                {lang.label}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 
