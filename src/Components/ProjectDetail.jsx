@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchAllProjects, deleteProject } from "../service/Project";
-import { Button, Modal, message } from "antd";
+import { Button, Modal, message, List, Typography } from "antd";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -12,7 +12,7 @@ const ProjectDetail = () => {
     const fetchProject = async () => {
       try {
         const allProjects = await fetchAllProjects();
-        const projectData = allProjects.find(project => project.key === id);
+        const projectData = allProjects.find((project) => project.key === id);
         if (projectData) {
           setProject(projectData);
         } else {
@@ -53,13 +53,22 @@ const ProjectDetail = () => {
     return <div>Loading...</div>;
   }
 
+  const renderAttachment = (attachment) => {
+    if (attachment.type.startsWith("image/")) {
+      return <img src={attachment.url} alt="Attachment" style={{ width: "100%", marginBottom: "20px" }} />;
+    } else if (attachment.type === "application/pdf") {
+      return <a href={attachment.url} target="_blank" rel="noopener noreferrer">View PDF</a>;
+    } else {
+      return <a href={attachment.url} target="_blank" rel="noopener noreferrer">Download File</a>;
+    }
+  };
+
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <Button type="default" onClick={() => navigate("/project-management")}>
         Back
       </Button>
       <h2>Project Detail</h2>
-      {project.imageUrl && <img src={project.imageUrl} alt="Project" style={{ width: "100%", marginBottom: "20px" }} />}
       <p><strong>ID:</strong> {project.key}</p>
       <p><strong>Name:</strong> {project.name}</p>
       <p><strong>Description:</strong> {project.description}</p>
@@ -74,6 +83,21 @@ const ProjectDetail = () => {
       <p><strong>End Date:</strong> {project.endDate}</p>
       <p><strong>Technologies Used:</strong> {project.technologiesUsed}</p>
       <p><strong>Programming Management:</strong> {project.programmingManagement}</p>
+      {project.attachments && Array.isArray(project.attachments) && (
+        <div>
+          <h3>Attachments:</h3>
+          <List
+            itemLayout="vertical"
+            dataSource={project.attachments}
+            renderItem={(attachment) => (
+              <List.Item>
+                <Typography.Text>{attachment.name}</Typography.Text>
+                {renderAttachment(attachment)}
+              </List.Item>
+            )}
+          />
+        </div>
+      )}
       <Button type="primary" onClick={() => navigate(`/edit-project/${project.key}`)} style={{ marginRight: "10px" }}>
         Edit
       </Button>

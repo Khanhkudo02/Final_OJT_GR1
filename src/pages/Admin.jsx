@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
-import "../assets/style/Pages/Admin.scss";
 import "../assets/style/Global.scss";
+import "../assets/style/Pages/Admin.scss";
 
 const { Option } = Select;
 
@@ -179,6 +179,10 @@ function AdminPage() {
       const userData = snapshot.val();
 
       if (userData) {
+        if (userData.isAdmin) {
+          message.error(t("cannotDeleteAdminUser"));
+          return;
+        }
         const adminUsers = users.filter((user) => user.role === "admin");
 
         if (userData.role === "admin" && adminUsers.length === 1) {
@@ -264,11 +268,16 @@ function AdminPage() {
       title: t("role"),
       dataIndex: "role",
       key: "role",
+      render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1) : '',
     },
     {
       title: t("status"),
       dataIndex: "status",
       key: "status",
+      render: (text) => {
+        const className = text === 'active' ? 'status-active' : 'status-inactive';
+        return <span className={className}>{text ? text.charAt(0).toUpperCase() + text.slice(1) : ''}</span>;
+      },
     },
     {
       title: t("createdAt"),
@@ -304,7 +313,11 @@ function AdminPage() {
       <LanguageSwitcher />
       <h1>{t("adminPage")}</h1>
       <div className="admin-actions">
-        <Button className="btn" type="primary" onClick={() => setModalVisible(true)}>
+        <Button
+          className="btn"
+          type="primary"
+          onClick={() => setModalVisible(true)}
+        >
           {t("addUser")}
         </Button>
         <ExportExcel data={users} fileName="File Excel" />
