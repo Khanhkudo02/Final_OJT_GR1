@@ -92,19 +92,34 @@ const LanguageManagement = () => {
       >
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
-        <Column title="Status" dataIndex="status" key="status" />
+        <Column
+          title="Status"
+          dataIndex="status"
+          key="status"
+          render={(text) => {
+            const className =
+              text === "active" ? "status-active" : "status-inactive";
+            return (
+              <span className={className}>
+                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+              </span>
+            );
+          }}
+        />
         <Column
           title="Actions"
           key="actions"
           render={(text, record) => (
             <span>
               <Button
+                className="detail-button"
                 type="primary"
                 onClick={() => navigate(`/programing-language/view/${record.key}`)}
               >
                 Detail
               </Button>
               <Button
+                className="edit-button"
                 type="primary"
                 onClick={() => navigate(`/programing-language/edit/${record.key}`)}
                 style={{ marginLeft: 8 }}
@@ -112,6 +127,7 @@ const LanguageManagement = () => {
                 Edit
               </Button>
               <Button
+                className="delete-button"
                 type="danger"
                 onClick={() => handleDelete(record)}
                 style={{ marginLeft: 8 }}
