@@ -1,3 +1,23 @@
+@import "../style/Pages/AccountInfo.scss";
+@import "../style/Pages/Admin.scss";
+@import "../style/Pages/ChangePassword.scss";
+@import "../style/Pages/EmployeeManagement.scss";
+@import "../style/Pages/Footer.scss";
+@import "../style/Pages/ForgetPassword.scss";
+@import "../style/Pages/Header.scss";
+@import "../style/Pages/Login.module.scss";
+@import "../style/Pages/LogoutButton.scss";
+@import "../style/Pages/PageCV.scss";
+@import "../style/Pages/PositionManagement.scss";
+@import "../style/Pages/ProgramingLanguage.scss";
+@import "../style/Pages/ProjectManagement.scss";
+@import "../style/Pages/ResetPassword.scss";
+@import "../style/Pages/Sidebar.scss";
+@import "../style/Pages/TechnologyManagement.scss";
+
+@import "../style/template/templateCV1.scss";
+@import "../style/template/templateCV2.scss";
+
 body {
   margin: 0;
 }
@@ -5,6 +25,7 @@ body {
 .btn {
   font-weight: 500;
   color: white;
+  margin-right: 5px;
 }
 
 .detail-button {
