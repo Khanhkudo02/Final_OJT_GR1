@@ -46,7 +46,7 @@ const LanguageManagement = () => {
   };
 
   const showAddPage = () => {
-    navigate("/programming-language/add");
+    navigate("/programing-language/add");
   };
 
   const handleDelete = (record) => {

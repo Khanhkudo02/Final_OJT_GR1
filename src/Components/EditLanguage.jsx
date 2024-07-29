@@ -44,7 +44,7 @@ const EditLanguage = () => {
         try {
             await putUpdateLanguage(id, name, description, status);
             toast.success("Language updated successfully!");
-            navigate("/programming-language");
+            navigate("/programing-language");
         } catch (error) {
             toast.error("Failed to update language.");
             console.error("Error details:", error);
