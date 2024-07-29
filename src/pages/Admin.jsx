@@ -138,8 +138,10 @@ function AdminPage() {
 
         await set(userRef, userData);
         message.success(t("userAddedSuccessfully"));
-      }
 
+        
+      }
+      
       form.resetFields();
       setEmail("");
       setPassword("");
@@ -340,7 +342,7 @@ function AdminPage() {
             name="email"
             rules={[{ required: true, message: t("emailRequired") }]}
           >
-            <Input />
+            <Input disabled={editMode}/>
           </Form.Item>
           {!editMode && (
             <Form.Item
