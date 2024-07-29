@@ -39,47 +39,48 @@ const Sidebar = ({ role }) => {
     },
     {
       key: "2",
+      icon: <TeamOutlined />,
+      label: <NavLink to="/employee">Employee</NavLink>,
+    },
+    {
+      key: "3",
       icon: <ProjectOutlined />,
       label: <NavLink to="/project-management">Project Management</NavLink>,
       children: [
         {
-          key: "2-1",
+          key: "3-1",
           label: <NavLink to="/new-project">New Project</NavLink>,
         },
         {
-          key: "2-2",
-          label: <NavLink to="/assign-employees">Assign Employees</NavLink>,
-        },
-        {
-          key: "2-3",
+          key: "3-2",
           label: <NavLink to="/project-tracking">Project Tracking</NavLink>,
         },
       ],
     },
     {
-      key: "3",
+      key: "4",
       icon: <TeamOutlined />,
       label: <NavLink to="/position-management">Position Management</NavLink>,
     },
     {
-      key: "4",
+      key: "5",
       icon: <ToolOutlined />,
       label: (
         <NavLink to="/technology-management">Technology Management</NavLink>
       ),
     },
     {
-      key: "5",
+      key: "6",
       icon: <CodeOutlined />,
       label: <NavLink to="/programing-language">Programming Languages</NavLink>,
     },
     {
-      key: "6",
+      key: "7",
       icon: <FileTextOutlined />,
       label: <NavLink to="/cv">CV</NavLink>,
     },
     {
-      key: "7",
+      key: "8",
       label: <LogoutButton collapsed={collapsed} />,
     },
   ];
