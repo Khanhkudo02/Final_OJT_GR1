@@ -7,7 +7,7 @@ import ChangePassword from "./Components/ChangePassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import NewProject from "./Components/NewProject";
 import PositionManagement from "./Components/PositionManagement";
-import ProgramingLanguage from "./Components/ProgramingLanguage";
+import LanguageManagement from "./Components/LanguageManagement";
 import ProjectManagement from "./Components/ProjectManagement";
 import Sidebar from "./Components/Sidebar";
 import TechnologyManagement from "./Components/TechnologyManagement";
@@ -16,10 +16,13 @@ import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
 import ProjectDetail from "./Components/ProjectDetail";
-import AddPosition from "./Components/AddPosition"; 
-import ProjectEdit from "./Components/ProjectEdit"; 
+import AddPosition from "./Components/AddPosition";
+import ProjectEdit from "./Components/ProjectEdit";
 import EditPosition from "./Components/EditPosition";
 import PositionDetails from "./Components/PositionDetails";
+import AddLanguage from "./Components/AddLanguage";
+import EditLanguage from "./Components/EditLanguage";
+import LanguageDetails from "./Components/LanguageDetails";
 
 const { Content } = Layout;
 
@@ -83,11 +86,11 @@ const App = () => {
                           path="/project-management"
                           element={<ProjectManagement />}
                         />
-                        <Route 
-                          path="/project/:id" 
-                          element={<ProjectDetail />} 
+                        <Route
+                          path="/project/:id"
+                          element={<ProjectDetail />}
                         />
-                        <Route path="/edit-project/:id" element={<ProjectEdit />} /> 
+                        <Route path="/edit-project/:id" element={<ProjectEdit />} />
 
                         <Route
                           path="/position-management"
@@ -111,7 +114,19 @@ const App = () => {
                         />
                         <Route
                           path="/programing-language"
-                          element={<ProgramingLanguage />}
+                          element={<LanguageManagement />}
+                        />
+                        <Route
+                          path="/programing-language/add"
+                          element={<AddLanguage />}
+                        />
+                        <Route
+                          path="/programing-language/edit/:id"
+                          element={<EditLanguage />}
+                        />
+                        <Route
+                          path="/programing-language/view/:id"
+                          element={<LanguageDetails />}
                         />
                         <Route path="/new-project" element={<NewProject />} />
                         <Route path="/" element={<Navigate to="/login" />} />

@@ -7,6 +7,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/PositionManagement.scss";
 import "../assets/style/Global.scss";
+import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -59,7 +60,6 @@ const PositionManagement = () => {
 
     confirm({
       title: "Are you sure you want to delete this position?",
-      title: "Are you sure you want to delete this position?",
       onOk: async () => {
         try {
           await deletePositionById(record.key);
@@ -70,7 +70,6 @@ const PositionManagement = () => {
         }
       },
       onCancel() {
-        console.log("Cancel");
         console.log("Cancel");
       },
     });
@@ -104,32 +103,24 @@ const PositionManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
+              
               <Button
-                className="detail-button"
-                type="primary"
-                onClick={() =>
-                  navigate(`/position-management/view/${record.key}`)
-                }
-              >
-                Detail
-              </Button>
-              <Button
-                className="edit-button" 
+                className="edit-button"
                 type="primary"
                 onClick={() =>
                   navigate(`/position-management/edit/${record.key}`)
                 }
                 style={{ marginLeft: 8 }}
               >
-                Edit
+              <EditOutlined />
               </Button>
               <Button
-                className="delete-button" 
+                className="delete-button"
                 type="danger"
                 onClick={() => handleDelete(record)}
                 style={{ marginLeft: 8 }}
               >
-                Delete
+              <DeleteOutlined />
               </Button>
             </span>
           )}

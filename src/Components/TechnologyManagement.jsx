@@ -151,7 +151,6 @@ const TechnologyManagement = () => {
           technologyIdToDelete={technologyIdToDelete}
         />
       )}
-
     </div>
   );
 };
