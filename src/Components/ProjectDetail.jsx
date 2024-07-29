@@ -19,7 +19,8 @@ const ProjectDetail = () => {
   };
 
   // Convert IDs to names using the provided list
-  const getNamesFromIds = (ids, options) => {
+  const getNamesFromIds = (ids = [], options = []) => {
+    if (!Array.isArray(ids) || !Array.isArray(options)) return '';
     return options
       .filter(option => ids.includes(option.value))
       .map(option => option.label)
@@ -63,9 +64,13 @@ const ProjectDetail = () => {
 
   const handleDelete = async () => {
     try {
-      await deleteProject(project.key);
-      message.success("Project deleted successfully");
-      navigate("/project-management");
+      if (project && project.key) {
+        await deleteProject(project.key);
+        message.success("Project deleted successfully");
+        navigate("/project-management");
+      } else {
+        message.error("Project not found");
+      }
     } catch (error) {
       message.error("Failed to delete project");
     }
@@ -86,8 +91,8 @@ const ProjectDetail = () => {
     return <div>Loading...</div>;
   }
 
-  const displayedTechnologies = getNamesFromIds(project.technologies, technologies);
-  const displayedLanguages = getNamesFromIds(project.languages, languages);
+  const displayedTechnologies = getNamesFromIds(project.technologies || [], technologies);
+  const displayedLanguages = getNamesFromIds(project.languages || [], languages);
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
@@ -95,7 +100,15 @@ const ProjectDetail = () => {
         Back
       </Button>
       <h2>Project Detail</h2>
-      {project.imageUrl && <img src={project.imageUrl} alt="Project" style={{ width: "100%", marginBottom: "20px" }} />}
+      {project.imageUrl && (
+        <div style={{ marginBottom: "20px", textAlign: "center" }}>
+          <img 
+            src={project.imageUrl} 
+            alt="Project" 
+            style={{ maxWidth: "100%", maxHeight: "400px", objectFit: "contain" }} 
+          />
+        </div>
+      )}
       <p><strong>ID:</strong> {project.key}</p>
       <p><strong>Name:</strong> {project.name}</p>
       <p><strong>Description:</strong> {project.description}</p>
