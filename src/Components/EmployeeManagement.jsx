@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, message } from "antd";
-import ModalAddEmployee from "./ModalAddEmployee";
-import ModalEditEmployee from "./ModalEditEmployee";
-import ModalDeleteEmployee from "./ModalDeleteEmployee";
-import { fetchAllEmployees } from "../service/EmployeeServices";
+import { Button, Table, message, Modal } from "antd";
+import {
+  fetchAllEmployees,
+  deleteEmployeeById,
+} from "../service/EmployeeServices";
+import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/EmployeeManagement.scss";
+import "../assets/style/Global.scss";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const { Column } = Table;
+const { confirm } = Modal;
 
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [dataEmployeeEdit, setDataEmployeeEdit] = useState(null);
-  const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const navigate = useNavigate();
 
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      const filteredData = data.filter((employee) => !employee.isAdmin); // Filter out admin employees
+      // Filter employees to only include those with role 'employee'
+      const filteredData = data.filter(employee => employee.role === 'employee');
       setEmployees(filteredData);
     } catch (error) {
       console.error("Failed to fetch employees:", error);
@@ -28,109 +31,117 @@ const EmployeeManagement = () => {
 
   useEffect(() => {
     loadEmployees();
+
+    const employeeAdded = localStorage.getItem("employeeAdded");
+    if (employeeAdded === "true") {
+      message.success("Employee added successfully!");
+      localStorage.removeItem("employeeAdded");
+    }
   }, []);
 
-  const showEditModal = (record) => {
-    setDataEmployeeEdit(record);
-    setIsEditModalVisible(true);
+  const handleTableChange = (pagination) => {
+    setCurrentPage(pagination.current);
+    setPageSize(pagination.pageSize);
   };
 
-  const showAddModal = () => {
-    setIsAddModalVisible(true);
+  const showAddPage = () => {
+    navigate("/employee-management/add");
   };
 
-  const showDeleteModal = (record) => {
-    if (record.status && record.status.toLowerCase() === "inactive") {
-      setEmployeeToDelete(record);
-      setIsDeleteModalVisible(true);
-    } else {
+  const handleDelete = (record) => {
+    if (record.status !== "inactive") {
       message.error("Only inactive employees can be deleted.");
+      return;
     }
+
+    confirm({
+      title: "Are you sure you want to delete this employee?",
+      onOk: async () => {
+        try {
+          await deleteEmployeeById(record.key);
+          message.success("Employee deleted successfully!");
+          loadEmployees();
+        } catch (error) {
+          message.error("Failed to delete employee.");
+        }
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
   };
 
-  const handleCloseEditModal = () => {
-    setIsEditModalVisible(false);
-    setDataEmployeeEdit(null);
-    setTimeout(loadEmployees, 100);
-  };
-
-  const handleCloseAddModal = () => {
-    setIsAddModalVisible(false);
-    setTimeout(loadEmployees, 100);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalVisible(false);
-    setEmployeeToDelete(null);
-    setTimeout(loadEmployees, 100);
-  };
+  const paginatedData = employees.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   return (
     <div>
       <Button
+        className="btn"
         type="primary"
         style={{ marginBottom: 16 }}
-        onClick={showAddModal}
+        onClick={showAddPage}
       >
         Add New Employee
       </Button>
-      <Table dataSource={employees} pagination={false}>
-        <Column
-          title="Image"
-          dataIndex="imageUrl"
-          key="imageUrl"
-          render={(text, record) => (
-            <img
-              src={record.imageUrl}
-              alt={record.name}
-              style={{ width: 50, height: 50 }}
-            />
-          )}
-        />
+      <Table
+        dataSource={paginatedData}
+        rowKey="key"
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          total: employees.length,
+          onChange: (page, pageSize) =>
+            handleTableChange({ current: page, pageSize }),
+        }}
+      >
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Email" dataIndex="email" key="email" />
-        <Column title="Status" dataIndex="status" key="status" />
+        <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
+        <Column title="Skills" dataIndex="skills" key="skills" />
+        <Column
+          title="Status"
+          dataIndex="status"
+          key="status"
+          render={(text) => {
+            const className =
+              text === "active" ? "status-active" : "status-inactive";
+            return (
+              <span className={className}>
+                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+              </span>
+            );
+          }}
+        />
         <Column
           title="Actions"
           key="actions"
           render={(text, record) => (
             <span>
               <Button
+                className="edit-button"
                 type="primary"
-                style={{ marginRight: 8 }}
-                onClick={() => showEditModal(record)}
+                onClick={() =>
+                  navigate(`/employee-management/edit/${record.key}`)
+                }
+                style={{ marginLeft: 8 }}
               >
-                Edit
+                <EditOutlined />
               </Button>
               <Button
-                type="danger"
                 className="delete-button"
-                onClick={() => showDeleteModal(record)}
+                type="danger"
+                onClick={() => handleDelete(record)}
+                style={{ marginLeft: 8 }}
               >
-                Delete
+                <DeleteOutlined />
               </Button>
             </span>
           )}
         />
       </Table>
-      {dataEmployeeEdit && (
-        <ModalEditEmployee
-          open={isEditModalVisible}
-          handleClose={handleCloseEditModal}
-          dataEmployeeEdit={dataEmployeeEdit}
-        />
-      )}
-      <ModalAddEmployee
-        open={isAddModalVisible}
-        handleClose={handleCloseAddModal}
-      />
-      {employeeToDelete && (
-        <ModalDeleteEmployee
-          open={isDeleteModalVisible}
-          handleClose={handleCloseDeleteModal}
-          employee={employeeToDelete}
-        />
-      )}
     </div>
   );
 };
