@@ -63,17 +63,20 @@ const fetchAllEmployees = async () => {
 };
 
 // Update existing employee
-const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, department, imageFile) => {
+const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, department, imageFile, oldImageUrl) => {
     try {
         const employeeRef = ref(db, `users/${id}`);
         const employeeSnapshot = await get(employeeRef);
         const currentData = employeeSnapshot.val();
 
         let imageUrl = currentData?.imageUrl || null;
+
         if (imageFile) {
             if (imageUrl) {
                 // Delete the old image
-                const oldImageRef = storageRef(storageInstance, `employee/${id}/${imageUrl.split('/').pop().split('?')[0]}`);
+                const oldImagePath = imageUrl.split("/o/")[1].split("?")[0];
+                const decodedOldImagePath = decodeURIComponent(oldImagePath);
+                const oldImageRef = storageRef(storageInstance, decodedOldImagePath);
                 await deleteObject(oldImageRef);
             }
 
@@ -87,6 +90,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
 
         const formattedDateOfBirth = dateOfBirth ? moment(dateOfBirth).format('YYYY-MM-DD') : null;
 
+        // Prepare the updates for the employee
         const updates = {
             name,
             email,
@@ -96,7 +100,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             skills,
             status,
             department,
-            imageUrl: imageUrl || null,
+            imageUrl: imageUrl || currentData.imageUrl, // Use the new image URL or keep the old one
         };
 
         if (currentData) {
@@ -104,6 +108,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             updates.isAdmin = currentData.isAdmin;
         }
 
+        // Update employee data
         await update(employeeRef, updates);
 
         return id;
@@ -113,25 +118,35 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
     }
 };
 
+
 // Delete employee
 const deleteEmployeeById = async (id) => {
     try {
-        const employeeRef = ref(db, `users/${id}`);
+        const employeeRef = ref(database, `users/${id}`);
         const employeeSnapshot = await get(employeeRef);
+
+        if (!employeeSnapshot.exists()) {
+            throw new Error("Employee not found");
+        }
+
         const employeeData = employeeSnapshot.val();
 
-        if (employeeData && employeeData.status === 'inactive') {
-            const imageUrl = employeeData.imageUrl;
-            if (imageUrl) {
-                const imageName = imageUrl.split('/').pop().split('?')[0];
-                const imageRef = storageRef(storageInstance, `images/${id}/${imageName}`);
-                await deleteObject(imageRef);
-            }
-
-            await remove(employeeRef);
-        } else {
+        // Check if the employee is inactive before attempting to delete
+        if (employeeData.status !== 'inactive') {
             throw new Error("Only employees with status 'inactive' can be deleted.");
         }
+
+        // Delete images from Firebase Storage
+        const imageUrl = employeeData.imageUrl;
+        if (imageUrl) {
+            const imagePath = imageUrl.split("/o/")[1].split("?")[0];
+            const decodedImagePath = decodeURIComponent(imagePath);
+            const imageStorageRef = storageRef(storage, decodedImagePath);
+            await deleteObject(imageStorageRef);
+        }
+
+        // Delete employee from Realtime Database
+        await remove(employeeRef);
     } catch (error) {
         console.error("Failed to delete employee:", error);
         throw error;

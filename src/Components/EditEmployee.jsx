@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Input, Select, Upload, Button, Layout } from "antd";
+import { Input, Select, Upload, Button } from "antd";
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 import { putUpdateEmployee, fetchEmployeeById } from "../service/EmployeeServices";
 import { PlusOutlined } from "@ant-design/icons";
+import moment from 'moment';
 
 const { Option } = Select;
-const { Header } = Layout;
 
 // Define department options
 const departmentOptions = [
@@ -45,6 +45,8 @@ const EditEmployee = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [skills, setSkills] = useState([]);
     const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [oldImageUrl, setOldImageUrl] = useState("");
 
     useEffect(() => {
         const loadEmployee = async () => {
@@ -58,7 +60,8 @@ const EditEmployee = () => {
                     setDateOfBirth(employee.dateOfBirth || "");
                     setAddress(employee.address || "");
                     setPhoneNumber(employee.phoneNumber || "");
-                    setSkills(employee.skills || []); // Ensure skills is an array
+                    setSkills(employee.skills || []);
+                    setOldImageUrl(employee.imageUrl || ""); // Set old image URL
                 } else {
                     toast.error("Employee not found.");
                 }
@@ -97,7 +100,8 @@ const EditEmployee = () => {
                 skills,
                 status,
                 department,
-                imageFile
+                imageFile,
+                oldImageUrl // Pass old image URL for deletion
             );
             toast.success("Employee updated successfully!");
             navigate("/employee-management");
@@ -107,14 +111,18 @@ const EditEmployee = () => {
         }
     };
 
-    const handleImageChange = ({ file }) => {
-        if (file && file.originFileObj) {
-            setImageFile(file.originFileObj);
+    const handleImageChange = ({ target }) => {
+        const file = target.files[0];
+        if (file) {
+            // Generate image preview URL
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+            setImageFile(file);
         }
     };
 
     const beforeUpload = (file) => {
-        handleImageChange({ file });
+        handleImageChange({ target: { files: [file] } });
         return false; // Prevent automatic upload
     };
 
@@ -168,7 +176,7 @@ const EditEmployee = () => {
                 <label>Date of Birth</label>
                 <Input
                     type="date"
-                    value={dateOfBirth}
+                    value={moment(dateOfBirth).format('YYYY-MM-DD')}
                     onChange={(e) => setDateOfBirth(e.target.value)}
                 />
             </div>
@@ -207,14 +215,22 @@ const EditEmployee = () => {
             <div className="form-group">
                 <label>Upload Image</label>
                 <Upload
-                    name="image"
+                    accept=".jpg,.jpeg,.png"
+                    beforeUpload={beforeUpload}
                     listType="picture"
                     showUploadList={false}
-                    beforeUpload={beforeUpload}
-                    onChange={handleImageChange}
                 >
-                    <Button icon={<PlusOutlined />}>Upload</Button>
+                    <Button icon={<PlusOutlined />}>Upload Image</Button>
                 </Upload>
+                {imagePreview && (
+                    <div style={{ marginTop: 16 }}>
+                        <img
+                            src={imagePreview}
+                            alt="Image Preview"
+                            width="30%"
+                        />
+                    </div>
+                )}
             </div>
             <Button
                 type="primary"

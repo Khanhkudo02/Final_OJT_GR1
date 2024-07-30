@@ -144,23 +144,15 @@ const EmployeeManagement = () => {
                 onClick={() => navigate(`/employee-management/view/${record.key}`)}
               />
               <Button
-                className="edit-button"
-                type="primary"
-                onClick={() =>
-                  navigate(`/employee-management/edit/${record.key}`)
-                }
-                style={{ marginLeft: 8 }}
-              >
-                <EditOutlined />
-              </Button>
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
+                onClick={() => navigate(`/employee-management/edit/${record.key}`)}
+              />
               <Button
-                className="delete-button"
-                type="danger"
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
-                style={{ marginLeft: 8 }}
-              >
-                <DeleteOutlined />
-              </Button>
+              />
             </span>
           )}
         />
