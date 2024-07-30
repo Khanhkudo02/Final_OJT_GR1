@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
+import { Table, Tag, Space, Button, Avatar, Pagination, Tabs, Modal, message } from "antd";
 import { useNavigate } from "react-router-dom"; 
-import { fetchAllProjects } from "../service/Project";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { fetchAllProjects, moveToArchive } from "../service/Project";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, InboxOutlined } from "@ant-design/icons";
 import "../assets/style/Pages/ProjectManagement.scss";
 import "../assets/style/Global.scss"
 
@@ -58,6 +58,21 @@ const ProjectManagement = () => {
       "#13c2c2", "#096dd9", "#f5222d", "#fa8c16", "#fa541c", "#52c41a"
     ];
     return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  const handleDelete = (key) => {
+    Modal.confirm({
+      title: 'Are you sure you want to archive this project?',
+      onOk: async () => {
+        try {
+          await moveToArchive(key);
+          setData(prevData => prevData.filter(item => item.key !== key));
+          message.success('Project archived successfully');
+        } catch (error) {
+          message.error('Failed to archive project');
+        }
+      }
+    });
   };
 
   const columns = [
@@ -131,7 +146,7 @@ const ProjectManagement = () => {
             <Button 
               icon={<DeleteOutlined />} 
               style={{ color: "red", borderColor: "red" }} 
-              onClick={() => console.log('Delete', record.key)}
+              onClick={() => handleDelete(record.key)}
             />
           )}
         </Space>
@@ -141,12 +156,21 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button 
-        className="btn" 
-        type="primary" 
-        icon={<PlusOutlined />} 
-        onClick={() => navigate("/new-project")}
-      />
+      <div className="project-management-header">
+        <Button 
+          className="btn" 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={() => navigate("/new-project")}
+        />
+        <Button 
+          className="btn" 
+          type="default" 
+          icon={<InboxOutlined />} 
+          onClick={() => navigate("/archived-projects")}
+          style={{ marginLeft: "auto" }}
+        />
+      </div>
       <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} centered>
         <TabPane tab="All Projects" key="All Projects" />
         <TabPane tab="Ongoing" key="Ongoing" />

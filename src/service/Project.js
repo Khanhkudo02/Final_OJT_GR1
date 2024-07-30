@@ -40,6 +40,18 @@ const fetchAllProjects = async () => {
     }
 };
 
+const fetchArchivedProjects = async () => {
+    try {
+        const archivedProjectsRef = ref(db, 'archivedProjects');
+        const snapshot = await get(archivedProjectsRef);
+        const data = snapshot.val();
+        return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
+    } catch (error) {
+        console.error("Failed to fetch archived projects:", error);
+        throw error;
+    }
+};
+
 const putUpdateProject = async (id, projectData, imageFile) => {
     try {
         const projectRef = ref(db, `projects/${id}`);
@@ -49,7 +61,6 @@ const putUpdateProject = async (id, projectData, imageFile) => {
             const imageRef = storageRef(storageInstance, `images/${id}/${imageFile.name}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
-            
         }
 
         await update(projectRef, {
@@ -64,10 +75,29 @@ const putUpdateProject = async (id, projectData, imageFile) => {
     }
 };
 
-const deleteProject = async (id) => {
+const moveToArchive = async (id) => {
     try {
         const projectRef = ref(db, `projects/${id}`);
         const projectSnapshot = await get(projectRef);
+        const projectData = projectSnapshot.val();
+
+        if (projectData) {
+            const archivedProjectRef = ref(db, `archivedProjects/${id}`);
+            await set(archivedProjectRef, projectData);
+            await remove(projectRef);
+        } else {
+            throw new Error("Project not found");
+        }
+    } catch (error) {
+        console.error("Failed to archive project:", error);
+        throw error;
+    }
+};
+
+const deleteProjectPermanently = async (id) => {
+    try {
+        const archivedProjectRef = ref(db, `archivedProjects/${id}`);
+        const projectSnapshot = await get(archivedProjectRef);
 
         const imageUrl = projectSnapshot.val()?.imageUrl;
         if (imageUrl) {
@@ -85,11 +115,18 @@ const deleteProject = async (id) => {
             }
         }
 
-        await remove(projectRef);
+        await remove(archivedProjectRef);
     } catch (error) {
         console.error("Failed to delete project:", error);
         throw error;
     }
 };
 
-export { fetchAllProjects, postCreateProject, putUpdateProject, deleteProject };
+export {
+    fetchAllProjects,
+    postCreateProject,
+    putUpdateProject,
+    moveToArchive,
+    fetchArchivedProjects,
+    deleteProjectPermanently as deleteProject // Đổi tên xuất thành deleteProject
+};
