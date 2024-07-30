@@ -40,8 +40,6 @@ const ProjectEdit = () => {
           setProject(projectData);
           form.setFieldsValue({
             ...projectData,
-            // startDate: moment(projectData.startDate),
-            // endDate: moment(projectData.endDate),
             startDate: dayjs(projectData.startDate),
             endDate: dayjs(projectData.endDate),
           });
