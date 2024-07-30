@@ -104,6 +104,10 @@ const ProjectDetail = () => {
     languages
   );
 
+  const formattedCategories = Array.isArray(project.category)
+    ? project.category.join(", ")
+    : "No categories";
+
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <Button type="default" onClick={() => navigate("/project-management")}>
@@ -151,7 +155,7 @@ const ProjectDetail = () => {
         <strong>Priority:</strong> {project.priority}
       </p>
       <p>
-        <strong>Category:</strong> {project.category}
+        <strong>Category:</strong> {formattedCategories}
       </p>
       <p>
         <strong>Start Date:</strong> {formatDate(project.startDate)}
