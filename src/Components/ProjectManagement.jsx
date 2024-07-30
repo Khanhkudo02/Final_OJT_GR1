@@ -24,7 +24,8 @@ const ProjectManagement = () => {
   useEffect(() => {
     const fetchData = async () => {
       const projects = await fetchAllProjects();
-      setData(projects);
+      // setData(projects);
+      setData(projects.reverse());
     };
     fetchData();
   }, []);
