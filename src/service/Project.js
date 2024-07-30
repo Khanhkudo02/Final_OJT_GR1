@@ -151,7 +151,7 @@ const restoreProject = async (id) => {
       await set(projectRef, projectData);
       await remove(archivedProjectRef);
     } else {
-      throw new Error("Project not found in archive");
+      throw new Error("Project not found");
     }
   } catch (error) {
     console.error("Failed to restore project:", error);

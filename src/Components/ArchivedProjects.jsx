@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Space, Button, Pagination, message, Modal } from "antd";
 import { useNavigate } from "react-router-dom"; 
 import { fetchArchivedProjects, deleteProjectPermanently, restoreProject } from "../service/Project";
-import { DeleteOutlined, EyeOutlined, RollbackOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { DeleteOutlined, RollbackOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 
 import "../assets/style/Global.scss";
 
@@ -14,8 +14,13 @@ const ArchivedProjects = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const projects = await fetchArchivedProjects();
-      setData(projects);
+      try {
+        const projects = await fetchArchivedProjects();
+        setData(projects);
+      } catch (error) {
+        message.error('Failed to fetch archived projects');
+        console.error('Failed to fetch archived projects:', error);
+      }
     };
     fetchData();
   }, []);
@@ -39,6 +44,7 @@ const ArchivedProjects = () => {
           message.success('Project permanently deleted');
         } catch (error) {
           message.error('Failed to delete project');
+          console.error('Failed to delete project:', error);
         }
       }
     });
@@ -54,6 +60,7 @@ const ArchivedProjects = () => {
           message.success('Project restored successfully');
         } catch (error) {
           message.error('Failed to restore project');
+          console.error('Failed to restore project:', error);
         }
       }
     });
@@ -88,12 +95,12 @@ const ArchivedProjects = () => {
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <Button 
-        
         type="default" 
         icon={<ArrowLeftOutlined />} 
         onClick={() => navigate("/project-management")}
         style={{ marginBottom: "16px" }}
       >
+        Back to Project Management
       </Button>
       <Table 
         columns={columns} 
