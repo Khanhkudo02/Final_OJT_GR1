@@ -10,7 +10,7 @@ const storageInstance = storage;
 // Create new employee
 const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, imageFile) => {
     try {
-        const newEmployeeRef = push(ref(db, 'employees'));
+        const newEmployeeRef = push(ref(db, 'users'));
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -48,7 +48,7 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
 // Fetch all employees
 const fetchAllEmployees = async () => {
     try {
-        const employeesRef = ref(db, 'employees');
+        const employeesRef = ref(db, 'users');
         const snapshot = await get(employeesRef);
         const data = snapshot.val();
         return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
@@ -61,7 +61,7 @@ const fetchAllEmployees = async () => {
 // Update existing employee
 const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, imageFile) => {
     try {
-        const employeeRef = ref(db, `employees/${id}`);
+        const employeeRef = ref(db, `users/${id}`);
 
         let imageUrl = null;
         if (imageFile) {
@@ -102,7 +102,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
 // Delete employee
 const deleteEmployeeById = async (id) => {
     try {
-        const employeeRef = ref(db, `employees/${id}`);
+        const employeeRef = ref(db, `users/${id}`);
         const employeeSnapshot = await get(employeeRef);
         const employeeData = employeeSnapshot.val();
 
@@ -127,7 +127,7 @@ const deleteEmployeeById = async (id) => {
 // Fetch employee by ID
 const fetchEmployeeById = async (id) => {
     try {
-        const employeeRef = ref(database, `employees/${id}`);
+        const employeeRef = ref(database, `users/${id}`);
         const snapshot = await get(employeeRef);
         return snapshot.val();
     } catch (error) {

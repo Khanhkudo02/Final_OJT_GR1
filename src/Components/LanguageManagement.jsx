@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, message, Modal } from 'antd';
+import { Button, Table, message, Modal, Space } from 'antd';
 import { fetchAllLanguages, deleteLanguageById } from "../service/LanguageServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/LanguageManagement.scss";
 import "../assets/style/Global.scss";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -110,24 +111,23 @@ const LanguageManagement = () => {
           title="Actions"
           key="actions"
           render={(text, record) => (
-            <span>
+            <Space>
               <Button
-                className="edit-button"
-                type="primary"
+                icon={<EyeOutlined />}
+                style={{ color: "green", borderColor: "green" }}
+                onClick={() => navigate(`/programing-language/view/${record.key}`)}
+              />
+              <Button
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
                 onClick={() => navigate(`/programing-language/edit/${record.key}`)}
-                style={{ marginLeft: 8 }}
-              >
-                Edit
-              </Button>
+              />
               <Button
-                className="delete-button"
-                type="danger"
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
-                style={{ marginLeft: 8 }}
-              >
-                Delete
-              </Button>
-            </span>
+              />
+            </Space>
           )}
         />
       </Table>

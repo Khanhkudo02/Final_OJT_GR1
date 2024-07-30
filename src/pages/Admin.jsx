@@ -1,4 +1,4 @@
-import { Button, Form, Input, message, Modal, Select, Table } from "antd";
+import { Button, Form, Input, message, Modal, Select, Space, Table } from "antd";
 import bcrypt from "bcryptjs";
 import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/Admin.scss";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -295,21 +296,19 @@ function AdminPage() {
       title: t("actions"),
       key: "actions",
       render: (_, record) => (
-        <div key={record.id}>
-          <Button
-            className="edit-button"
+        <Space key={record.id}>
+          <Button 
+            icon={<EditOutlined />} 
+            style={{ color: "blue", borderColor: "blue" }} 
             onClick={() => handleEditUser(record)}
-          >
-            {t("edit")}
-          </Button>
-          <Button
-            className="delete-button"
+          />
+          <Button 
+            icon={<DeleteOutlined />} 
+            style={{ color: "red", borderColor: "red" }} 
             onClick={() => handleDeleteUser(record.id)}
-          >
-            {t("delete")}
-          </Button>
+          />
           {/* Đã loại bỏ nút reset mật khẩu */}
-        </div>
+        </Space>
       ),
     },
   ];
