@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchAllProjects, deleteProject } from "../service/Project";
+import { fetchAllProjects, deleteProjectPermanently } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { Button, Modal, message } from "antd";
@@ -69,7 +69,7 @@ const ProjectDetail = () => {
   const handleDelete = async () => {
     try {
       if (project && project.key) {
-        await deleteProject(project.key);
+        await deleteProjectPermanently(project.key);
         message.success("Project deleted successfully");
         navigate("/project-management");
       } else {

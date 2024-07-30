@@ -16,6 +16,7 @@ import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
 import ProjectDetail from "./Components/ProjectDetail";
+import ArchivedProjects from "./Components/ArchivedProjects";
 import AddPosition from "./Components/AddPosition";
 import ProjectEdit from "./Components/ProjectEdit";
 import EditPosition from "./Components/EditPosition";
@@ -34,7 +35,6 @@ const App = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  // Initialize user state with local storage data
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
@@ -44,7 +44,6 @@ const App = () => {
     setUser(userInfo);
   };
 
-  // eslint-disable-next-line react/prop-types
   const ProtectedRoute = ({ children }) => {
     if (!user) {
       return <Navigate to="/login" />;
@@ -105,8 +104,11 @@ const App = () => {
                           path="/project/:id"
                           element={<ProjectDetail />}
                         />
-                        <Route path="/edit-project/:id" element={<ProjectEdit />} />
-
+                        <Route 
+                          path="/edit-project/:id" 
+                          element={<ProjectEdit />} 
+                        />
+                        <Route path="/archived-projects" element={<ArchivedProjects />} />
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
