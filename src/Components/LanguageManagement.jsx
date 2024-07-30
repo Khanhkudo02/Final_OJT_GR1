@@ -112,13 +112,6 @@ const LanguageManagement = () => {
           render={(text, record) => (
             <span>
               <Button
-                className="detail-button"
-                type="primary"
-                onClick={() => navigate(`/programing-language/view/${record.key}`)}
-              >
-                Detail
-              </Button>
-              <Button
                 className="edit-button"
                 type="primary"
                 onClick={() => navigate(`/programing-language/edit/${record.key}`)}

@@ -114,8 +114,8 @@ const TechnologyManagement = () => {
             Edit
           </Button>
           <Button
-            className="delete-button" 
-            type="danger" 
+            className="delete-button"
+            type="danger"
             onClick={() => showDeleteModal(record)}
           >
             Delete

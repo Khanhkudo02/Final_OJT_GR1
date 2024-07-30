@@ -1,5 +1,5 @@
 import { ref, set, push, update, get, remove } from "firebase/database";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
 import { database, storage } from '../firebaseConfig';
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
@@ -7,9 +7,10 @@ import moment from 'moment';
 const db = database;
 const storageInstance = storage;
 
+// Create new employee
 const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, imageFile) => {
     try {
-        const newEmployeeRef = push(ref(db, 'users'));
+        const newEmployeeRef = push(ref(db, 'employees'));
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,7 +22,6 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
             imageUrl = await getDownloadURL(snapshot.ref);
         }
 
-        // Format dateOfBirth if provided
         const formattedDateOfBirth = dateOfBirth ? moment(dateOfBirth).format('YYYY-MM-DD') : null;
 
         await set(newEmployeeRef, {
@@ -36,7 +36,6 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
             imageUrl,
             isAdmin: false,
             role: "employee",
-            status,
         });
 
         return newEmployeeRef.key;
@@ -46,9 +45,10 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
     }
 };
 
+// Fetch all employees
 const fetchAllEmployees = async () => {
     try {
-        const employeesRef = ref(db, 'users');
+        const employeesRef = ref(db, 'employees');
         const snapshot = await get(employeesRef);
         const data = snapshot.val();
         return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
@@ -58,9 +58,10 @@ const fetchAllEmployees = async () => {
     }
 };
 
+// Update existing employee
 const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, imageFile) => {
     try {
-        const employeeRef = ref(db, `users/${id}`);
+        const employeeRef = ref(db, `employees/${id}`);
 
         let imageUrl = null;
         if (imageFile) {
@@ -71,7 +72,6 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
 
         const formattedDateOfBirth = dateOfBirth ? moment(dateOfBirth).format('YYYY-MM-DD') : null;
 
-        // Define updates object with the fields to be updated
         const updates = {
             name,
             email,
@@ -79,16 +79,15 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             address,
             phoneNumber,
             skills,
-            status, // Ensure status is included
+            status,
             imageUrl: imageUrl || null,
         };
 
-        // Keep the role and isAdmin fields unchanged
         const employeeSnapshot = await get(employeeRef);
         const currentData = employeeSnapshot.val();
         if (currentData) {
-            updates.role = currentData.role; // Ensure role is preserved
-            updates.isAdmin = currentData.isAdmin; // Ensure isAdmin is preserved
+            updates.role = currentData.role;
+            updates.isAdmin = currentData.isAdmin;
         }
 
         await update(employeeRef, updates);
@@ -100,13 +99,21 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
     }
 };
 
-const deleteEmployee = async (id) => {
+// Delete employee
+const deleteEmployeeById = async (id) => {
     try {
-        const employeeRef = ref(db, `users/${id}`);
+        const employeeRef = ref(db, `employees/${id}`);
         const employeeSnapshot = await get(employeeRef);
         const employeeData = employeeSnapshot.val();
 
         if (employeeData && employeeData.status === 'inactive') {
+            const imageUrl = employeeData.imageUrl;
+            if (imageUrl) {
+                const imageName = imageUrl.split('/').pop().split('?')[0];
+                const imageRef = storageRef(storageInstance, `images/${id}/${imageName}`);
+                await deleteObject(imageRef);
+            }
+
             await remove(employeeRef);
         } else {
             throw new Error("Only employees with status 'inactive' can be deleted.");
@@ -117,5 +124,16 @@ const deleteEmployee = async (id) => {
     }
 };
 
+// Fetch employee by ID
+const fetchEmployeeById = async (id) => {
+    try {
+        const employeeRef = ref(database, `employees/${id}`);
+        const snapshot = await get(employeeRef);
+        return snapshot.val();
+    } catch (error) {
+        console.error("Failed to fetch employee by ID:", error);
+        throw error;
+    }
+};
 
-export { fetchAllEmployees, postCreateEmployee, putUpdateEmployee, deleteEmployee };
+export { fetchAllEmployees, postCreateEmployee, putUpdateEmployee, deleteEmployeeById, fetchEmployeeById };
