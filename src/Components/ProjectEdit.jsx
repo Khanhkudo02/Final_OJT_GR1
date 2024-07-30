@@ -309,7 +309,7 @@ const ProjectEdit = () => {
             { required: true, message: "Please select the project category!" },
           ]}
         >
-          <Select>
+          <Select mode="multiple" placeholder="Select categories">
             <Option value="WEB DESIGN">Web Design</Option>
             <Option value="MOBILE APP">Mobile App Development</Option>
             <Option value="UI/UX">UI/UX</Option>
