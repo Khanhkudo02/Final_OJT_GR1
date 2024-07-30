@@ -1,6 +1,12 @@
 import { ref, set, push, update, get, remove } from "firebase/database";
-import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
-import { database, storage } from '../firebaseConfig';
+import {
+  getStorage,
+  ref as storageRef,
+  deleteObject,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { database, storage } from "../firebaseConfig";
 
 const db = database;
 const storageInstance = storage;
@@ -21,11 +27,11 @@ const postCreateProject = async (projectData, imageFile) => {
             imageUrl,
         });
 
-        return newProjectRef.key;
-    } catch (error) {
-        console.error("Failed to create project:", error);
-        throw error;
-    }
+    return newProjectRef.key;
+  } catch (error) {
+    console.error("Failed to create project:", error);
+    throw error;
+  }
 };
 
 const fetchAllProjects = async () => {

@@ -18,7 +18,7 @@ function AccountInfo() {
           navigate("/login"); // Chuyển hướng đến trang đăng nhập nếu không có người dùng
           return;
         }
-        
+
         const db = getDatabase();
         const userRef = ref(db, `users/${userId}`);
         const snapshot = await get(userRef);
@@ -40,11 +40,21 @@ function AccountInfo() {
     <div className="account-info-container">
       <Card title={t("userProfile")}>
         <Descriptions bordered column={1}>
-          <Descriptions.Item label={t("email")}>{userData.email}</Descriptions.Item>
-          <Descriptions.Item label={t("name")}>{userData.name}</Descriptions.Item>
-          <Descriptions.Item label={t("role")}>{userData.role}</Descriptions.Item>
-          <Descriptions.Item label={t("status")}>{userData.status}</Descriptions.Item>
-          <Descriptions.Item label={t("createdAt")}>{new Date(userData.createdAt).toLocaleDateString()}</Descriptions.Item>
+          <Descriptions.Item label={t("email")}>
+            {userData.email}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("name")}>
+            {userData.name}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("role")}>
+            {userData.role}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("status")}>
+            {userData.status}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("createdAt")}>
+            {new Date(userData.createdAt).toLocaleDateString()}
+          </Descriptions.Item>
           {/* Hiển thị các thông tin khác của người dùng tại đây */}
         </Descriptions>
       </Card>

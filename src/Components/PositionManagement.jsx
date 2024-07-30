@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal } from "antd";
+import { Button, Table, message, Modal, Space } from "antd";
 import {
   fetchAllPositions,
   deletePositionById,
@@ -7,7 +7,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/PositionManagement.scss";
 import "../assets/style/Global.scss";
-import {  EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -80,7 +85,12 @@ const PositionManagement = () => {
   );
   return (
     <div>
-      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
+      <Button
+        className="btn"
+        type="primary"
+        style={{ marginBottom: 16 }}
+        onClick={showAddPage}
+      >
         Add New Position
       </Button>
       <Table
@@ -115,27 +125,20 @@ const PositionManagement = () => {
           title="Actions"
           key="actions"
           render={(text, record) => (
-            <span>
-              
+            <Space>
               <Button
-                className="edit-button"
-                type="primary"
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
                 onClick={() =>
                   navigate(`/position-management/edit/${record.key}`)
                 }
-                style={{ marginLeft: 8 }}
-              >
-              <EditOutlined />
-              </Button>
+              />
               <Button
-                className="delete-button"
-                type="danger"
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
-                style={{ marginLeft: 8 }}
-              >
-              <DeleteOutlined />
-              </Button>
-            </span>
+              />
+            </Space>
           )}
         />
       </Table>
@@ -146,7 +149,6 @@ const PositionManagement = () => {
           dataPositionEdit={dataPositionEdit}
         />
       )}
-
     </div>
   );
 };

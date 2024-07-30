@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Table, Modal } from "antd";
+import { Button, Input, Select, Table, Modal, Space } from "antd";
 import {
   postCreatePosition,
   fetchAllPositions,
   deletePositionById,
 } from "../service/PositionServices";
-import { PlusOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../Components/AddPosition.jsx";
+import "../assets/style/Global.scss"
 
 const { Option } = Select;
 const { Column } = Table;
@@ -123,27 +124,42 @@ const AddPosition = () => {
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
         <Column title="Department" dataIndex="department" key="department" />
-        <Column title="Status" dataIndex="status" key="status" />
+        <Column
+          title="Status"
+          dataIndex="status"
+          key="status"
+          render={(text) => {
+            const className =
+              text === "active" ? "status-active" : "status-inactive";
+            return (
+              <span className={className}>
+                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+              </span>
+            );
+          }}
+        />
         <Column
           title="Actions"
           key="actions"
           render={(text, record) => (
-            <div>
-              <Button onClick={() => handleViewPosition(record)}>View</Button>
-              <Button
+            <Space>
+              <Button 
+                icon={<EyeOutlined />} 
+                style={{ color: "green", borderColor: "green" }} 
+                onClick={() => handleViewPosition(record)}
+              />
+              <Button 
+                icon={<DeleteOutlined />} 
+                style={{ color: "red", borderColor: "red" }} 
                 onClick={() => handleDeletePosition(record.key)}
-                disabled={record.status !== "inactive"}
-                style={{ marginLeft: 8 }}
-              >
-                Delete
-              </Button>
-            </div>
+              />
+            </Space>
           )}
         />
       </Table>
       <Modal
         title="View Position"
-        visible={viewModalVisible}
+        open={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>

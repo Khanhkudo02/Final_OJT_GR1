@@ -4,9 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchAllProjects, moveToArchive } from "../service/Project";
 import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, InboxOutlined } from "@ant-design/icons";
 import "../assets/style/Pages/ProjectManagement.scss";
-import "../assets/style/Global.scss"
-
-const { TabPane } = Tabs;
+import "../assets/style/Global.scss";
 
 const statusColors = {
   COMPLETED: "green",
@@ -19,12 +17,12 @@ const ProjectManagement = () => {
   const [filteredStatus, setFilteredStatus] = useState("All Projects");
   const [data, setData] = useState([]);
   const pageSize = 10;
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       const projects = await fetchAllProjects();
-      setData(projects);
+      setData(projects.reverse());
     };
     fetchData();
   }, []);
@@ -49,13 +47,27 @@ const ProjectManagement = () => {
   );
 
   const getInitials = (name) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   const getRandomColor = () => {
     const colors = [
-      "#f56a00", "#7265e6", "#ffbf00", "#00a2ae", "#eb2f96", "#7cb305",
-      "#13c2c2", "#096dd9", "#f5222d", "#fa8c16", "#fa541c", "#52c41a"
+      "#f56a00",
+      "#7265e6",
+      "#ffbf00",
+      "#00a2ae",
+      "#eb2f96",
+      "#7cb305",
+      "#13c2c2",
+      "#096dd9",
+      "#f5222d",
+      "#fa8c16",
+      "#fa541c",
+      "#52c41a",
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -86,9 +98,9 @@ const ProjectManagement = () => {
       dataIndex: "startDate",
       key: "startDate",
       render: (date) => {
-        if (!date) return '';
+        if (!date) return "";
         const dateObj = new Date(date);
-        return dateObj.toLocaleDateString('en-GB');
+        return dateObj.toLocaleDateString("en-GB");
       },
     },
     {
@@ -96,9 +108,9 @@ const ProjectManagement = () => {
       dataIndex: "endDate",
       key: "endDate",
       render: (date) => {
-        if (!date) return '';
+        if (!date) return "";
         const dateObj = new Date(date);
-        return dateObj.toLocaleDateString('en-GB');
+        return dateObj.toLocaleDateString("en-GB");
       },
     },
     {
@@ -132,14 +144,14 @@ const ProjectManagement = () => {
       key: "actions",
       render: (text, record) => (
         <Space size="middle">
-          <Button 
-            icon={<EyeOutlined />} 
-            style={{ color: "green", borderColor: "green" }} 
+          <Button
+            icon={<EyeOutlined />}
+            style={{ color: "green", borderColor: "green" }}
             onClick={() => navigate(`/project/${record.key}`)}
           />
-          <Button 
-            icon={<EditOutlined />} 
-            style={{ color: "blue", borderColor: "blue" }} 
+          <Button
+            icon={<EditOutlined />}
+            style={{ color: "blue", borderColor: "blue" }}
             onClick={() => navigate(`/edit-project/${record.key}`)}
           />
           {record.status !== "ONGOING" && (
@@ -152,6 +164,15 @@ const ProjectManagement = () => {
         </Space>
       ),
     },
+  ];
+
+  // Tabs items
+  const tabItems = [
+    { key: "All Projects", label: "All Projects" },
+    { key: "Ongoing", label: "Ongoing" },
+    { key: "Not Started", label: "Not Started" },
+    { key: "Completed", label: "Completed" },
+    { key: "Pending", label: "Pending" },
   ];
 
   return (
@@ -171,13 +192,7 @@ const ProjectManagement = () => {
           style={{ marginLeft: "auto" }}
         />
       </div>
-      <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} centered>
-        <TabPane tab="All Projects" key="All Projects" />
-        <TabPane tab="Ongoing" key="Ongoing" />
-        <TabPane tab="Not Started" key="Not Started" />
-        <TabPane tab="Completed" key="Completed" />
-        <TabPane tab="Pending" key="Pending" />
-      </Tabs>
+      <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} items={tabItems} centered />
       <Table 
         columns={columns} 
         dataSource={paginatedData} 
