@@ -50,7 +50,10 @@ function ChangePassword() {
         const userData = snapshot.val();
 
         // Kiểm tra mật khẩu cũ
-        const isOldPasswordValid = await bcrypt.compare(oldPassword, userData.password);
+        const isOldPasswordValid = await bcrypt.compare(
+          oldPassword,
+          userData.password
+        );
         if (!isOldPasswordValid) {
           message.error(t("Old Password Is Incorrect"));
           return;
@@ -79,7 +82,9 @@ function ChangePassword() {
           <Form.Item
             label={t("Old Password")}
             name="oldPassword"
-            rules={[{ required: true, message: t("Please Input Old Password") }]}
+            rules={[
+              { required: true, message: t("Please Input Old Password") },
+            ]}
           >
             <Input.Password placeholder={t("Enter Old Password")} />
           </Form.Item>

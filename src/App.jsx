@@ -23,6 +23,9 @@ import PositionDetails from "./Components/PositionDetails";
 import AddLanguage from "./Components/AddLanguage";
 import EditLanguage from "./Components/EditLanguage";
 import LanguageDetails from "./Components/LanguageDetails";
+import AddEmployee from "./Components/AddEmployee";
+import EditEmployee from "./Components/EditEmployee";
+import EmployeeDetails from "./Components/EmployeeDetails";
 
 const { Content } = Layout;
 
@@ -81,6 +84,18 @@ const App = () => {
                         <Route
                           path="/employee-management"
                           element={<EmployeeManagement />}
+                        />
+                        <Route
+                          path="/employee-management/add"
+                          element={<AddEmployee />}
+                        />
+                        <Route
+                          path="/employee-management/edit/:id"
+                          element={<EditEmployee />}
+                        />
+                        <Route
+                          path="/employee-management/view/:id"
+                          element={<EmployeeDetails />}
                         />
                         <Route
                           path="/project-management"

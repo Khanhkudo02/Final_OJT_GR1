@@ -12,44 +12,35 @@ const ModalAddTechnology = ({ open, handleClose }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("active");
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-      setImagePreview(URL.createObjectURL(e.target.files[0]));
-    }
+  const handleImageChange = ({ fileList }) => {
+    setImages(fileList.map(file => file.originFileObj));
+    setImagePreviews(fileList.map(file => URL.createObjectURL(file.originFileObj)));
   };
 
   const handleUpload = async () => {
-    if (image) {
-      try {
-        const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
-        const snapshot = await uploadBytes(imageRef, image);
-        const url = await getDownloadURL(snapshot.ref);
-        return url;
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        toast.error("Failed to upload image.");
-        throw error;
-      }
-    }
-    return "";
+    const urls = await Promise.all(images.map(async (image) => {
+      const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
+      const snapshot = await uploadBytes(imageRef, image);
+      return await getDownloadURL(snapshot.ref);
+    }));
+    return urls;
   };
 
   const handleSubmit = async () => {
     try {
       setUploading(true);
 
-      let uploadedImageURL = "";
-      if (image) {
-        uploadedImageURL = await handleUpload();
-        toast.success("Image uploaded successfully!");
+      let uploadedImageURLs = [];
+      if (images.length > 0) {
+        uploadedImageURLs = await handleUpload();
+        toast.success("Images uploaded successfully!");
       }
 
-      await postCreateTechnology(name, description, status, uploadedImageURL);
+      await postCreateTechnology(name, description, status, uploadedImageURLs);
 
       toast.success("Technology added successfully!");
 
@@ -57,8 +48,8 @@ const ModalAddTechnology = ({ open, handleClose }) => {
       setName("");
       setDescription("");
       setStatus("active");
-      setImage(null);
-      setImagePreview(null);
+      setImages([]);
+      setImagePreviews([]);
 
       handleClose();
     } catch (error) {
@@ -75,7 +66,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
       open={open}
       onCancel={() => {
         handleClose();
-        setImagePreview("");
+        setImagePreviews([]);
         setStatus("active");
       }}
       footer={[
@@ -123,20 +114,19 @@ const ModalAddTechnology = ({ open, handleClose }) => {
         <div className="mb-3">
           <Upload
             accept=".jpg,.jpeg,.png"
-            beforeUpload={(file) => {
-              handleImageChange({ target: { files: [file] } });
-              return false; // Prevent automatic upload
-            }}
+            beforeUpload={() => false}
+            multiple
             listType="picture"
+            onChange={handleImageChange}
           >
             <Button>
               <PlusOutlined />
-              Upload Image
+              Upload Images
             </Button>
           </Upload>
-          {imagePreview && (
-            <img src={imagePreview} alt="Image Preview" width="100%" />
-          )}
+          {imagePreviews.map((preview, index) => (
+            <img key={index} src={preview} alt={`Image Preview ${index}`} width="100%" />
+          ))}
         </div>
       </div>
     </Modal>

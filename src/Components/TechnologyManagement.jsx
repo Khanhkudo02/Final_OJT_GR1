@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, message } from "antd";
+import { Button, Space, Table, message } from "antd";
 import ModalAddTechnology from "./ModalAddTechnology";
 import ModalEditTechnology from "./ModalEditTechnology";
 import ModalDeleteTechnology from "./ModalDeleteTechnology";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import "../assets/style/Pages/TechnologyManagement.scss";
 import "../assets/style/Global.scss";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 const { Column } = Table;
 
@@ -21,7 +27,7 @@ const TechnologyManagement = () => {
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
-      setTechnologies(data);
+      setTechnologies(data.sort((a, b) => b.createdAt - a.createdAt));
     } catch (error) {
       console.error("Failed to fetch technologies:", error);
     }
@@ -79,7 +85,9 @@ const TechnologyManagement = () => {
       title: "Image",
       dataIndex: "imageURL",
       key: "imageURL",
-      render: (text) => <img src={text} alt="Technology" style={{ width: 50, height: 50 }} />,
+      render: (text) => (
+        <img src={text} alt="Technology" style={{ width: 50, height: 50 }} />
+      ),
     },
     {
       title: "Name",
@@ -96,31 +104,31 @@ const TechnologyManagement = () => {
       dataIndex: "status",
       key: "status",
       render: (text) => {
-        const className = text === 'active' ? 'status-active' : 'status-inactive';
-        return <span className={className}>{text ? text.charAt(0).toUpperCase() + text.slice(1) : ''}</span>;
+        const className =
+          text === "active" ? "status-active" : "status-inactive";
+        return (
+          <span className={className}>
+            {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+          </span>
+        );
       },
     },
     {
       title: "Action",
       key: "action",
       render: (text, record) => (
-        <span>
+        <Space>
           <Button
-            className="edit-button"
-            type="primary"
-            style={{ marginRight: 8 }}
+            icon={<EditOutlined />}
+            style={{ color: "blue", borderColor: "blue" }}
             onClick={() => showEditModal(record)}
-          >
-            Edit
-          </Button>
+          />
           <Button
-            className="delete-button" 
-            type="danger" 
+            icon={<DeleteOutlined />}
+            style={{ color: "red", borderColor: "red" }}
             onClick={() => showDeleteModal(record)}
-          >
-            Delete
-          </Button>
-        </span>
+          />
+        </Space>
       ),
     },
   ];
