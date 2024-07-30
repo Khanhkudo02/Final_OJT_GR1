@@ -12,7 +12,7 @@ import {
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
@@ -111,30 +111,6 @@ const ProjectEdit = () => {
     loadLanguages();
   }, []);
 
-  // const onFinish = async (values) => {
-  //   Modal.confirm({
-  //     title: "Confirm Changes",
-  //     content: "Do you agree with the changes you have made?",
-  //     okText: "Yes",
-  //     cancelText: "No",
-  //     onOk: async () => {
-  //       try {
-  //         const projectData = {
-  //           ...values,
-  //           startDate: values.startDate.format('YYYY-MM-DD'),
-  //           endDate: values.endDate.format('YYYY-MM-DD'),
-  //           imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl,
-  //         };
-  //         await putUpdateProject(id, projectData, fileList.length > 0 ? fileList[0].originFileObj : null);
-  //         message.success('Project updated successfully');
-  //         navigate(`/project/${id}`);
-  //       } catch (error) {
-  //         message.error('Failed to update project');
-  //       }
-  //     },
-  //   });
-  // };
-
   const onFinish = async (values) => {
     Modal.confirm({
       title: "Confirm Changes",
@@ -181,7 +157,7 @@ const ProjectEdit = () => {
         margin: "auto",
       }}
     >
-      <Button type="default" onClick={() => navigate(`/project/${id}`)}>
+      <Button type="default" icon={<ArrowLeftOutlined />} onClick={() => navigate(`/project/${id}`)}>
         Back
       </Button>
       <h2>Edit Project</h2>
@@ -193,7 +169,7 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project name!" },
           ]}
         >
-          <Input />
+          <Input placeholder="input placeholder"/>
         </Form.Item>
 
         <Form.Item
@@ -206,7 +182,7 @@ const ProjectEdit = () => {
             },
           ]}
         >
-          <TextArea rows={4} />
+          <TextArea rows={4} placeholder="input placeholder"/>
         </Form.Item>
 
         <Form.Item
@@ -226,24 +202,33 @@ const ProjectEdit = () => {
         </Form.Item>
 
         <Form.Item
-          label="Client Name"
+          label="Name"
           name="clientName"
           rules={[{ required: true, message: "Please input the client name!" }]}
         >
-          <Input />
+          <Input placeholder="input placeholder"/>
         </Form.Item>
 
         <Form.Item
-          label="Client Contact"
-          name="clientContact"
+          label="Email"
+          name="email"
           rules={[
-            {
-              required: true,
-              message: "Please input the client contact information!",
-            },
+            { required: true, message: "Please input the email address!" },
+            { type: "email", message: "Please enter a valid email address!" }
           ]}
         >
-          <Input />
+          <Input placeholder="NameManeger@gmail.com"/>
+        </Form.Item>
+
+        <Form.Item
+          label="Phone Number"
+          name="phoneNumber"
+          rules={[
+            { required: true, message: "Please input the phone number!" },
+            { pattern: /^\d+$/, message: "Please enter a valid phone number!" }
+          ]}
+        >
+          <Input placeholder=""/>
         </Form.Item>
 
         <Form.Item
@@ -253,7 +238,7 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project manager!" },
           ]}
         >
-          <Input />
+          <Input placeholder="input placeholder"/>
         </Form.Item>
 
         <Form.Item
@@ -261,7 +246,7 @@ const ProjectEdit = () => {
           name="teamMembers"
           rules={[{ required: true, message: "Please list the team members!" }]}
         >
-          <TextArea rows={2} />
+          <TextArea rows={2} placeholder="input placeholder"/>
         </Form.Item>
 
         <Form.Item
@@ -315,6 +300,8 @@ const ProjectEdit = () => {
             <Option value="UI/UX">UI/UX</Option>
           </Select>
         </Form.Item>
+
+       
 
         {/* Select technologies */}
         <Form.Item label="Technologies Used" name="technologies">
