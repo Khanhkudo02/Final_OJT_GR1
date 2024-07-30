@@ -185,7 +185,6 @@ const ProjectManagement = () => {
           onClick={() => navigate("/new-project")}
         />
         <Button 
-          className="btn" 
           type="default" 
           icon={<InboxOutlined />} 
           onClick={() => navigate("/archived-projects")}
