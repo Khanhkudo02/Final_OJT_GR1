@@ -316,15 +316,11 @@ const ProjectEdit = () => {
           </Select>
         </Form.Item>
 
-        {/* <Form.Item label="Technologies Used" name="technologies">
-          <TextArea rows={2} />
-        </Form.Item> */}
-
         {/* Select technologies */}
         <Form.Item label="Technologies Used" name="technologies">
           <Select mode="multiple" placeholder="Select technologies">
             {technologies.map((tech) => (
-              <Option key={tech.key} value={tech.value}>
+              <Option key={tech.value} value={tech.value}>
                 {tech.label}
               </Option>
             ))}
@@ -335,7 +331,7 @@ const ProjectEdit = () => {
         <Form.Item label="Programming Languages Used" name="languages">
           <Select mode="multiple" placeholder="Select languages">
             {languages.map((lang) => (
-              <Option key={lang.key} value={lang.value}>
+              <Option key={lang.value} value={lang.value}>
                 {lang.label}
               </Option>
             ))}
