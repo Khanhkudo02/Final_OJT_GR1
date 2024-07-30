@@ -124,22 +124,22 @@ const deleteProjectPermanently = async (id) => {
 
 const restoreProject = async (id) => {
     try {
-      const archivedProjectRef = ref(db, `archivedProjects/${id}`);
-      const projectSnapshot = await get(archivedProjectRef);
-      const projectData = projectSnapshot.val();
-  
-      if (projectData) {
-        const projectRef = ref(db, `projects/${id}`);
-        await set(projectRef, projectData);
-        await remove(archivedProjectRef);
-      } else {
-        throw new Error("Project not found in archive");
-      }
+        const archivedProjectRef = ref(db, `archivedProjects/${id}`);
+        const projectSnapshot = await get(archivedProjectRef);
+        const projectData = projectSnapshot.val();
+
+        if (projectData) {
+            const projectRef = ref(db, `projects/${id}`);
+            await set(projectRef, projectData);
+            await remove(archivedProjectRef);
+        } else {
+            throw new Error("Project not found");
+        }
     } catch (error) {
-      console.error("Failed to restore project:", error);
-      throw error;
+        console.error("Failed to restore project:", error);
+        throw error;
     }
-  };
+};
   
   export { fetchAllProjects, postCreateProject, putUpdateProject, moveToArchive, fetchArchivedProjects, deleteProjectPermanently, restoreProject };
   
