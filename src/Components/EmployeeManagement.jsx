@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Table, message } from 'antd';
-import ModalAddEmployee from './ModalAddEmployee';
-import ModalEditEmployee from './ModalEditEmployee';
-import ModalDeleteEmployee from './ModalDeleteEmployee';
+import React, { useState, useEffect } from "react";
+import { Button, Table, message } from "antd";
+import ModalAddEmployee from "./ModalAddEmployee";
+import ModalEditEmployee from "./ModalEditEmployee";
+import ModalDeleteEmployee from "./ModalDeleteEmployee";
 import { fetchAllEmployees } from "../service/EmployeeServices";
 import "../assets/style/Pages/EmployeeManagement.scss";
 
@@ -19,7 +19,7 @@ const EmployeeManagement = () => {
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      const filteredData = data.filter(employee => !employee.isAdmin); // Filter out admin employees
+      const filteredData = data.filter((employee) => !employee.isAdmin); // Filter out admin employees
       setEmployees(filteredData);
     } catch (error) {
       console.error("Failed to fetch employees:", error);
@@ -40,11 +40,11 @@ const EmployeeManagement = () => {
   };
 
   const showDeleteModal = (record) => {
-    if (record.status && record.status.toLowerCase() === 'inactive') {
+    if (record.status && record.status.toLowerCase() === "inactive") {
       setEmployeeToDelete(record);
       setIsDeleteModalVisible(true);
     } else {
-      message.error('Only inactive employees can be deleted.');
+      message.error("Only inactive employees can be deleted.");
     }
   };
 
@@ -67,7 +67,11 @@ const EmployeeManagement = () => {
 
   return (
     <div>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
+      <Button
+        type="primary"
+        style={{ marginBottom: 16 }}
+        onClick={showAddModal}
+      >
         Add New Employee
       </Button>
       <Table dataSource={employees} pagination={false}>
@@ -91,10 +95,18 @@ const EmployeeManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
-              <Button type="primary" style={{ marginRight: 8 }} onClick={() => showEditModal(record)}>
+              <Button
+                type="primary"
+                style={{ marginRight: 8 }}
+                onClick={() => showEditModal(record)}
+              >
                 Edit
               </Button>
-              <Button type="danger" className="delete-button"  onClick={() => showDeleteModal(record)}>
+              <Button
+                type="danger"
+                className="delete-button"
+                onClick={() => showDeleteModal(record)}
+              >
                 Delete
               </Button>
             </span>

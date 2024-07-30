@@ -6,7 +6,12 @@ import ModalDeleteTechnology from "./ModalDeleteTechnology";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import "../assets/style/Pages/TechnologyManagement.scss";
 import "../assets/style/Global.scss";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 const { Column } = Table;
 
@@ -80,7 +85,9 @@ const TechnologyManagement = () => {
       title: "Image",
       dataIndex: "imageURL",
       key: "imageURL",
-      render: (text) => <img src={text} alt="Technology" style={{ width: 50, height: 50 }} />,
+      render: (text) => (
+        <img src={text} alt="Technology" style={{ width: 50, height: 50 }} />
+      ),
     },
     {
       title: "Name",
@@ -97,8 +104,13 @@ const TechnologyManagement = () => {
       dataIndex: "status",
       key: "status",
       render: (text) => {
-        const className = text === 'active' ? 'status-active' : 'status-inactive';
-        return <span className={className}>{text ? text.charAt(0).toUpperCase() + text.slice(1) : ''}</span>;
+        const className =
+          text === "active" ? "status-active" : "status-inactive";
+        return (
+          <span className={className}>
+            {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+          </span>
+        );
       },
     },
     {
@@ -106,14 +118,14 @@ const TechnologyManagement = () => {
       key: "action",
       render: (text, record) => (
         <Space>
-          <Button 
-            icon={<EditOutlined />} 
-            style={{ color: "blue", borderColor: "blue" }} 
+          <Button
+            icon={<EditOutlined />}
+            style={{ color: "blue", borderColor: "blue" }}
             onClick={() => showEditModal(record)}
           />
-          <Button 
-            icon={<DeleteOutlined />} 
-            style={{ color: "red", borderColor: "red" }} 
+          <Button
+            icon={<DeleteOutlined />}
+            style={{ color: "red", borderColor: "red" }}
             onClick={() => showDeleteModal(record)}
           />
         </Space>

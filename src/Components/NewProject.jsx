@@ -29,6 +29,7 @@ const NewProject = () => {
   const [agreement, setAgreement] = useState(false);
   const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
+  const [fileList, setFileList] = useState([]);
 
   const onFinish = async (values) => {
     try {
@@ -51,8 +52,13 @@ const NewProject = () => {
     setAgreement(e.target.checked);
   };
 
-  const handleImageChange = (info) => {
-    setImageFile(info.file.originFileObj);
+  const handleImageChange = ({ fileList }) => {
+    setFileList(fileList);
+    if (fileList.length > 0) {
+      setImageFile(fileList[fileList.length - 1].originFileObj);
+    } else {
+      setImageFile(null);
+    }
   };
 
   // Load technologies
@@ -98,10 +104,6 @@ const NewProject = () => {
     loadLanguages();
   }, []);
 
-  const handleChange = (value) => {
-    console.log(`Selected technologies: ${value}`);
-  };
-
   return (
     <div
       style={{
@@ -109,8 +111,6 @@ const NewProject = () => {
         background: "#fff",
         maxWidth: "1000px",
         margin: "auto",
-        // maxWidth: "600px",
-        // margin: "0 auto",
       }}
     >
       <h2>New Project</h2>
@@ -248,8 +248,8 @@ const NewProject = () => {
         {/* Select technologies */}
         <Form.Item label="Technologies Used" name="technologies">
           <Select mode="multiple" placeholder="Select technologies">
-            {technologies.map(tech => (
-              <Option key={tech.key} value={tech.value}>
+            {technologies.map((tech) => (
+              <Option key={tech.value} value={tech.value}>
                 {tech.label}
               </Option>
             ))}
@@ -259,8 +259,8 @@ const NewProject = () => {
         {/* Select programming languages */}
         <Form.Item label="Programming Languages Used" name="languages">
           <Select mode="multiple" placeholder="Select languages">
-            {languages.map(lang => (
-              <Option key={lang.key} value={lang.value}>
+            {languages.map((lang) => (
+              <Option key={lang.value} value={lang.value}>
                 {lang.label}
               </Option>
             ))}
@@ -268,7 +268,11 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item label="Attachments" name="attachments">
-          <Upload beforeUpload={() => false} onChange={handleImageChange}>
+          <Upload
+            fileList={fileList}
+            beforeUpload={() => false}
+            onChange={handleImageChange}
+          >
             <Button icon={<UploadOutlined />}>Click to Upload</Button>
           </Upload>
         </Form.Item>
