@@ -17,6 +17,7 @@ const AddEmployee = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [skills, setSkills] = useState("");
     const [status, setStatus] = useState("active");
+    const [department, setDepartment] = useState("");
     const [employees, setEmployees] = useState([]);
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -28,7 +29,7 @@ const AddEmployee = () => {
     const loadEmployees = async () => {
         try {
             const data = await fetchAllEmployees();
-            const filteredData = data.filter(employee => !employee.isAdmin); // Filter out admin employees
+            const filteredData = data.filter(employee => employee.role === "employee"); // Filter by role "employee"
             setEmployees(filteredData);
         } catch (error) {
             console.error("Failed to fetch employees:", error);
@@ -40,13 +41,13 @@ const AddEmployee = () => {
     }, []);
 
     const handleAddEmployee = async () => {
-        if (!name || !email || !password || !dateOfBirth || !address || !phoneNumber || !skills || !status) {
+        if (!name || !email || !password || !dateOfBirth || !address || !phoneNumber || !skills || !status || !department) {
             toast.error("Please fill in all fields.");
             return;
         }
 
         try {
-            await postCreateEmployee(name, email, password, dateOfBirth, address, phoneNumber, skills, status, "employee", imageFiles[0]); // Pass the first image file only
+            await postCreateEmployee(name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, "employee", imageFiles[0]); // Pass the first image file only
             localStorage.setItem("employeeAdded", "true");
             navigate("/employee-management");
         } catch (error) {
@@ -157,6 +158,21 @@ const AddEmployee = () => {
                 </Select>
             </div>
             <div className="form-group">
+                <label>Department</label>
+                <Select
+                    value={department}
+                    onChange={(value) => setDepartment(value)}
+                    placeholder="Select Department"
+                >
+                    <Option value="Accounting department">Accounting department</Option>
+                    <Option value="Audit department">Audit department</Option>
+                    <Option value="Sales department">Sales department</Option>
+                    <Option value="Administration department">Administration department</Option>
+                    <Option value="Human Resources department">Human Resources department</Option>
+                    <Option value="Customer Service department">Customer Service department</Option>
+                </Select>
+            </div>
+            <div className="form-group">
                 <label>Images</label>
                 <Upload
                     accept=".jpg,.jpeg,.png"
@@ -179,7 +195,7 @@ const AddEmployee = () => {
             <Button
                 type="primary"
                 onClick={handleAddEmployee}
-                disabled={!name || !email || !password || !dateOfBirth || !address || !phoneNumber || !skills || !status}
+                disabled={!name || !email || !password || !dateOfBirth || !address || !phoneNumber || !skills || !status || !department}
             >
                 Save
             </Button>
@@ -199,6 +215,7 @@ const AddEmployee = () => {
                 <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
                 <Column title="Skills" dataIndex="skills" key="skills" />
                 <Column title="Status" dataIndex="status" key="status" />
+                <Column title="Department" dataIndex="department" key="department" />
                 <Column
                     title="Actions"
                     key="actions"
@@ -235,9 +252,9 @@ const AddEmployee = () => {
                         <p>Phone Number: {selectedEmployee.phoneNumber}</p>
                         <p>Skills: {selectedEmployee.skills}</p>
                         <p>Status: {selectedEmployee.status}</p>
-                        {selectedEmployee.imageUrl && (
-                            <img src={selectedEmployee.imageUrl} alt="Employee" width="100%" />
-                        )}
+                        <p>Department: {selectedEmployee.department}</p>
+                        <p>Image:</p>
+                        {selectedEmployee.imageUrl && <img src={selectedEmployee.imageUrl} alt="Employee" width="100%" />}
                     </div>
                 )}
             </Modal>

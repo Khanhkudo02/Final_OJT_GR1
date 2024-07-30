@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchEmployeeById } from "../service/EmployeeServices";
 import { Button, Spin, message } from 'antd';
-import "../Components/EmployeeDetails.jsx";
 
 const EmployeeDetails = () => {
     const { id } = useParams();
@@ -32,11 +31,29 @@ const EmployeeDetails = () => {
             <h2>Employee Details</h2>
             {employee ? (
                 <div>
+                    {employee.imageUrl && (
+                        <div>
+                            <strong>Image:</strong>
+                            <img
+                                src={employee.imageUrl}
+                                alt="Employee"
+                                width="100"
+                                height="100"
+                                style={{ objectFit: "cover", marginLeft: "10px" }}
+                            />
+                        </div>
+                    )}
                     <p><strong>Name:</strong> {employee.name}</p>
                     <p><strong>Email:</strong> {employee.email}</p>
+                    <p><strong>Phone Number:</strong> {employee.phoneNumber}</p>
+                    <p><strong>Skills:</strong> {employee.skills}</p>
                     <p><strong>Department:</strong> {employee.department}</p>
-                    <p><strong>Status:</strong> {employee.status}</p>
-                    <Button type="primary" onClick={() => navigate("/employee-management")}>
+                    <p><strong>Status:</strong>
+                        <span className={employee.status === "active" ? "status-active" : "status-inactive"}>
+                            {employee.status ? employee.status.charAt(0).toUpperCase() + employee.status.slice(1) : ""}
+                        </span>
+                    </p>
+                    <Button type="primary" onClick={() => navigate("/employee-management")} style={{ marginTop: "16px" }}>
                         Back to Employee Management
                     </Button>
                 </div>

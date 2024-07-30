@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, Table, message, Modal } from "antd";
-import {
-  fetchAllEmployees,
-  deleteEmployeeById,
-} from "../service/EmployeeServices";
+import { fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/EmployeeManagement.scss";
 import "../assets/style/Global.scss";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -21,7 +18,6 @@ const EmployeeManagement = () => {
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      // Filter employees to only include those with role 'employee'
       const filteredData = data.filter(employee => employee.role === 'employee');
       setEmployees(filteredData);
     } catch (error) {
@@ -97,6 +93,20 @@ const EmployeeManagement = () => {
             handleTableChange({ current: page, pageSize }),
         }}
       >
+        <Column
+          title="Image"
+          dataIndex="imageUrl"
+          key="imageUrl"
+          render={(text, record) => (
+            <img
+              src={record.imageUrl}
+              alt="Employee"
+              width="50"
+              height="50"
+              style={{ objectFit: "cover" }}
+            />
+          )}
+        />
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Email" dataIndex="email" key="email" />
         <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
@@ -120,6 +130,11 @@ const EmployeeManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
+              <Button
+                icon={<EyeOutlined />}
+                style={{ color: "green", borderColor: "green" }}
+                onClick={() => navigate(`/employee-management/view/${record.key}`)}
+              />
               <Button
                 className="edit-button"
                 type="primary"

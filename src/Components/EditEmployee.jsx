@@ -11,6 +11,16 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const { Header } = Layout;
 
+// Define department options
+const departmentOptions = [
+    { value: "accounting", label: "Accounting Department" },
+    { value: "audit", label: "Audit Department" },
+    { value: "sales", label: "Sales Department" },
+    { value: "administration", label: "Administration Department" },
+    { value: "hr", label: "Human Resources Department" },
+    { value: "customer_service", label: "Customer Service Department" },
+];
+
 const EditEmployee = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -19,19 +29,25 @@ const EditEmployee = () => {
     const [email, setEmail] = useState("");
     const [department, setDepartment] = useState("");
     const [status, setStatus] = useState("");
+    const [dateOfBirth, setDateOfBirth] = useState("");
+    const [address, setAddress] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [skills, setSkills] = useState("");
     const [imageFile, setImageFile] = useState(null);
 
     useEffect(() => {
         const loadEmployee = async () => {
             try {
-                console.log(`Loading employee with ID: ${id}`);
                 const employee = await fetchEmployeeById(id);
                 if (employee) {
-                    console.log("Loaded employee:", employee);
                     setName(employee.name || "");
                     setEmail(employee.email || "");
                     setDepartment(employee.department || "");
                     setStatus(employee.status || "");
+                    setDateOfBirth(employee.dateOfBirth || "");
+                    setAddress(employee.address || "");
+                    setPhoneNumber(employee.phoneNumber || "");
+                    setSkills(employee.skills || "");
                 } else {
                     toast.error("Employee not found.");
                 }
@@ -44,7 +60,7 @@ const EditEmployee = () => {
     }, [id]);
 
     const handleUpdateEmployee = async () => {
-        if (!name || !email || !department || !status) {
+        if (!name || !email || !department || !status || !dateOfBirth || !address || !phoneNumber || !skills) {
             toast.error("Please fill in all fields.");
             return;
         }
@@ -54,8 +70,12 @@ const EditEmployee = () => {
                 id,
                 name,
                 email,
-                department,
+                dateOfBirth,
+                address,
+                phoneNumber,
+                skills,
                 status,
+                department,
                 imageFile
             );
             toast.success("Employee updated successfully!");
@@ -67,16 +87,14 @@ const EditEmployee = () => {
     };
 
     const handleImageChange = ({ file }) => {
-        if (file.type === "image/png" || file.type === "image/svg+xml") {
+        if (file && file.originFileObj) {
             setImageFile(file.originFileObj);
-        } else {
-            toast.error("Only PNG and SVG images are allowed.");
         }
     };
 
     const beforeUpload = (file) => {
         handleImageChange({ file });
-        return false;
+        return false; // Prevent automatic upload
     };
 
     return (
@@ -101,11 +119,17 @@ const EditEmployee = () => {
             </div>
             <div className="form-group">
                 <label>Department</label>
-                <Input
-                    placeholder="Department"
+                <Select
+                    placeholder="Select Department"
                     value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                />
+                    onChange={(value) => setDepartment(value)}
+                >
+                    {departmentOptions.map(dept => (
+                        <Option key={dept.value} value={dept.value}>
+                            {dept.label}
+                        </Option>
+                    ))}
+                </Select>
             </div>
             <div className="form-group">
                 <label>Status</label>
@@ -119,7 +143,39 @@ const EditEmployee = () => {
                 </Select>
             </div>
             <div className="form-group">
-                <label>Upload Image (PNG or SVG only)</label>
+                <label>Date of Birth</label>
+                <Input
+                    type="date"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Address</label>
+                <Input
+                    placeholder="Address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Phone Number</label>
+                <Input
+                    placeholder="Phone Number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Skills</label>
+                <Input
+                    placeholder="Skills"
+                    value={skills}
+                    onChange={(e) => setSkills(e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Upload Image</label>
                 <Upload
                     name="image"
                     listType="picture"
@@ -133,7 +189,7 @@ const EditEmployee = () => {
             <Button
                 type="primary"
                 onClick={handleUpdateEmployee}
-                disabled={!name || !email || !department || !status}
+                disabled={!name || !email || !department || !status || !dateOfBirth || !address || !phoneNumber || !skills}
             >
                 Save
             </Button>

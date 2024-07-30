@@ -8,7 +8,7 @@ const db = database;
 const storageInstance = storage;
 
 // Create new employee
-const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, role, imageFile) => {
+const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, role, imageFile) => {
     try {
         const newEmployeeRef = push(ref(db, 'users'));
 
@@ -35,6 +35,7 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
             phoneNumber,
             skills,
             status,
+            department,  // Added department
             imageUrl,
             isAdmin: false,
             role: role || "employee", // Default to "employee" if role is not provided
@@ -62,13 +63,24 @@ const fetchAllEmployees = async () => {
 };
 
 // Update existing employee
-const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, imageFile) => {
+const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, department, imageFile) => {
     try {
         const employeeRef = ref(db, `users/${id}`);
+        const employeeSnapshot = await get(employeeRef);
+        const currentData = employeeSnapshot.val();
 
-        let imageUrl = null;
+        let imageUrl = currentData?.imageUrl || null;
         if (imageFile) {
-            const imageRef = storageRef(storageInstance, `images/${id}/${imageFile.name}`);
+            if (imageUrl) {
+                // Delete the old image
+                const oldImageRef = storageRef(storageInstance, `employee/${id}/${imageUrl.split('/').pop().split('?')[0]}`);
+                await deleteObject(oldImageRef);
+            }
+
+            // Upload the new image
+            const timestamp = Date.now();
+            const filename = `${timestamp}_${imageFile.name}`;
+            const imageRef = storageRef(storageInstance, `employee/${id}/${filename}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
@@ -83,11 +95,10 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             phoneNumber,
             skills,
             status,
+            department,
             imageUrl: imageUrl || null,
         };
 
-        const employeeSnapshot = await get(employeeRef);
-        const currentData = employeeSnapshot.val();
         if (currentData) {
             updates.role = currentData.role;
             updates.isAdmin = currentData.isAdmin;
