@@ -8,6 +8,30 @@ import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 const { Column } = Table;
 
+// Define department options
+const departmentOptions = [
+    { value: "accounting", label: "Accounting Department" },
+    { value: "audit", label: "Audit Department" },
+    { value: "sales", label: "Sales Department" },
+    { value: "administration", label: "Administration Department" },
+    { value: "hr", label: "Human Resources Department" },
+    { value: "customer_service", label: "Customer Service Department" },
+];
+
+// Define skill options
+const skillOptions = [
+    { value: "active_listening", label: "Active Listening Skills" },
+    { value: "communication", label: "Communication Skills" },
+    { value: "computer", label: "Computer Skills" },
+    { value: "customer_service", label: "Customer Service Skills" },
+    { value: "interpersonal", label: "Interpersonal Skills" },
+    { value: "leadership", label: "Leadership Skills" },
+    { value: "management", label: "Management Skills" },
+    { value: "problem_solving", label: "Problem-Solving Skills" },
+    { value: "time_management", label: "Time Management Skills" },
+    { value: "transferable", label: "Transferable Skills" },
+];
+
 const AddEmployee = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -15,7 +39,7 @@ const AddEmployee = () => {
     const [dateOfBirth, setDateOfBirth] = useState("");
     const [address, setAddress] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [skills, setSkills] = useState("");
+    const [skills, setSkills] = useState([]);
     const [status, setStatus] = useState("active");
     const [department, setDepartment] = useState("");
     const [employees, setEmployees] = useState([]);
@@ -41,7 +65,7 @@ const AddEmployee = () => {
     }, []);
 
     const handleAddEmployee = async () => {
-        if (!name || !email || !password || !dateOfBirth || !address || !phoneNumber || !skills || !status || !department) {
+        if (!name || !email || !password || !dateOfBirth || !address || !phoneNumber || skills.length === 0 || !status || !department) {
             toast.error("Please fill in all fields.");
             return;
         }
@@ -67,6 +91,16 @@ const AddEmployee = () => {
             loadEmployees(); // Reload the employees list
         } catch (error) {
             toast.error("Failed to delete employee.");
+        }
+    };
+
+    const handlePhoneNumberChange = (e) => {
+        const value = e.target.value;
+        // Remove all non-numeric characters
+        const numericValue = value.replace(/\D/g, '');
+        // Limit to 10 digits
+        if (numericValue.length <= 10) {
+            setPhoneNumber(numericValue);
         }
     };
 
@@ -135,16 +169,24 @@ const AddEmployee = () => {
                 <Input
                     type="text"
                     value={phoneNumber}
-                    onChange={(event) => setPhoneNumber(event.target.value)}
+                    onChange={handlePhoneNumberChange}
+                    maxLength={10}
                 />
             </div>
             <div className="form-group">
                 <label>Skills</label>
-                <Input
-                    type="text"
+                <Select
+                    mode="multiple"
                     value={skills}
-                    onChange={(event) => setSkills(event.target.value)}
-                />
+                    onChange={(value) => setSkills(value)}
+                    placeholder="Select Skills"
+                >
+                    {skillOptions.map(skill => (
+                        <Option key={skill.value} value={skill.value}>
+                            {skill.label}
+                        </Option>
+                    ))}
+                </Select>
             </div>
             <div className="form-group">
                 <label>Status</label>
@@ -164,12 +206,11 @@ const AddEmployee = () => {
                     onChange={(value) => setDepartment(value)}
                     placeholder="Select Department"
                 >
-                    <Option value="Accounting department">Accounting department</Option>
-                    <Option value="Audit department">Audit department</Option>
-                    <Option value="Sales department">Sales department</Option>
-                    <Option value="Administration department">Administration department</Option>
-                    <Option value="Human Resources department">Human Resources department</Option>
-                    <Option value="Customer Service department">Customer Service department</Option>
+                    {departmentOptions.map(dept => (
+                        <Option key={dept.value} value={dept.value}>
+                            {dept.label}
+                        </Option>
+                    ))}
                 </Select>
             </div>
             <div className="form-group">
@@ -195,7 +236,7 @@ const AddEmployee = () => {
             <Button
                 type="primary"
                 onClick={handleAddEmployee}
-                disabled={!name || !email || !password || !dateOfBirth || !address || !phoneNumber || !skills || !status || !department}
+                disabled={!name || !email || !password || !dateOfBirth || !address || !phoneNumber || skills.length === 0 || !status || !department}
             >
                 Save
             </Button>
@@ -213,7 +254,12 @@ const AddEmployee = () => {
                 <Column title="Date of Birth" dataIndex="dateOfBirth" key="dateOfBirth" />
                 <Column title="Address" dataIndex="address" key="address" />
                 <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
-                <Column title="Skills" dataIndex="skills" key="skills" />
+                <Column
+                    title="Skills"
+                    dataIndex="skills"
+                    key="skills"
+                    render={(skills) => (Array.isArray(skills) ? skills.join(', ') : '')}
+                />
                 <Column title="Status" dataIndex="status" key="status" />
                 <Column title="Department" dataIndex="department" key="department" />
                 <Column
@@ -250,7 +296,7 @@ const AddEmployee = () => {
                         <p>Date of Birth: {selectedEmployee.dateOfBirth}</p>
                         <p>Address: {selectedEmployee.address}</p>
                         <p>Phone Number: {selectedEmployee.phoneNumber}</p>
-                        <p>Skills: {selectedEmployee.skills}</p>
+                        <p>Skills: {Array.isArray(selectedEmployee.skills) ? selectedEmployee.skills.join(', ') : ''}</p>
                         <p>Status: {selectedEmployee.status}</p>
                         <p>Department: {selectedEmployee.department}</p>
                         <p>Image:</p>

@@ -110,7 +110,15 @@ const EmployeeManagement = () => {
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Email" dataIndex="email" key="email" />
         <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
-        <Column title="Skills" dataIndex="skills" key="skills" />
+        <Column
+          title="Skills"
+          dataIndex="skills"
+          key="skills"
+          render={(text) => {
+            // Ensure text is an array and then join with ', '
+            return Array.isArray(text) ? text.join(', ') : text;
+          }}
+        />
         <Column
           title="Status"
           dataIndex="status"

@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Input, Select, Upload, Button, Layout } from "antd";
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-    putUpdateEmployee,
-    fetchEmployeeById,
-} from "../service/EmployeeServices";
+import { putUpdateEmployee, fetchEmployeeById } from "../service/EmployeeServices";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
@@ -21,18 +18,32 @@ const departmentOptions = [
     { value: "customer_service", label: "Customer Service Department" },
 ];
 
+// Define skill options
+const skillOptions = [
+    { value: "active_listening", label: "Active Listening Skills" },
+    { value: "communication", label: "Communication Skills" },
+    { value: "computer", label: "Computer Skills" },
+    { value: "customer_service", label: "Customer Service Skills" },
+    { value: "interpersonal", label: "Interpersonal Skills" },
+    { value: "leadership", label: "Leadership Skills" },
+    { value: "management", label: "Management Skills" },
+    { value: "problem_solving", label: "Problem-Solving Skills" },
+    { value: "time_management", label: "Time Management Skills" },
+    { value: "transferable", label: "Transferable Skills" },
+];
+
 const EditEmployee = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [department, setDepartment] = useState("");
+    const [department, setDepartment] = useState([]);
     const [status, setStatus] = useState("");
     const [dateOfBirth, setDateOfBirth] = useState("");
     const [address, setAddress] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [skills, setSkills] = useState("");
+    const [skills, setSkills] = useState([]);
     const [imageFile, setImageFile] = useState(null);
 
     useEffect(() => {
@@ -42,12 +53,12 @@ const EditEmployee = () => {
                 if (employee) {
                     setName(employee.name || "");
                     setEmail(employee.email || "");
-                    setDepartment(employee.department || "");
+                    setDepartment(employee.department || []);
                     setStatus(employee.status || "");
                     setDateOfBirth(employee.dateOfBirth || "");
                     setAddress(employee.address || "");
                     setPhoneNumber(employee.phoneNumber || "");
-                    setSkills(employee.skills || "");
+                    setSkills(employee.skills || []); // Ensure skills is an array
                 } else {
                     toast.error("Employee not found.");
                 }
@@ -59,8 +70,18 @@ const EditEmployee = () => {
         loadEmployee();
     }, [id]);
 
+    const handlePhoneNumberChange = (e) => {
+        const value = e.target.value;
+        // Remove all non-numeric characters
+        const numericValue = value.replace(/\D/g, '');
+        // Limit to 10 digits
+        if (numericValue.length <= 10) {
+            setPhoneNumber(numericValue);
+        }
+    };
+
     const handleUpdateEmployee = async () => {
-        if (!name || !email || !department || !status || !dateOfBirth || !address || !phoneNumber || !skills) {
+        if (!name || !email || department.length === 0 || !status || !dateOfBirth || !address || !phoneNumber || skills.length === 0) {
             toast.error("Please fill in all fields.");
             return;
         }
@@ -120,6 +141,7 @@ const EditEmployee = () => {
             <div className="form-group">
                 <label>Department</label>
                 <Select
+                    mode="multiple"
                     placeholder="Select Department"
                     value={department}
                     onChange={(value) => setDepartment(value)}
@@ -163,16 +185,24 @@ const EditEmployee = () => {
                 <Input
                     placeholder="Phone Number"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={handlePhoneNumberChange}
+                    maxLength={10}
                 />
             </div>
             <div className="form-group">
                 <label>Skills</label>
-                <Input
-                    placeholder="Skills"
+                <Select
+                    mode="multiple"
+                    placeholder="Select Skills"
                     value={skills}
-                    onChange={(e) => setSkills(e.target.value)}
-                />
+                    onChange={(value) => setSkills(value)}
+                >
+                    {skillOptions.map(skill => (
+                        <Option key={skill.value} value={skill.value}>
+                            {skill.label}
+                        </Option>
+                    ))}
+                </Select>
             </div>
             <div className="form-group">
                 <label>Upload Image</label>
@@ -189,7 +219,7 @@ const EditEmployee = () => {
             <Button
                 type="primary"
                 onClick={handleUpdateEmployee}
-                disabled={!name || !email || !department || !status || !dateOfBirth || !address || !phoneNumber || !skills}
+                disabled={!name || !email || department.length === 0 || !status || !dateOfBirth || !address || !phoneNumber || skills.length === 0}
             >
                 Save
             </Button>

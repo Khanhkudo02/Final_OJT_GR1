@@ -46,7 +46,7 @@ const EmployeeDetails = () => {
                     <p><strong>Name:</strong> {employee.name}</p>
                     <p><strong>Email:</strong> {employee.email}</p>
                     <p><strong>Phone Number:</strong> {employee.phoneNumber}</p>
-                    <p><strong>Skills:</strong> {employee.skills}</p>
+                    <p><strong>Skills:</strong> {Array.isArray(employee.skills) ? employee.skills.join(', ') : employee.skills}</p>
                     <p><strong>Department:</strong> {employee.department}</p>
                     <p><strong>Status:</strong>
                         <span className={employee.status === "active" ? "status-active" : "status-inactive"}>
