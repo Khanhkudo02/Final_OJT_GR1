@@ -7,6 +7,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/PositionManagement.scss";
 import "../assets/style/Global.scss";
+import {  EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -79,12 +80,7 @@ const PositionManagement = () => {
   );
   return (
     <div>
-      <Button
-        className="btn"
-        type="primary"
-        style={{ marginBottom: 16 }}
-        onClick={showAddPage}
-      >
+      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
         Add New Position
       </Button>
       <Table
@@ -120,6 +116,7 @@ const PositionManagement = () => {
           key="actions"
           render={(text, record) => (
             <span>
+              
               <Button
                 className="edit-button"
                 type="primary"
@@ -128,7 +125,7 @@ const PositionManagement = () => {
                 }
                 style={{ marginLeft: 8 }}
               >
-                Edit
+              <EditOutlined />
               </Button>
               <Button
                 className="delete-button"
@@ -136,7 +133,7 @@ const PositionManagement = () => {
                 onClick={() => handleDelete(record)}
                 style={{ marginLeft: 8 }}
               >
-                Delete
+              <DeleteOutlined />
               </Button>
             </span>
           )}
@@ -149,6 +146,7 @@ const PositionManagement = () => {
           dataPositionEdit={dataPositionEdit}
         />
       )}
+
     </div>
   );
 };
