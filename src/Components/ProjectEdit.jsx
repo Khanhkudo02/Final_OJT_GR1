@@ -68,48 +68,48 @@ const ProjectEdit = () => {
     fetchProject();
   }, [id, form, navigate]);
 
-    // Load technologies
-    useEffect(() => {
-      const loadTechnologies = async () => {
-        try {
-          const data = await fetchAllTechnology();
-          // Convert data from Firebase to format for Select
-          const techOptions = data.map((tech) => ({
-            label: tech.name,
-            value: tech.key, // Use key as value for Option
-          }));
-          setTechnologies(techOptions);
-        } catch (err) {
-          setError("Failed to fetch technologies");
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      loadTechnologies();
-    }, []);
-  
-    // Load languages
-    useEffect(() => {
-      const loadLanguages = async () => {
-        try {
-          const data = await fetchAllLanguages();
-          // Convert data from Firebase to format for Select
-          const languageOptions = data.map((lang) => ({
-            label: lang.name,
-            value: lang.key, // Use key as value for Option
-          }));
-          setLanguages(languageOptions);
-        } catch (err) {
-          setError("Failed to fetch languages");
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      loadLanguages();
-    }, []);
+  // Load technologies
+  useEffect(() => {
+    const loadTechnologies = async () => {
+      try {
+        const data = await fetchAllTechnology();
+        // Convert data from Firebase to format for Select
+        const techOptions = data.map((tech) => ({
+          label: tech.name,
+          value: tech.key, // Use key as value for Option
+        }));
+        setTechnologies(techOptions);
+      } catch (err) {
+        setError("Failed to fetch technologies");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTechnologies();
+  }, []);
+
+  // Load languages
+  useEffect(() => {
+    const loadLanguages = async () => {
+      try {
+        const data = await fetchAllLanguages();
+        // Convert data from Firebase to format for Select
+        const languageOptions = data.map((lang) => ({
+          label: lang.name,
+          value: lang.key, // Use key as value for Option
+        }));
+        setLanguages(languageOptions);
+      } catch (err) {
+        setError("Failed to fetch languages");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadLanguages();
+  }, []);
 
   // const onFinish = async (values) => {
   //   Modal.confirm({
@@ -316,15 +316,11 @@ const ProjectEdit = () => {
           </Select>
         </Form.Item>
 
-        {/* <Form.Item label="Technologies Used" name="technologies">
-          <TextArea rows={2} />
-        </Form.Item> */}
-
         {/* Select technologies */}
         <Form.Item label="Technologies Used" name="technologies">
           <Select mode="multiple" placeholder="Select technologies">
-            {technologies.map(tech => (
-              <Option key={tech.key} value={tech.value}>
+            {technologies.map((tech) => (
+              <Option key={tech.value} value={tech.value}>
                 {tech.label}
               </Option>
             ))}
@@ -334,8 +330,8 @@ const ProjectEdit = () => {
         {/* Select programming languages */}
         <Form.Item label="Programming Languages Used" name="languages">
           <Select mode="multiple" placeholder="Select languages">
-            {languages.map(lang => (
-              <Option key={lang.key} value={lang.value}>
+            {languages.map((lang) => (
+              <Option key={lang.value} value={lang.value}>
                 {lang.label}
               </Option>
             ))}

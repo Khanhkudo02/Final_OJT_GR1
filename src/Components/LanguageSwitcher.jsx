@@ -13,8 +13,8 @@ const LanguageSwitcher = () => {
 
   return (
     <Select defaultValue={i18n.language} onChange={handleChange}>
-        <Option value="vi">Tiếng Việt</Option>
-        <Option value="en">English</Option>
+      <Option value="vi">Tiếng Việt</Option>
+      <Option value="en">English</Option>
     </Select>
   );
 };

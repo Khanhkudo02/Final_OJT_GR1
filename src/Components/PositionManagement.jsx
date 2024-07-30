@@ -7,7 +7,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/PositionManagement.scss";
 import "../assets/style/Global.scss";
-import {  EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -80,7 +85,12 @@ const PositionManagement = () => {
   );
   return (
     <div>
-      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
+      <Button
+        className="btn"
+        type="primary"
+        style={{ marginBottom: 16 }}
+        onClick={showAddPage}
+      >
         Add New Position
       </Button>
       <Table
@@ -116,14 +126,16 @@ const PositionManagement = () => {
           key="actions"
           render={(text, record) => (
             <Space>
-              <Button 
-                icon={<EditOutlined />} 
-                style={{ color: "blue", borderColor: "blue" }} 
-                onClick={() => navigate(`/position-management/edit/${record.key}`)}
+              <Button
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
+                onClick={() =>
+                  navigate(`/position-management/edit/${record.key}`)
+                }
               />
-              <Button 
-                icon={<DeleteOutlined />} 
-                style={{ color: "red", borderColor: "red" }} 
+              <Button
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
               />
             </Space>
@@ -137,7 +149,6 @@ const PositionManagement = () => {
           dataPositionEdit={dataPositionEdit}
         />
       )}
-
     </div>
   );
 };

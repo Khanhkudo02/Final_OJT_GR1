@@ -139,6 +139,18 @@ export const signUpUser = async (
     };
     await set(newUserRef, newUser);
 
+    if (newUser.role === "employee") {
+      const employeeRef = ref(db, `employees/${userId}`);
+      await set(employeeRef, {
+        name: newUser.name,
+        email: newUser.email,
+        contact: newUser.contact,
+        cv_list: newUser.cv_list,
+        createdAt: newUser.createdAt,
+        status: newUser.status,
+      });
+    }
+
     console.log("New User Object:", newUser); // Console log the new user object
 
     setSuccessMessage("Account created successfully! Please log in.");

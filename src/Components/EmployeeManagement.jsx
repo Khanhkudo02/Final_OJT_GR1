@@ -21,7 +21,9 @@ const EmployeeManagement = () => {
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      setEmployees(data);
+      // Filter employees to only include those with role 'employee'
+      const filteredData = data.filter(employee => employee.role === 'employee');
+      setEmployees(filteredData);
     } catch (error) {
       console.error("Failed to fetch employees:", error);
     }

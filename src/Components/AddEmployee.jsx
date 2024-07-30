@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Table, Modal } from "antd";
-import {
-    postCreateEmployee,
-    fetchAllEmployees,
-    deleteEmployeeById,
-} from "../service/EmployeeServices";
+import { Button, Input, Select, Table, Modal, Upload } from "antd";
+import { postCreateEmployee, fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServices";
 import { PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -15,11 +11,17 @@ const { Column } = Table;
 const AddEmployee = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [department, setDepartment] = useState("");
+    const [password, setPassword] = useState("");
+    const [dateOfBirth, setDateOfBirth] = useState("");
+    const [address, setAddress] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [skills, setSkills] = useState("");
     const [status, setStatus] = useState("active");
     const [employees, setEmployees] = useState([]);
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [imageFiles, setImageFiles] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
 
     const navigate = useNavigate();
 
@@ -38,13 +40,13 @@ const AddEmployee = () => {
     }, []);
 
     const handleAddEmployee = async () => {
-        if (!name || !email || !department || !status) {
+        if (!name || !email || !password || !dateOfBirth || !address || !phoneNumber || !skills || !status) {
             toast.error("Please fill in all fields.");
             return;
         }
 
         try {
-            await postCreateEmployee(name, email, department, status);
+            await postCreateEmployee(name, email, password, dateOfBirth, address, phoneNumber, skills, status, "employee", imageFiles[0]); // Pass the first image file only
             localStorage.setItem("employeeAdded", "true");
             navigate("/employee-management");
         } catch (error) {
@@ -67,6 +69,23 @@ const AddEmployee = () => {
         }
     };
 
+    const handleImageChange = (info) => {
+        if (info.fileList) {
+            // Save files to state
+            setImageFiles(info.fileList.map(file => file.originFileObj));
+
+            // Generate preview URLs
+            const previewUrls = info.fileList.map(file => {
+                if (file.originFileObj) {
+                    return URL.createObjectURL(file.originFileObj);
+                }
+                return "";
+            });
+            setImagePreviews(previewUrls);
+        }
+        return false; // Prevent automatic upload
+    };
+
     return (
         <div className="add-employee">
             <h2>Add New Employee</h2>
@@ -87,11 +106,43 @@ const AddEmployee = () => {
                 />
             </div>
             <div className="form-group">
-                <label>Department</label>
+                <label>Password</label>
+                <Input
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Date of Birth</label>
+                <Input
+                    type="date"
+                    value={dateOfBirth}
+                    onChange={(event) => setDateOfBirth(event.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Address</label>
                 <Input
                     type="text"
-                    value={department}
-                    onChange={(event) => setDepartment(event.target.value)}
+                    value={address}
+                    onChange={(event) => setAddress(event.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Phone Number</label>
+                <Input
+                    type="text"
+                    value={phoneNumber}
+                    onChange={(event) => setPhoneNumber(event.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Skills</label>
+                <Input
+                    type="text"
+                    value={skills}
+                    onChange={(event) => setSkills(event.target.value)}
                 />
             </div>
             <div className="form-group">
@@ -105,10 +156,30 @@ const AddEmployee = () => {
                     <Option value="inactive">Inactive</Option>
                 </Select>
             </div>
+            <div className="form-group">
+                <label>Images</label>
+                <Upload
+                    accept=".jpg,.jpeg,.png"
+                    beforeUpload={() => false} // Prevent automatic upload
+                    multiple
+                    listType="picture"
+                    onChange={handleImageChange}
+                >
+                    <Button>
+                        <PlusOutlined />
+                        Upload Images
+                    </Button>
+                </Upload>
+                <div className="image-previews">
+                    {imagePreviews.map((preview, index) => (
+                        <img key={index} src={preview} alt={`Image Preview ${index}`} width="100%" />
+                    ))}
+                </div>
+            </div>
             <Button
                 type="primary"
                 onClick={handleAddEmployee}
-                disabled={!name || !email || !department || !status}
+                disabled={!name || !email || !password || !dateOfBirth || !address || !phoneNumber || !skills || !status}
             >
                 Save
             </Button>
@@ -123,7 +194,10 @@ const AddEmployee = () => {
             <Table dataSource={employees} rowKey="key" pagination={false}>
                 <Column title="Name" dataIndex="name" key="name" />
                 <Column title="Email" dataIndex="email" key="email" />
-                <Column title="Department" dataIndex="department" key="department" />
+                <Column title="Date of Birth" dataIndex="dateOfBirth" key="dateOfBirth" />
+                <Column title="Address" dataIndex="address" key="address" />
+                <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
+                <Column title="Skills" dataIndex="skills" key="skills" />
                 <Column title="Status" dataIndex="status" key="status" />
                 <Column
                     title="Actions"
@@ -154,18 +228,16 @@ const AddEmployee = () => {
             >
                 {selectedEmployee && (
                     <div>
-                        <p>
-                            <strong>Name:</strong> {selectedEmployee.name}
-                        </p>
-                        <p>
-                            <strong>Email:</strong> {selectedEmployee.email}
-                        </p>
-                        <p>
-                            <strong>Department:</strong> {selectedEmployee.department}
-                        </p>
-                        <p>
-                            <strong>Status:</strong> {selectedEmployee.status}
-                        </p>
+                        <p>Name: {selectedEmployee.name}</p>
+                        <p>Email: {selectedEmployee.email}</p>
+                        <p>Date of Birth: {selectedEmployee.dateOfBirth}</p>
+                        <p>Address: {selectedEmployee.address}</p>
+                        <p>Phone Number: {selectedEmployee.phoneNumber}</p>
+                        <p>Skills: {selectedEmployee.skills}</p>
+                        <p>Status: {selectedEmployee.status}</p>
+                        {selectedEmployee.imageUrl && (
+                            <img src={selectedEmployee.imageUrl} alt="Employee" width="100%" />
+                        )}
                     </div>
                 )}
             </Modal>

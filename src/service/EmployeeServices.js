@@ -8,7 +8,7 @@ const db = database;
 const storageInstance = storage;
 
 // Create new employee
-const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, imageFile) => {
+const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, role, imageFile) => {
     try {
         const newEmployeeRef = push(ref(db, 'users'));
 
@@ -17,7 +17,9 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
 
         let imageUrl = null;
         if (imageFile) {
-            const imageRef = storageRef(storageInstance, `images/${newEmployeeRef.key}/${imageFile.name}`);
+            const timestamp = Date.now();
+            const filename = `${timestamp}_${imageFile.name}`;
+            const imageRef = storageRef(storageInstance, `employee/${newEmployeeRef.key}/${filename}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
@@ -35,7 +37,8 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
             status,
             imageUrl,
             isAdmin: false,
-            role: "employee",
+            role: role || "employee", // Default to "employee" if role is not provided
+            createdAt: Date.now(), // Automatically set the createdAt attribute
         });
 
         return newEmployeeRef.key;

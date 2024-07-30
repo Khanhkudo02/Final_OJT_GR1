@@ -1,5 +1,6 @@
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Modal, Select, Space, Table } from "antd";
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs'; // Thay vì import bcrypt
 import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,7 +10,6 @@ import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/Admin.scss";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -27,28 +27,30 @@ function AdminPage() {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const db = getDatabase();
-        const userRef = ref(db, "users");
-        const snapshot = await get(userRef);
-        const userData = snapshot.val();
-        if (userData) {
-          const usersArray = Object.entries(userData).map(([id, data]) => ({
-            id,
-            ...data,
-          }));
-          usersArray.sort(
-            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-          );
-          setUsers(usersArray);
-        }
-      } catch (error) {
-        message.error(t("errorFetchingUsers"));
+  const fetchUsers = async () => {
+    try {
+      const db = getDatabase();
+      const userRef = ref(db, "users");
+      const snapshot = await get(userRef);
+      const userData = snapshot.val();
+      if (userData) {
+        const usersArray = Object.entries(userData).map(([id, data]) => ({
+          id,
+          ...data,
+        }));
+        // Lọc người dùng có role là admin
+        const adminUsers = usersArray.filter(user => user.role === "admin");
+        adminUsers.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+        setUsers(adminUsers);
       }
-    };
+    } catch (error) {
+      message.error(t("errorFetchingUsers"));
+    }
+  };
 
+  useEffect(() => {
     fetchUsers();
   }, [t]);
 
@@ -91,7 +93,6 @@ function AdminPage() {
           return;
         }
       }
-
       const userRef = ref(db, `users/${editUserId || uuidv4()}`);
       let userData = {
         email,
@@ -105,7 +106,7 @@ function AdminPage() {
             updatedAt: new Date().toISOString(),
           },
         ],
-        role,
+        role: editMode ? role : "admin",
         createdAt: new Date().toISOString(),
         projetcIds: "",
         skill: "",
@@ -124,6 +125,7 @@ function AdminPage() {
           userData.password = hashedPassword;
         }
         await update(userRef, userData);
+
         message.success(t("userUpdatedSuccessfully"));
       } else {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -133,11 +135,12 @@ function AdminPage() {
           (user) => user.role === "admin"
         );
 
-        if (role === "admin" && adminUsers.length === 0) {
+        if (role === "admin" && adminUsers.length === 1) {
           userData.isAdmin = true;
         }
 
         await set(userRef, userData);
+
         message.success(t("userAddedSuccessfully"));
       }
 
@@ -151,17 +154,8 @@ function AdminPage() {
       setEditUserId("");
       setModalVisible(false);
 
-      const updatedSnapshot = await get(ref(db, "users"));
-      const updatedUserData = updatedSnapshot.val();
-      if (updatedUserData) {
-        const usersArray = Object.entries(updatedUserData).map(
-          ([id, data]) => ({
-            id,
-            ...data,
-          })
-        );
-        setUsers(usersArray);
-      }
+      // Fetch lại danh sách người dùng
+      fetchUsers();
     } catch (error) {
       message.error(t("errorAddingOrUpdatingUser"));
     }
@@ -196,28 +190,16 @@ function AdminPage() {
         }
 
         await remove(userRef);
+
         message.success(t("userDeletedSuccessfully"));
 
-        const updatedSnapshot = await get(ref(db, "users"));
-        const updatedUserData = updatedSnapshot.val();
-        if (updatedUserData) {
-          const usersArray = Object.entries(updatedUserData).map(
-            ([id, data]) => ({
-              id,
-              ...data,
-            })
-          );
-          setUsers(usersArray);
-        } else {
-          setUsers([]);
-        }
-      } else {
-        message.error(t("cannotDeleteAccount"));
+        // Fetch lại danh sách người dùng
+        fetchUsers();
       }
     } catch (error) {
       message.error(t("errorDeletingUser"));
     }
-  };
+  };  
 
   const handleEditUser = (user) => {
     setEmail(user.email);
@@ -269,8 +251,14 @@ function AdminPage() {
       title: t("role"),
       dataIndex: "role",
       key: "role",
-      render: (text) =>
-        text ? text.charAt(0).toUpperCase() + text.slice(1) : "",
+      render: (text) => {
+        const className = text === "admin" ? "role-admin" : "role-employee";
+        return (
+          <span className={className}>
+            {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+          </span>
+        );
+      },
     },
     {
       title: t("status"),
@@ -285,12 +273,6 @@ function AdminPage() {
           </span>
         );
       },
-    },
-    {
-      title: t("createdAt"),
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (text) => new Date(text).toLocaleDateString(),
     },
     {
       title: t("actions"),
@@ -363,16 +345,19 @@ function AdminPage() {
           >
             <Input />
           </Form.Item>
-          <Form.Item
+          {editMode &&(
+            <Form.Item
             label={t("role")}
             name="role"
-            rules={[{ required: true, message: t("roleRequired") }]}
+            initialValue={role}
+            rules={[{ required: true, message: t("pleaseSelectRole") }]}
           >
-            <Select>
+            <Select onChange={(value) => setRole(value)}>
               <Option value="admin">{t("admin")}</Option>
-              <Option value="employee">{t("employee")}</Option>
             </Select>
           </Form.Item>
+          )}
+          
           {editMode && (
             <Form.Item
               label={t("status")}
@@ -402,4 +387,4 @@ function AdminPage() {
   );
 }
 
-export default AdminPage;
+export default AdminPage; 
