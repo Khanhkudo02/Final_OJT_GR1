@@ -8,22 +8,20 @@ const storageInstance = storage;
 const postCreateProject = async (projectData, imageFile) => {
     try {
         const newProjectRef = push(ref(db, 'projects'));
-        const projectId = newProjectRef.key; // Firebase generated key
 
         let imageUrl = null;
         if (imageFile) {
-            const imageRef = storageRef(storageInstance, `images/${projectId}/${imageFile.name}`);
+            const imageRef = storageRef(storageInstance, `images/${newProjectRef.key}/${imageFile.name}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
 
         await set(newProjectRef, {
-            id: projectId,
             ...projectData,
             imageUrl,
         });
 
-        return projectId;
+        return newProjectRef.key;
     } catch (error) {
         console.error("Failed to create project:", error);
         throw error;
@@ -35,8 +33,7 @@ const fetchAllProjects = async () => {
         const projectsRef = ref(db, 'projects');
         const snapshot = await get(projectsRef);
         const data = snapshot.val();
-        if (!data) return [];
-        return Object.entries(data).map(([key, value]) => ({ key, ...value }));
+        return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
     } catch (error) {
         console.error("Failed to fetch projects:", error);
         throw error;
@@ -52,6 +49,7 @@ const putUpdateProject = async (id, projectData, imageFile) => {
             const imageRef = storageRef(storageInstance, `images/${id}/${imageFile.name}`);
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
+            
         }
 
         await update(projectRef, {
@@ -73,9 +71,18 @@ const deleteProject = async (id) => {
 
         const imageUrl = projectSnapshot.val()?.imageUrl;
         if (imageUrl) {
-            const imageName = imageUrl.split('/').pop().split('?')[0];
+            const imageName = decodeURIComponent(imageUrl.split('/').pop().split('?')[0]);
             const imageRef = storageRef(storageInstance, `images/${id}/${imageName}`);
-            await deleteObject(imageRef);
+
+            try {
+                await deleteObject(imageRef);
+            } catch (error) {
+                if (error.code !== 'storage/object-not-found') {
+                    throw error;
+                } else {
+                    console.warn(`Object not found: ${imageName}`);
+                }
+            }
         }
 
         await remove(projectRef);

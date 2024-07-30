@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Select, DatePicker, InputNumber, message, Upload, Modal } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  DatePicker,
+  InputNumber,
+  message,
+  Upload,
+  Modal,
+} from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
+import { fetchAllTechnology } from "../service/TechnologyServices";
+import { fetchAllLanguages } from "../service/LanguageServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -14,12 +26,16 @@ const ProjectEdit = () => {
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [fileList, setFileList] = useState([]);
+  const [technologies, setTechnologies] = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
         const allProjects = await fetchAllProjects();
-        const projectData = allProjects.find(project => project.key === id);
+        const projectData = allProjects.find((project) => project.key === id);
         if (projectData) {
           setProject(projectData);
           form.setFieldsValue({
@@ -32,9 +48,9 @@ const ProjectEdit = () => {
           if (projectData.imageUrl) {
             setFileList([
               {
-                uid: '-1',
-                name: 'attachment',
-                status: 'done',
+                uid: "-1",
+                name: "attachment",
+                status: "done",
                 url: projectData.imageUrl,
               },
             ]);
@@ -52,6 +68,73 @@ const ProjectEdit = () => {
     fetchProject();
   }, [id, form, navigate]);
 
+    // Load technologies
+    useEffect(() => {
+      const loadTechnologies = async () => {
+        try {
+          const data = await fetchAllTechnology();
+          // Convert data from Firebase to format for Select
+          const techOptions = data.map((tech) => ({
+            label: tech.name,
+            value: tech.key, // Use key as value for Option
+          }));
+          setTechnologies(techOptions);
+        } catch (err) {
+          setError("Failed to fetch technologies");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadTechnologies();
+    }, []);
+  
+    // Load languages
+    useEffect(() => {
+      const loadLanguages = async () => {
+        try {
+          const data = await fetchAllLanguages();
+          // Convert data from Firebase to format for Select
+          const languageOptions = data.map((lang) => ({
+            label: lang.name,
+            value: lang.key, // Use key as value for Option
+          }));
+          setLanguages(languageOptions);
+        } catch (err) {
+          setError("Failed to fetch languages");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      loadLanguages();
+    }, []);
+
+  // const onFinish = async (values) => {
+  //   Modal.confirm({
+  //     title: "Confirm Changes",
+  //     content: "Do you agree with the changes you have made?",
+  //     okText: "Yes",
+  //     cancelText: "No",
+  //     onOk: async () => {
+  //       try {
+  //         const projectData = {
+  //           ...values,
+  //           startDate: values.startDate.format('YYYY-MM-DD'),
+  //           endDate: values.endDate.format('YYYY-MM-DD'),
+  //           imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl,
+  //         };
+  //         await putUpdateProject(id, projectData, fileList.length > 0 ? fileList[0].originFileObj : null);
+  //         message.success('Project updated successfully');
+  //         navigate(`/project/${id}`);
+  //       } catch (error) {
+  //         message.error('Failed to update project');
+  //       }
+  //     },
+  //   });
+  // };
+
   const onFinish = async (values) => {
     Modal.confirm({
       title: "Confirm Changes",
@@ -62,15 +145,20 @@ const ProjectEdit = () => {
         try {
           const projectData = {
             ...values,
-            startDate: values.startDate.format('YYYY-MM-DD'),
-            endDate: values.endDate.format('YYYY-MM-DD'),
-            imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl,
+            startDate: values.startDate.format("YYYY-MM-DD"),
+            endDate: values.endDate.format("YYYY-MM-DD"),
+            imageUrl:
+              fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
           };
-          await putUpdateProject(id, projectData, fileList.length > 0 ? fileList[0].originFileObj : null);
-          message.success('Project updated successfully');
+          await putUpdateProject(
+            id,
+            projectData,
+            fileList.length > 0 ? fileList[0].originFileObj : null
+          );
+          message.success("Project updated successfully");
           navigate(`/project/${id}`);
         } catch (error) {
-          message.error('Failed to update project');
+          message.error("Failed to update project");
         }
       },
     });
@@ -90,7 +178,7 @@ const ProjectEdit = () => {
         padding: "24px 0",
         background: "#fff",
         maxWidth: "1000px",
-        margin: "auto"
+        margin: "auto",
       }}
     >
       <Button type="default" onClick={() => navigate(`/project/${id}`)}>
@@ -228,8 +316,30 @@ const ProjectEdit = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Technologies Used" name="technologies">
+        {/* <Form.Item label="Technologies Used" name="technologies">
           <TextArea rows={2} />
+        </Form.Item> */}
+
+        {/* Select technologies */}
+        <Form.Item label="Technologies Used" name="technologies">
+          <Select mode="multiple" placeholder="Select technologies">
+            {technologies.map(tech => (
+              <Option key={tech.key} value={tech.value}>
+                {tech.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        {/* Select programming languages */}
+        <Form.Item label="Programming Languages Used" name="languages">
+          <Select mode="multiple" placeholder="Select languages">
+            {languages.map(lang => (
+              <Option key={lang.key} value={lang.value}>
+                {lang.label}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item label="Attachments" name="attachments">
