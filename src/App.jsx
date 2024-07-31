@@ -1,13 +1,13 @@
 import { Layout, theme } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ResetPassword from "../src/pages/ResetPassword";
 import AccountInfo from "./Components/AccountInfo.jsx";
 import ChangePassword from "./Components/ChangePassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
+import LanguageManagement from "./Components/LanguageManagement";
 import NewProject from "./Components/NewProject";
 import PositionManagement from "./Components/PositionManagement";
-import LanguageManagement from "./Components/LanguageManagement";
 import ProjectManagement from "./Components/ProjectManagement";
 import Sidebar from "./Components/Sidebar";
 import TechnologyManagement from "./Components/TechnologyManagement";
@@ -44,6 +44,7 @@ const App = () => {
     setUser(userInfo);
   };
 
+  // eslint-disable-next-line react/prop-types
   const ProtectedRoute = ({ children }) => {
     if (!user) {
       return <Navigate to="/login" />;

@@ -4,7 +4,7 @@ import { fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServic
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/EmployeeManagement.scss";
 import "../assets/style/Global.scss";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -79,8 +79,9 @@ const EmployeeManagement = () => {
         type="primary"
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
+        icon={<PlusOutlined />}
       >
-        Add New Employee
+       
       </Button>
       <Table
         dataSource={paginatedData}

@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Modal, Select, Space, Table } from "antd";
 import bcrypt from 'bcryptjs'; // Thay vì import bcrypt
 import { get, getDatabase, ref, remove, set, update } from "firebase/database";
@@ -304,8 +304,8 @@ function AdminPage() {
           className="btn"
           type="primary"
           onClick={() => setModalVisible(true)}
+          icon={<PlusOutlined />}
         >
-          {t("addUser")}
         </Button>
         <ExportExcel data={users} fileName="File Excel" />
       </div>
