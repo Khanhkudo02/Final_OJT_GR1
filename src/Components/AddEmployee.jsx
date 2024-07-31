@@ -163,7 +163,7 @@ const AddEmployee = () => {
 
   return (
     <div className="add-employee">
-      <h2>Add New Employee</h2>
+      <h2>{t("addNewEmployee")}</h2>
       <div className="form-group">
         <label>{t("name")}</label>
         <Input
