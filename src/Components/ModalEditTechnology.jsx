@@ -1,104 +1,76 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button, Input, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { putUpdateTechnology } from "../service/TechnologyServices";
+import { Button, Input, Modal, Select, Upload } from "antd";
+import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
+import PropTypes from "prop-types";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import {
-  ref as storageRef,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
 import { storage } from "../firebaseConfig";
+import { putUpdateTechnology } from "../service/TechnologyServices";
 
 const { Option } = Select;
 
 const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("");
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
+  const [status, setStatus] = useState("active");
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [oldImageURLs, setOldImageURLs] = useState([]);
 
   useEffect(() => {
     if (dataTechnologyEdit) {
       setName(dataTechnologyEdit.name);
       setDescription(dataTechnologyEdit.description);
       setStatus(dataTechnologyEdit.status);
-      setImagePreview(dataTechnologyEdit.imageURL); // Cập nhật preview ảnh
+      setOldImageURLs(dataTechnologyEdit.imageURLs || []);
+      setImagePreviews(dataTechnologyEdit.imageURLs || []);
     }
   }, [dataTechnologyEdit]);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
+  const handleImageChange = ({ fileList }) => {
+    setImages(fileList.map(file => file.originFileObj));
+    setImagePreviews(fileList.map(file => URL.createObjectURL(file.originFileObj)));
   };
 
-  // Hàm để tải lên ảnh và lấy URL của ảnh đó
   const handleUpload = async () => {
-    if (image) {
-      try {
-        const imageRef = storageRef(
-          storage,
-          `technology/${Date.now()}_${image.name}`
-        );
-        const snapshot = await uploadBytes(imageRef, image);
-        const url = await getDownloadURL(snapshot.ref);
-        return url;
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        toast.error("Failed to upload image.");
-        throw error;
-      }
-    }
-    return imagePreview; // Trả về URL hiện tại nếu không có ảnh mới
+    const urls = await Promise.all(images.map(async (image) => {
+      const imageRef = storageRef(storage, `technology/${Date.now()}_${image.name}`);
+      const snapshot = await uploadBytes(imageRef, image);
+      return await getDownloadURL(snapshot.ref);
+    }));
+    return urls;
   };
 
-  // Hàm để xóa ảnh cũ nếu có
-  const deleteOldImage = async () => {
-    if (dataTechnologyEdit.imageURL) {
-      try {
-        const oldImagePath = dataTechnologyEdit.imageURL
-          .split("/o/")[1]
-          .split("?")[0];
-        const decodedOldImagePath = decodeURIComponent(oldImagePath);
-        const oldImageRef = storageRef(storage, decodedOldImagePath);
-        await deleteObject(oldImageRef);
-      } catch (error) {
-        console.error("Error deleting old image:", error);
-        toast.error("Failed to delete old image.");
-      }
-    }
-  };
-
-  // Hàm để xử lý việc gửi dữ liệu cập nhật
   const handleSubmit = async () => {
     try {
       setUploading(true);
 
-      // Tải lên ảnh mới và lấy URL nếu có ảnh mới
-      let uploadedImageURL = await handleUpload(); // URL của ảnh mới hoặc hiện tại nếu không có ảnh mới
+      // Upload new images and get their URLs
+      let uploadedImageURLs = [];
+      if (images.length > 0) {
+        uploadedImageURLs = await handleUpload();
+        toast.success("Images uploaded successfully!");
+      } else {
+        uploadedImageURLs = oldImageURLs; // Keep old images if no new images are uploaded
+      }
 
-      // Cập nhật dữ liệu công nghệ với URL ảnh mới
-      await putUpdateTechnology(
-        dataTechnologyEdit.key,
-        name,
-        description,
-        status,
-        uploadedImageURL, // URL mới hoặc cũ nếu không có ảnh mới
-        dataTechnologyEdit.imageURL // URL cũ để xóa sau
-      );
+      await putUpdateTechnology(dataTechnologyEdit.key, name, description, status, uploadedImageURLs, oldImageURLs);
 
       toast.success("Technology updated successfully!");
+
+      // Reset form fields
+      setName("");
+      setDescription("");
+      setStatus("active");
+      setImages([]);
+      setImagePreviews([]);
+      setOldImageURLs([]);
 
       handleClose();
     } catch (error) {
       toast.error("Failed to update technology.");
-      console.error("Error uploading image or updating technology:", error);
+      console.error("Error updating technology:", error);
     } finally {
       setUploading(false);
     }
@@ -110,7 +82,12 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
       open={open}
       onCancel={() => {
         handleClose();
-        setImagePreview("");
+        setName("");
+        setDescription("");
+        setStatus("active");
+        setImages([]);
+        setImagePreviews([]);
+        setOldImageURLs([]);
       }}
       footer={[
         <Button key="back" onClick={handleClose}>
@@ -157,24 +134,29 @@ const ModalEditTechnology = ({ open, handleClose, dataTechnologyEdit }) => {
         <div className="mb-3">
           <Upload
             accept=".jpg,.jpeg,.png"
-            beforeUpload={(file) => {
-              handleImageChange({ target: { files: [file] } });
-              return false; // Ngăn tải ảnh tự động
-            }}
+            beforeUpload={() => false}
+            multiple
             listType="picture"
+            onChange={handleImageChange}
           >
             <Button>
               <PlusOutlined />
-              Upload Image
+              Upload Images
             </Button>
           </Upload>
-          {imagePreview && (
-            <img src={imagePreview} alt="Image Preview" width="100%" />
-          )}
+          {imagePreviews.map((preview, index) => (
+            <img key={index} src={preview} alt={`Image Preview ${index}`} width="100%" />
+          ))}
         </div>
       </div>
     </Modal>
   );
+};
+
+ModalEditTechnology.propTypes = {
+  open: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  dataTechnologyEdit: PropTypes.object.isRequired,
 };
 
 export default ModalEditTechnology;
