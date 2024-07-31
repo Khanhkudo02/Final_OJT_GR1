@@ -1,20 +1,20 @@
+import React, { useState, useEffect } from "react";
+import { Button, Table, message, Modal, Space } from "antd";
 import {
-  DeleteOutlined,
-  EditOutlined,
   EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { Button, message, Modal, Table } from "antd";
-import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { useTranslation } from "react-i18next";
-import "../assets/style/Global.scss";
-import "../assets/style/Pages/EmployeeManagement.scss";
 import {
-  deleteEmployeeById,
   fetchAllEmployees,
+  deleteEmployeeById,
 } from "../service/EmployeeServices";
+import "../assets/style/Pages/EmployeeManagement.scss";
+import "../assets/style/Global.scss";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -29,9 +29,9 @@ const EmployeeManagement = () => {
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      const filteredData = data.filter(
-        (employee) => employee.role === "employee"
-      );
+      const filteredData = data
+        .filter((employee) => employee.role === "employee")
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp theo createdAt
       setEmployees(filteredData);
     } catch (error) {
       console.error(t("errorFetchingEmployees"), error);
@@ -105,6 +105,14 @@ const EmployeeManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       ></Button>
+      {/* <Button
+        className="btn"
+        type="primary"
+        style={{ marginBottom: 16, marginLeft: 16 }}
+        onClick={exportToExcel}
+      >
+        {t("addNewEmployee")}
+      </Button> */}
       <Button
         className="btn"
         type="primary"
@@ -150,7 +158,22 @@ const EmployeeManagement = () => {
           dataIndex="skills"
           key="skills"
           render={(text) => {
-            return Array.isArray(text) ? text.join(", ") : text;
+            if (Array.isArray(text)) {
+              return text
+                .map((skill) =>
+                  skill
+                    .replace(/_/g, " ")
+                    .split(" ")
+                    .map(
+                      (word) =>
+                        word.charAt(0).toUpperCase() +
+                        word.slice(1).toLowerCase()
+                    )
+                    .join(" ")
+                )
+                .join(", ");
+            }
+            return text;
           }}
         />
         <Column
@@ -171,7 +194,7 @@ const EmployeeManagement = () => {
           title={t("actions")}
           key="actions"
           render={(text, record) => (
-            <span>
+            <Space>
               <Button
                 icon={<EyeOutlined />}
                 style={{ color: "green", borderColor: "green" }}
@@ -191,7 +214,7 @@ const EmployeeManagement = () => {
                 style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
               />
-            </span>
+            </Space>
           )}
         />
       </Table>

@@ -1,46 +1,45 @@
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Upload } from "antd";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Input, Select, Upload, Button } from "antd";
 import { toast } from "react-toastify";
+import { useParams, useNavigate } from "react-router-dom";
 import {
-  fetchEmployeeById,
   putUpdateEmployee,
+  fetchEmployeeById,
 } from "../service/EmployeeServices";
+import { PlusOutlined } from "@ant-design/icons";
+import moment from "moment";
+import { useTranslation } from 'react-i18next';
 
 const { Option } = Select;
 
 // Define department options
 const departmentOptions = [
-  { value: "accounting", label: "accounting" },
-  { value: "audit", label: "audit" },
-  { value: "sales", label: "sales" },
-  { value: "administration", label: "administration" },
-  { value: "hr", label: "hr" },
-  { value: "customer_service", label: "customer_service" },
+  { value: "accounting", label: "Accounting Department" },
+  { value: "audit", label: "Audit Department" },
+  { value: "sales", label: "Sales Department" },
+  { value: "administration", label: "Administration Department" },
+  { value: "human_resources", label: "Human Resources Department" },
+  { value: "customer_service", label: "Customer Service Department" },
 ];
 
 // Define skill options
 const skillOptions = [
-  { value: "active_listening", label: "active_listening" },
-  { value: "communication", label: "communication" },
-  { value: "computer", label: "computer" },
-  { value: "customer_service", label: "customer_service" },
-  { value: "interpersonal", label: "interpersonal" },
-  { value: "leadership", label: "leadership" },
-  { value: "management", label: "management" },
-  { value: "problem_solving", label: "problem_solving" },
-  { value: "time_management", label: "time_management" },
-  { value: "transferable", label: "transferable" },
+  { value: "active_listening", label: "Active Listening Skills" },
+  { value: "communication", label: "Communication Skills" },
+  { value: "computer", label: "Computer Skills" },
+  { value: "customer_service", label: "Customer Service Skills" },
+  { value: "interpersonal", label: "Interpersonal Skills" },
+  { value: "leadership", label: "Leadership Skills" },
+  { value: "management", label: "Management Skills" },
+  { value: "problem_solving", label: "Problem-Solving Skills" },
+  { value: "time_management", label: "Time Management Skills" },
+  { value: "transferable", label: "Transferable Skills" },
 ];
 
 const EditEmployee = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useTranslation(); // useTranslation hook
-
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [department, setDepartment] = useState([]);
@@ -49,8 +48,7 @@ const EditEmployee = () => {
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [skills, setSkills] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [fileList, setFileList] = useState([]);
   const [oldImageUrl, setOldImageUrl] = useState("");
 
   useEffect(() => {
@@ -67,16 +65,28 @@ const EditEmployee = () => {
           setPhoneNumber(employee.phoneNumber || "");
           setSkills(employee.skills || []);
           setOldImageUrl(employee.imageUrl || ""); // Set old image URL
+
+          // Set fileList for existing image
+          if (employee.imageUrl) {
+            setFileList([
+              {
+                uid: "-1",
+                name: "attachment",
+                status: "done",
+                url: employee.imageUrl,
+              },
+            ]);
+          }
         } else {
-          toast.error(t("employeeNotFound"));
+          toast.error("Employee not found.");
         }
       } catch (error) {
-        toast.error(t("failedToFetchEmployeeData"));
+        toast.error("Failed to fetch employee data.");
       }
     };
 
     loadEmployee();
-  }, [id, t]);
+  }, [id]);
 
   const handlePhoneNumberChange = (e) => {
     const value = e.target.value;
@@ -99,7 +109,7 @@ const EditEmployee = () => {
       !phoneNumber ||
       skills.length === 0
     ) {
-      toast.error(t("pleaseFillAllFields"));
+      toast.error("Please fill in all fields.");
       return;
     }
 
@@ -114,29 +124,23 @@ const EditEmployee = () => {
         skills,
         status,
         department,
-        imageFile,
+        fileList.length > 0 ? fileList[0].originFileObj : null,
         oldImageUrl // Pass old image URL for deletion
       );
-      toast.success(t("employeeUpdatedSuccessfully"));
+      toast.success("Employee updated successfully!");
       navigate("/employee-management");
     } catch (error) {
-      toast.error(t("failedToUpdateEmployee"));
+      toast.error("Failed to update employee.");
       console.error("Error details:", error);
     }
   };
 
-  const handleImageChange = ({ target }) => {
-    const file = target.files[0];
-    if (file) {
-      // Generate image preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-      setImageFile(file);
-    }
+  const handleImageChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
   const beforeUpload = (file) => {
-    handleImageChange({ target: { files: [file] } });
+    handleImageChange({ fileList: [file] });
     return false; // Prevent automatic upload
   };
 
@@ -158,20 +162,18 @@ const EditEmployee = () => {
           placeholder={t("email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          disabled
         />
       </div>
       <div className="form-group">
         <label>{t("department")}</label>
         <Select
-          mode="multiple"
           placeholder={t("department")}
           value={department}
           onChange={(value) => setDepartment(value)}
         >
           {departmentOptions.map((dept) => (
             <Option key={dept.value} value={dept.value}>
-              {t(dept.label)}
+              {dept.label}
             </Option>
           ))}
         </Select>
@@ -183,8 +185,8 @@ const EditEmployee = () => {
           value={status}
           onChange={(value) => setStatus(value)}
         >
-          <Option value="active">{t("active")}</Option>
-          <Option value="inactive">{t("inactive")}</Option>
+          <Option value="active">Active</Option>
+          <Option value="inactive">Inactive</Option>
         </Select>
       </div>
       <div className="form-group">
@@ -222,7 +224,7 @@ const EditEmployee = () => {
         >
           {skillOptions.map((skill) => (
             <Option key={skill.value} value={skill.value}>
-              {t(skill.label)}
+              {skill.label}
             </Option>
           ))}
         </Select>
@@ -232,14 +234,16 @@ const EditEmployee = () => {
         <Upload
           accept=".jpg,.jpeg,.png"
           beforeUpload={beforeUpload}
+          fileList={fileList}
+          onChange={handleImageChange}
           listType="picture"
           showUploadList={false}
         >
           <Button icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
         </Upload>
-        {imagePreview && (
+        {fileList.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <img src={imagePreview} alt="Image Preview" width="30%" />
+            <img src={fileList[0].url} alt="Image Preview" width="30%" />
           </div>
         )}
       </div>
