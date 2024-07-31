@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Table, message, Modal, Space } from 'antd';
-import { fetchAllLanguages, deleteLanguageById } from "../service/LanguageServices";
+import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, message, Modal, Space, Table } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Pages/LanguageManagement.scss";
 import "../assets/style/Global.scss";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import "../assets/style/Pages/LanguageManagement.scss";
+import { deleteLanguageById, fetchAllLanguages } from "../service/LanguageServices";
 
 const { Column } = Table;
 const { confirm } = Modal;

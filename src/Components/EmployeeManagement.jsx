@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal, Space } from "antd";
 import {
-  EyeOutlined,
-  EditOutlined,
   DeleteOutlined,
+  EditOutlined,
+  ExportOutlined,
+  EyeOutlined,
   PlusOutlined,
-  ExportOutlined
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import * as XLSX from "xlsx";
-import { useTranslation } from "react-i18next";
+import { Button, message, Modal, Space, Table } from "antd";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
-import {
-  fetchAllEmployees,
-  deleteEmployeeById,
-} from "../service/EmployeeServices";
-import "../assets/style/Pages/EmployeeManagement.scss";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 import "../assets/style/Global.scss";
+import "../assets/style/Pages/EmployeeManagement.scss";
+import {
+  deleteEmployeeById,
+  fetchAllEmployees,
+} from "../service/EmployeeServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -104,35 +104,38 @@ const EmployeeManagement = () => {
       sections: [
         {
           properties: {},
-          children: employees.map((employee) => new Paragraph({
-            children: [
-              new TextRun(`Name: ${employee.name}`),
-              new TextRun({
-                text: '\n',
-                break: 1,
-              }),
-              new TextRun(`Email: ${employee.email}`),
-              new TextRun({
-                text: '\n',
-                break: 1,
-              }),
-              new TextRun(`Phone Number: ${employee.phoneNumber}`),
-              new TextRun({
-                text: '\n',
-                break: 1,
-              }),
-              new TextRun(`Skills: ${employee.skills.join(', ')}`),
-              new TextRun({
-                text: '\n',
-                break: 1,
-              }),
-              new TextRun(`Status: ${employee.status}`),
-              new TextRun({
-                text: '\n\n',
-                break: 2,
-              }),
-            ],
-          })),
+          children: employees.map(
+            (employee) =>
+              new Paragraph({
+                children: [
+                  new TextRun(`Name: ${employee.name}`),
+                  new TextRun({
+                    text: "\n",
+                    break: 1,
+                  }),
+                  new TextRun(`Email: ${employee.email}`),
+                  new TextRun({
+                    text: "\n",
+                    break: 1,
+                  }),
+                  new TextRun(`Phone Number: ${employee.phoneNumber}`),
+                  new TextRun({
+                    text: "\n",
+                    break: 1,
+                  }),
+                  new TextRun(`Skills: ${employee.skills.join(", ")}`),
+                  new TextRun({
+                    text: "\n",
+                    break: 1,
+                  }),
+                  new TextRun(`Status: ${employee.status}`),
+                  new TextRun({
+                    text: "\n\n",
+                    break: 2,
+                  }),
+                ],
+              })
+          ),
         },
       ],
     });
@@ -141,7 +144,6 @@ const EmployeeManagement = () => {
       saveAs(blob, `${t("employees")}_CVs.docx`);
     });
   };
-
 
   return (
     <div>
@@ -193,28 +195,22 @@ const EmployeeManagement = () => {
           key="phoneNumber"
         />
         <Column
-          title={t("skills")}
-          dataIndex="skills"
-          key="skills"
-          render={(text) => {
-            if (Array.isArray(text)) {
-              return text
-                .map((skill) =>
-                  skill
-                    .replace(/_/g, " ")
-                    .split(" ")
-                    .map(
-                      (word) =>
-                        word.charAt(0).toUpperCase() +
-                        word.slice(1).toLowerCase()
-                    )
-                    .join(" ")
-                )
-                .join(", ");
-            }
-            return text;
-          }}
-        />
+  title={t("skills")}
+  dataIndex="skills"
+  key="skills"
+  render={(text) => {
+    if (Array.isArray(text)) {
+      return text
+        .map((skill) =>
+          t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
+            defaultValue: skill.replace(/_/g, " "),
+          })
+        )
+        .join(", ");
+    }
+    return text;
+  }}
+/>
         <Column
           title={t("status")}
           dataIndex="status"
