@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal } from "antd";
-import {
-  fetchAllEmployees,
-  deleteEmployeeById,
-} from "../service/EmployeeServices";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, message, Modal, Table } from "antd";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Pages/EmployeeManagement.scss";
 import "../assets/style/Global.scss";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import "../assets/style/Pages/EmployeeManagement.scss";
+import {
+  deleteEmployeeById,
+  fetchAllEmployees,
+} from "../service/EmployeeServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -83,8 +83,9 @@ const EmployeeManagement = () => {
         type="primary"
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
+        icon={<PlusOutlined />}
       >
-        Add New Employee
+       
       </Button>
       <Table
         dataSource={paginatedData}

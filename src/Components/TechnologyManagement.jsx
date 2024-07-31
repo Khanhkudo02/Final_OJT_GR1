@@ -135,8 +135,7 @@ const TechnologyManagement = () => {
 
   return (
     <div>
-      <Button className="btn" type="primary" onClick={showAddModal}>
-        Add Technology
+      <Button className="btn" type="primary" onClick={showAddModal} icon={<PlusOutlined />}>
       </Button>
       <Table
         columns={columns}

@@ -3,22 +3,11 @@ import React, { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ResetPassword from "../src/pages/ResetPassword";
 import AccountInfo from "./Components/AccountInfo.jsx";
-import AddEmployee from "./Components/AddEmployee";
-import AddLanguage from "./Components/AddLanguage";
-import AddPosition from "./Components/AddPosition";
 import ChangePassword from "./Components/ChangePassword";
-import EditEmployee from "./Components/EditEmployee";
-import EditLanguage from "./Components/EditLanguage";
-import EditPosition from "./Components/EditPosition";
-import EmployeeDetails from "./Components/EmployeeDetails";
 import EmployeeManagement from "./Components/EmployeeManagement";
-import LanguageDetails from "./Components/LanguageDetails";
 import LanguageManagement from "./Components/LanguageManagement";
 import NewProject from "./Components/NewProject";
-import PositionDetails from "./Components/PositionDetails";
 import PositionManagement from "./Components/PositionManagement";
-import ProjectDetail from "./Components/ProjectDetail";
-import ProjectEdit from "./Components/ProjectEdit";
 import ProjectManagement from "./Components/ProjectManagement";
 import Sidebar from "./Components/Sidebar";
 import TechnologyManagement from "./Components/TechnologyManagement";
@@ -26,6 +15,18 @@ import Admin from "./pages/Admin";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
+import ProjectDetail from "./Components/ProjectDetail";
+import ArchivedProjects from "./Components/ArchivedProjects";
+import AddPosition from "./Components/AddPosition";
+import ProjectEdit from "./Components/ProjectEdit";
+import EditPosition from "./Components/EditPosition";
+import PositionDetails from "./Components/PositionDetails";
+import AddLanguage from "./Components/AddLanguage";
+import EditLanguage from "./Components/EditLanguage";
+import LanguageDetails from "./Components/LanguageDetails";
+import AddEmployee from "./Components/AddEmployee";
+import EditEmployee from "./Components/EditEmployee";
+import EmployeeDetails from "./Components/EmployeeDetails";
 
 const { Content } = Layout;
 
@@ -34,7 +35,6 @@ const App = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  // Initialize user state with local storage data
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
@@ -105,8 +105,11 @@ const App = () => {
                           path="/project/:id"
                           element={<ProjectDetail />}
                         />
-                        <Route path="/edit-project/:id" element={<ProjectEdit />} />
-
+                        <Route 
+                          path="/edit-project/:id" 
+                          element={<ProjectEdit />} 
+                        />
+                        <Route path="/archived-projects" element={<ArchivedProjects />} />
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}

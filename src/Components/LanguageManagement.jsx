@@ -77,8 +77,7 @@ const LanguageManagement = () => {
 
   return (
     <div>
-      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage}>
-        Add New Language
+      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage} icon={<PlusOutlined />}>
       </Button>
       <Table
         dataSource={paginatedData}
