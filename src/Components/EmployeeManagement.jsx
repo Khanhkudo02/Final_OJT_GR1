@@ -1,13 +1,10 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Table } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Button, Table, message, Modal } from "antd";
+import { fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServices";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Global.scss";
 import "../assets/style/Pages/EmployeeManagement.scss";
-import {
-  deleteEmployeeById,
-  fetchAllEmployees,
-} from "../service/EmployeeServices";
+import "../assets/style/Global.scss";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -21,7 +18,6 @@ const EmployeeManagement = () => {
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      // Filter employees to only include those with role 'employee'
       const filteredData = data.filter(employee => employee.role === 'employee');
       setEmployees(filteredData);
     } catch (error) {
@@ -98,10 +94,32 @@ const EmployeeManagement = () => {
             handleTableChange({ current: page, pageSize }),
         }}
       >
+        <Column
+          title="Image"
+          dataIndex="imageUrl"
+          key="imageUrl"
+          render={(text, record) => (
+            <img
+              src={record.imageUrl}
+              alt="Employee"
+              width="50"
+              height="50"
+              style={{ objectFit: "cover" }}
+            />
+          )}
+        />
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Email" dataIndex="email" key="email" />
         <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
-        <Column title="Skills" dataIndex="skills" key="skills" />
+        <Column
+          title="Skills"
+          dataIndex="skills"
+          key="skills"
+          render={(text) => {
+            // Ensure text is an array and then join with ', '
+            return Array.isArray(text) ? text.join(', ') : text;
+          }}
+        />
         <Column
           title="Status"
           dataIndex="status"
@@ -122,23 +140,20 @@ const EmployeeManagement = () => {
           render={(text, record) => (
             <span>
               <Button
-                className="edit-button"
-                type="primary"
-                onClick={() =>
-                  navigate(`/employee-management/edit/${record.key}`)
-                }
-                style={{ marginLeft: 8 }}
-              >
-                <EditOutlined />
-              </Button>
+                icon={<EyeOutlined />}
+                style={{ color: "green", borderColor: "green" }}
+                onClick={() => navigate(`/employee-management/view/${record.key}`)}
+              />
               <Button
-                className="delete-button"
-                type="danger"
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
+                onClick={() => navigate(`/employee-management/edit/${record.key}`)}
+              />
+              <Button
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
-                style={{ marginLeft: 8 }}
-              >
-                <DeleteOutlined />
-              </Button>
+              />
             </span>
           )}
         />
