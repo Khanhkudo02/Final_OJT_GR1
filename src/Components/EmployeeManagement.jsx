@@ -105,14 +105,6 @@ const EmployeeManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       ></Button>
-      {/* <Button
-        className="btn"
-        type="primary"
-        style={{ marginBottom: 16, marginLeft: 16 }}
-        onClick={exportToExcel}
-      >
-        {t("addNewEmployee")}
-      </Button> */}
       <Button
         className="btn"
         type="primary"
