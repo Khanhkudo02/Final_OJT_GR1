@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/Admin.scss";
@@ -307,7 +306,6 @@ function AdminPage() {
           icon={<PlusOutlined />}
         >
         </Button>
-        <ExportExcel data={users} fileName="File Excel" />
       </div>
       <Modal
         title={editMode ? t("editUser") : t("addUser")}

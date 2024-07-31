@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { fetchAllProjects, deleteProjectPermanently } from "../service/Project";
-import { fetchAllTechnology } from "../service/TechnologyServices";
-import { fetchAllLanguages } from "../service/LanguageServices";
 import { Button, Modal, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchAllLanguages } from "../service/LanguageServices";
+import { deleteProjectPermanently, fetchAllProjects } from "../service/Project";
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const ProjectDetail = () => {
   const { id } = useParams();

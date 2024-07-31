@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Table, Modal, Upload } from "antd";
-import { postCreateEmployee, fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServices";
 import { PlusOutlined } from "@ant-design/icons";
-import { toast } from "react-toastify";
+import { Button, Input, Modal, Select, Table, Upload } from "antd";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { deleteEmployeeById, fetchAllEmployees, postCreateEmployee } from "../service/EmployeeServices";
 
 const { Option } = Select;
 const { Column } = Table;
 
-// Define department options
 const departmentOptions = [
     { value: "accounting", label: "Accounting Department" },
     { value: "audit", label: "Audit Department" },
@@ -18,7 +18,6 @@ const departmentOptions = [
     { value: "customer_service", label: "Customer Service Department" },
 ];
 
-// Define skill options
 const skillOptions = [
     { value: "active_listening", label: "Active Listening Skills" },
     { value: "communication", label: "Communication Skills" },
@@ -33,6 +32,7 @@ const skillOptions = [
 ];
 
 const AddEmployee = () => {
+    const { t } = useTranslation();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -53,7 +53,7 @@ const AddEmployee = () => {
     const loadEmployees = async () => {
         try {
             const data = await fetchAllEmployees();
-            const filteredData = data.filter(employee => employee.role === "employee"); // Filter by role "employee"
+            const filteredData = data.filter(employee => employee.role === "employee");
             setEmployees(filteredData);
         } catch (error) {
             console.error("Failed to fetch employees:", error);
@@ -66,16 +66,16 @@ const AddEmployee = () => {
 
     const handleAddEmployee = async () => {
         if (!name || !email || !password || !dateOfBirth || !address || !phoneNumber || skills.length === 0 || !status || !department) {
-            toast.error("Please fill in all fields.");
+            toast.error(t("pleaseFillAllFields"));
             return;
         }
 
         try {
-            await postCreateEmployee(name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, "employee", imageFiles[0]); // Pass the first image file only
+            await postCreateEmployee(name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, "employee", imageFiles[0]); 
             localStorage.setItem("employeeAdded", "true");
             navigate("/employee-management");
         } catch (error) {
-            toast.error("Failed to add employee.");
+            toast.error(t("failedToAddEmployee"));
         }
     };
 
@@ -87,18 +87,16 @@ const AddEmployee = () => {
     const handleDeleteEmployee = async (id) => {
         try {
             await deleteEmployeeById(id);
-            toast.success("Employee deleted successfully!");
-            loadEmployees(); // Reload the employees list
+            toast.success(t("employeeDeleted"));
+            loadEmployees();
         } catch (error) {
-            toast.error("Failed to delete employee.");
+            toast.error(t("failedToDeleteEmployee"));
         }
     };
 
     const handlePhoneNumberChange = (e) => {
         const value = e.target.value;
-        // Remove all non-numeric characters
         const numericValue = value.replace(/\D/g, '');
-        // Limit to 10 digits
         if (numericValue.length <= 10) {
             setPhoneNumber(numericValue);
         }
@@ -106,10 +104,8 @@ const AddEmployee = () => {
 
     const handleImageChange = (info) => {
         if (info.fileList) {
-            // Save files to state
             setImageFiles(info.fileList.map(file => file.originFileObj));
 
-            // Generate preview URLs
             const previewUrls = info.fileList.map(file => {
                 if (file.originFileObj) {
                     return URL.createObjectURL(file.originFileObj);
@@ -118,14 +114,14 @@ const AddEmployee = () => {
             });
             setImagePreviews(previewUrls);
         }
-        return false; // Prevent automatic upload
+        return false;
     };
 
     return (
         <div className="add-employee">
-            <h2>Add New Employee</h2>
+            <h2>{t("addNewEmployee")}</h2>
             <div className="form-group">
-                <label>Name</label>
+                <label>{t("name")}</label>
                 <Input
                     type="text"
                     value={name}
@@ -133,7 +129,7 @@ const AddEmployee = () => {
                 />
             </div>
             <div className="form-group">
-                <label>Email</label>
+                <label>{t("email")}</label>
                 <Input
                     type="email"
                     value={email}
@@ -141,7 +137,7 @@ const AddEmployee = () => {
                 />
             </div>
             <div className="form-group">
-                <label>Password</label>
+                <label>{t("password")}</label>
                 <Input
                     type="password"
                     value={password}
@@ -149,7 +145,7 @@ const AddEmployee = () => {
                 />
             </div>
             <div className="form-group">
-                <label>Date of Birth</label>
+                <label>{t("dateOfBirth")}</label>
                 <Input
                     type="date"
                     value={dateOfBirth}
@@ -157,7 +153,7 @@ const AddEmployee = () => {
                 />
             </div>
             <div className="form-group">
-                <label>Address</label>
+                <label>{t("address")}</label>
                 <Input
                     type="text"
                     value={address}
@@ -165,7 +161,7 @@ const AddEmployee = () => {
                 />
             </div>
             <div className="form-group">
-                <label>Phone Number</label>
+                <label>{t("phoneNumber")}</label>
                 <Input
                     type="text"
                     value={phoneNumber}
@@ -174,57 +170,57 @@ const AddEmployee = () => {
                 />
             </div>
             <div className="form-group">
-                <label>Skills</label>
+                <label>{t("skills")}</label>
                 <Select
                     mode="multiple"
                     value={skills}
                     onChange={(value) => setSkills(value)}
-                    placeholder="Select Skills"
+                    placeholder={t("selectSkills")}
                 >
                     {skillOptions.map(skill => (
                         <Option key={skill.value} value={skill.value}>
-                            {skill.label}
+                            {t(skill.label)}
                         </Option>
                     ))}
                 </Select>
             </div>
             <div className="form-group">
-                <label>Status</label>
+                <label>{t("status")}</label>
                 <Select
                     value={status}
                     onChange={(value) => setStatus(value)}
-                    placeholder="Select Status"
+                    placeholder={t("selectStatus")}
                 >
-                    <Option value="active">Active</Option>
-                    <Option value="inactive">Inactive</Option>
+                    <Option value="active">{t("active")}</Option>
+                    <Option value="inactive">{t("inactive")}</Option>
                 </Select>
             </div>
             <div className="form-group">
-                <label>Department</label>
+                <label>{t("department")}</label>
                 <Select
                     value={department}
                     onChange={(value) => setDepartment(value)}
-                    placeholder="Select Department"
+                    placeholder={t("selectDepartment")}
                 >
                     {departmentOptions.map(dept => (
                         <Option key={dept.value} value={dept.value}>
-                            {dept.label}
+                            {t(dept.label)}
                         </Option>
                     ))}
                 </Select>
             </div>
             <div className="form-group">
-                <label>Images</label>
+                <label>{t("images")}</label>
                 <Upload
                     accept=".jpg,.jpeg,.png"
-                    beforeUpload={() => false} // Prevent automatic upload
+                    beforeUpload={() => false}
                     multiple
                     listType="picture"
                     onChange={handleImageChange}
                 >
                     <Button>
                         <PlusOutlined />
-                        Upload Images
+                        {t("uploadImages")}
                     </Button>
                 </Upload>
                 <div className="image-previews">
@@ -238,68 +234,68 @@ const AddEmployee = () => {
                 onClick={handleAddEmployee}
                 disabled={!name || !email || !password || !dateOfBirth || !address || !phoneNumber || skills.length === 0 || !status || !department}
             >
-                Save
+                {t("save")}
             </Button>
             <Button
                 style={{ marginLeft: 8 }}
                 onClick={() => navigate("/employee-management")}
             >
-                Back to Employee Management
+                {t("backToEmployeeManagement")}
             </Button>
 
-            <h2>Existing Employees</h2>
+            <h2>{t("existingEmployees")}</h2>
             <Table dataSource={employees} rowKey="key" pagination={false}>
-                <Column title="Name" dataIndex="name" key="name" />
-                <Column title="Email" dataIndex="email" key="email" />
-                <Column title="Date of Birth" dataIndex="dateOfBirth" key="dateOfBirth" />
-                <Column title="Address" dataIndex="address" key="address" />
-                <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
+                <Column title={t("name")} dataIndex="name" key="name" />
+                <Column title={t("email")} dataIndex="email" key="email" />
+                <Column title={t("dateOfBirth")} dataIndex="dateOfBirth" key="dateOfBirth" />
+                <Column title={t("address")} dataIndex="address" key="address" />
+                <Column title={t("phoneNumber")} dataIndex="phoneNumber" key="phoneNumber" />
                 <Column
-                    title="Skills"
+                    title={t("skills")}
                     dataIndex="skills"
                     key="skills"
                     render={(skills) => (Array.isArray(skills) ? skills.join(', ') : '')}
                 />
-                <Column title="Status" dataIndex="status" key="status" />
-                <Column title="Department" dataIndex="department" key="department" />
+                <Column title={t("status")} dataIndex="status" key="status" />
+                <Column title={t("department")} dataIndex="department" key="department" />
                 <Column
-                    title="Actions"
+                    title={t("actions")}
                     key="actions"
                     render={(text, record) => (
                         <div>
-                            <Button onClick={() => handleViewEmployee(record)}>View</Button>
+                            <Button onClick={() => handleViewEmployee(record)}>{t("view")}</Button>
                             <Button
                                 onClick={() => handleDeleteEmployee(record.key)}
                                 disabled={record.status !== "inactive"}
                                 style={{ marginLeft: 8 }}
                             >
-                                Delete
+                                {t("delete")}
                             </Button>
                         </div>
                     )}
                 />
             </Table>
             <Modal
-                title="View Employee"
+                title={t("viewEmployee")}
                 visible={viewModalVisible}
                 onCancel={() => setViewModalVisible(false)}
                 footer={[
                     <Button key="close" onClick={() => setViewModalVisible(false)}>
-                        Close
+                        {t("close")}
                     </Button>,
                 ]}
             >
                 {selectedEmployee && (
                     <div>
-                        <p>Name: {selectedEmployee.name}</p>
-                        <p>Email: {selectedEmployee.email}</p>
-                        <p>Date of Birth: {selectedEmployee.dateOfBirth}</p>
-                        <p>Address: {selectedEmployee.address}</p>
-                        <p>Phone Number: {selectedEmployee.phoneNumber}</p>
-                        <p>Skills: {Array.isArray(selectedEmployee.skills) ? selectedEmployee.skills.join(', ') : ''}</p>
-                        <p>Status: {selectedEmployee.status}</p>
-                        <p>Department: {selectedEmployee.department}</p>
-                        <p>Image:</p>
+                        <p>{t("name")}: {selectedEmployee.name}</p>
+                        <p>{t("email")}: {selectedEmployee.email}</p>
+                        <p>{t("dateOfBirth")}: {selectedEmployee.dateOfBirth}</p>
+                        <p>{t("address")}: {selectedEmployee.address}</p>
+                        <p>{t("phoneNumber")}: {selectedEmployee.phoneNumber}</p>
+                        <p>{t("skills")}: {Array.isArray(selectedEmployee.skills) ? selectedEmployee.skills.join(', ') : ''}</p>
+                        <p>{t("status")}: {selectedEmployee.status}</p>
+                        <p>{t("department")}: {selectedEmployee.department}</p>
+                        <p>{t("image")}:</p>
                         {selectedEmployee.imageUrl && <img src={selectedEmployee.imageUrl} alt="Employee" width="100%" />}
                     </div>
                 )}
