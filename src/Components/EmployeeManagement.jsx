@@ -5,10 +5,13 @@ import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
+  ExportOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { useTranslation } from "react-i18next";
+import { Document, Packer, Paragraph, TextRun } from "docx";
+import { saveAs } from "file-saver";
 import {
   fetchAllEmployees,
   deleteEmployeeById,
@@ -95,6 +98,50 @@ const EmployeeManagement = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  const exportToWord = () => {
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: employees.map((employee) => new Paragraph({
+            children: [
+              new TextRun(`Name: ${employee.name}`),
+              new TextRun({
+                text: '\n',
+                break: 1,
+              }),
+              new TextRun(`Email: ${employee.email}`),
+              new TextRun({
+                text: '\n',
+                break: 1,
+              }),
+              new TextRun(`Phone Number: ${employee.phoneNumber}`),
+              new TextRun({
+                text: '\n',
+                break: 1,
+              }),
+              new TextRun(`Skills: ${employee.skills.join(', ')}`),
+              new TextRun({
+                text: '\n',
+                break: 1,
+              }),
+              new TextRun(`Status: ${employee.status}`),
+              new TextRun({
+                text: '\n\n',
+                break: 2,
+              }),
+            ],
+          })),
+        },
+      ],
+    });
+
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, `${t("employees")}_CVs.docx`);
+    });
+  };
+
 
   return (
     <div>
@@ -205,6 +252,11 @@ const EmployeeManagement = () => {
                 icon={<DeleteOutlined />}
                 style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
+              />
+              <Button
+                icon={<ExportOutlined />}
+                style={{ color: "black", borderColor: "black" }}
+                onClick={() => exportToWord()}
               />
             </Space>
           )}
