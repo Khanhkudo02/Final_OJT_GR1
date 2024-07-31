@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { fetchEmployeeById } from "../service/EmployeeServices";
 import { Button, Spin, message } from "antd";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchEmployeeById } from "../service/EmployeeServices";
 
 const EmployeeDetails = () => {
   const { id } = useParams();
@@ -18,7 +18,7 @@ const EmployeeDetails = () => {
         setEmployee(data);
         setLoading(false);
       } catch (error) {
-        message.error("Failed to fetch employee details.");
+        message.error(t("failedToFetchEmployeeDetails"));
         setLoading(false);
       }
     };
@@ -39,7 +39,7 @@ const EmployeeDetails = () => {
     ? employee.skills.map(formatSkill).join(", ")
     : employee.skills
     ? formatSkill(employee.skills)
-    : "No skills";
+    : t("noSkills");
 
   const formatDepartment = (department) => {
     if (typeof department === "string") {
@@ -60,7 +60,7 @@ const EmployeeDetails = () => {
               <strong>{t('image')}:</strong>
               <img
                 src={employee.imageUrl}
-                alt="Employee"
+                alt={t('employeeImage')}
                 width="100"
                 height="100"
                 style={{ objectFit: "cover", marginLeft: "10px" }}
