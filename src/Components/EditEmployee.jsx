@@ -1,43 +1,45 @@
-import React, { useState, useEffect } from "react";
-import { Input, Select, Upload, Button } from "antd";
-import { toast } from "react-toastify";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  putUpdateEmployee,
-  fetchEmployeeById,
-} from "../service/EmployeeServices";
 import { PlusOutlined } from "@ant-design/icons";
+import { Button, Input, Select, Upload } from "antd";
 import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  fetchEmployeeById,
+  putUpdateEmployee,
+} from "../service/EmployeeServices";
 
 const { Option } = Select;
 
 // Define department options
 const departmentOptions = [
-  { value: "accounting", label: "Accounting Department" },
-  { value: "audit", label: "Audit Department" },
-  { value: "sales", label: "Sales Department" },
-  { value: "administration", label: "Administration Department" },
-  { value: "hr", label: "Human Resources Department" },
-  { value: "customer_service", label: "Customer Service Department" },
+  { value: "accounting", label: "accounting" },
+  { value: "audit", label: "audit" },
+  { value: "sales", label: "sales" },
+  { value: "administration", label: "administration" },
+  { value: "hr", label: "hr" },
+  { value: "customer_service", label: "customer_service" },
 ];
 
 // Define skill options
 const skillOptions = [
-  { value: "active_listening", label: "Active Listening Skills" },
-  { value: "communication", label: "Communication Skills" },
-  { value: "computer", label: "Computer Skills" },
-  { value: "customer_service", label: "Customer Service Skills" },
-  { value: "interpersonal", label: "Interpersonal Skills" },
-  { value: "leadership", label: "Leadership Skills" },
-  { value: "management", label: "Management Skills" },
-  { value: "problem_solving", label: "Problem-Solving Skills" },
-  { value: "time_management", label: "Time Management Skills" },
-  { value: "transferable", label: "Transferable Skills" },
+  { value: "active_listening", label: "active_listening" },
+  { value: "communication", label: "communication" },
+  { value: "computer", label: "computer" },
+  { value: "customer_service", label: "customer_service" },
+  { value: "interpersonal", label: "interpersonal" },
+  { value: "leadership", label: "leadership" },
+  { value: "management", label: "management" },
+  { value: "problem_solving", label: "problem_solving" },
+  { value: "time_management", label: "time_management" },
+  { value: "transferable", label: "transferable" },
 ];
 
 const EditEmployee = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation(); // useTranslation hook
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -66,15 +68,15 @@ const EditEmployee = () => {
           setSkills(employee.skills || []);
           setOldImageUrl(employee.imageUrl || ""); // Set old image URL
         } else {
-          toast.error("Employee not found.");
+          toast.error(t("employeeNotFound"));
         }
       } catch (error) {
-        toast.error("Failed to fetch employee data.");
+        toast.error(t("failedToFetchEmployeeData"));
       }
     };
 
     loadEmployee();
-  }, [id]);
+  }, [id, t]);
 
   const handlePhoneNumberChange = (e) => {
     const value = e.target.value;
@@ -97,7 +99,7 @@ const EditEmployee = () => {
       !phoneNumber ||
       skills.length === 0
     ) {
-      toast.error("Please fill in all fields.");
+      toast.error(t("pleaseFillAllFields"));
       return;
     }
 
@@ -115,10 +117,10 @@ const EditEmployee = () => {
         imageFile,
         oldImageUrl // Pass old image URL for deletion
       );
-      toast.success("Employee updated successfully!");
+      toast.success(t("employeeUpdatedSuccessfully"));
       navigate("/employee-management");
     } catch (error) {
-      toast.error("Failed to update employee.");
+      toast.error(t("failedToUpdateEmployee"));
       console.error("Error details:", error);
     }
   };
@@ -140,53 +142,53 @@ const EditEmployee = () => {
 
   return (
     <div>
-      <h2>Edit Employee</h2>
+      <h2>{t("editEmployee")}</h2>
 
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
-          placeholder="Name"
+          placeholder={t("name")}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
       <div className="form-group">
-        <label>Email</label>
+        <label>{t("email")}</label>
         <Input
-          placeholder="Email"
+          placeholder={t("email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled
         />
       </div>
       <div className="form-group">
-        <label>Department</label>
+        <label>{t("department")}</label>
         <Select
           mode="multiple"
-          placeholder="Select Department"
+          placeholder={t("department")}
           value={department}
           onChange={(value) => setDepartment(value)}
         >
           {departmentOptions.map((dept) => (
             <Option key={dept.value} value={dept.value}>
-              {dept.label}
+              {t(dept.label)}
             </Option>
           ))}
         </Select>
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("status")}</label>
         <Select
-          placeholder="Select Status"
+          placeholder={t("status")}
           value={status}
           onChange={(value) => setStatus(value)}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
+          <Option value="active">{t("active")}</Option>
+          <Option value="inactive">{t("inactive")}</Option>
         </Select>
       </div>
       <div className="form-group">
-        <label>Date of Birth</label>
+        <label>{t("dateOfBirth")}</label>
         <Input
           type="date"
           value={moment(dateOfBirth).format("YYYY-MM-DD")}
@@ -194,46 +196,46 @@ const EditEmployee = () => {
         />
       </div>
       <div className="form-group">
-        <label>Address</label>
+        <label>{t("address")}</label>
         <Input
-          placeholder="Address"
+          placeholder={t("address")}
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
       </div>
       <div className="form-group">
-        <label>Phone Number</label>
+        <label>{t("phoneNumber")}</label>
         <Input
-          placeholder="Phone Number"
+          placeholder={t("phoneNumber")}
           value={phoneNumber}
           onChange={handlePhoneNumberChange}
           maxLength={10}
         />
       </div>
       <div className="form-group">
-        <label>Skills</label>
+        <label>{t("skills")}</label>
         <Select
           mode="multiple"
-          placeholder="Select Skills"
+          placeholder={t("skills")}
           value={skills}
           onChange={(value) => setSkills(value)}
         >
           {skillOptions.map((skill) => (
             <Option key={skill.value} value={skill.value}>
-              {skill.label}
+              {t(skill.label)}
             </Option>
           ))}
         </Select>
       </div>
       <div className="form-group">
-        <label>Upload Image</label>
+        <label>{t("uploadImage")}</label>
         <Upload
           accept=".jpg,.jpeg,.png"
           beforeUpload={beforeUpload}
           listType="picture"
           showUploadList={false}
         >
-          <Button icon={<PlusOutlined />}>Upload Image</Button>
+          <Button icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
         </Upload>
         {imagePreview && (
           <div style={{ marginTop: 16 }}>
@@ -255,13 +257,13 @@ const EditEmployee = () => {
           skills.length === 0
         }
       >
-        Save
+        {t("save")}
       </Button>
       <Button
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/employee-management")}
       >
-        Back to Employee Management
+        {t("backToEmployeeManagement")}
       </Button>
     </div>
   );

@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from "react";
+import { UploadOutlined } from "@ant-design/icons";
 import {
-  Form,
-  Input,
   Button,
-  Select,
   Checkbox,
   DatePicker,
+  Form,
+  Input,
   InputNumber,
   message,
-  Upload,
-  Space,
+  Select,
+  Upload
 } from "antd";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { postCreateProject } from "../service/Project";
-import { UploadOutlined } from "@ant-design/icons";
-import { fetchAllTechnology } from "../service/TechnologyServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
+import { postCreateProject } from "../service/Project";
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Option } = Select;
 const { TextArea } = Input;

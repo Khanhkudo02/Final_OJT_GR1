@@ -1,23 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal } from "antd";
 import {
-  fetchAllEmployees,
-  deleteEmployeeById,
-} from "../service/EmployeeServices";
-import { useNavigate } from "react-router-dom";
-import "../assets/style/Pages/EmployeeManagement.scss";
-import "../assets/style/Global.scss";
-import {
-  EyeOutlined,
-  EditOutlined,
   DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import { Button, message, Modal, Table } from "antd";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
+import { useTranslation } from "react-i18next";
+import "../assets/style/Global.scss";
+import "../assets/style/Pages/EmployeeManagement.scss";
+import {
+  deleteEmployeeById,
+  fetchAllEmployees,
+} from "../service/EmployeeServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
 
 const EmployeeManagement = () => {
+  const { t } = useTranslation();
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -31,7 +34,7 @@ const EmployeeManagement = () => {
       );
       setEmployees(filteredData);
     } catch (error) {
-      console.error("Failed to fetch employees:", error);
+      console.error(t("errorFetchingEmployees"), error);
     }
   };
 
@@ -40,10 +43,10 @@ const EmployeeManagement = () => {
 
     const employeeAdded = localStorage.getItem("employeeAdded");
     if (employeeAdded === "true") {
-      message.success("Employee added successfully!");
+      message.success(t("employeeAddedSuccessfully"));
       localStorage.removeItem("employeeAdded");
     }
-  }, []);
+  }, [t]);
 
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);
@@ -56,25 +59,36 @@ const EmployeeManagement = () => {
 
   const handleDelete = (record) => {
     if (record.status !== "inactive") {
-      message.error("Only inactive employees can be deleted.");
+      message.error(t("onlyInactiveEmployeesCanBeDeleted"));
       return;
     }
 
     confirm({
-      title: "Are you sure you want to delete this employee?",
+      title: t("confirmDeleteEmployee"),
       onOk: async () => {
         try {
           await deleteEmployeeById(record.key);
-          message.success("Employee deleted successfully!");
+          message.success(t("employeeDeletedSuccessfully"));
           loadEmployees();
         } catch (error) {
-          message.error("Failed to delete employee.");
+          message.error(t("failedToDeleteEmployee"));
         }
       },
       onCancel() {
-        console.log("Cancel");
+        console.log(t("cancel"));
       },
     });
+  };
+
+  const exportToExcel = () => {
+    const filteredEmployees = employees.map(
+      ({ key, createdAt, password, imageUrl, isAdmin, ...rest }) => rest
+    );
+
+    const ws = XLSX.utils.json_to_sheet(filteredEmployees);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, t("employees"));
+    XLSX.writeFile(wb, `${t("employees")}.xlsx`);
   };
 
   const paginatedData = employees.slice(
@@ -91,6 +105,14 @@ const EmployeeManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       ></Button>
+      <Button
+        className="btn"
+        type="primary"
+        style={{ marginBottom: 16, marginLeft: 16 }}
+        onClick={exportToExcel}
+      >
+        {t("exportToExcel")}
+      </Button>
       <Table
         dataSource={paginatedData}
         rowKey="key"
@@ -103,37 +125,36 @@ const EmployeeManagement = () => {
         }}
       >
         <Column
-          title="Image"
+          title={t("image")}
           dataIndex="imageUrl"
           key="imageUrl"
           render={(text, record) => (
             <img
               src={record.imageUrl}
-              alt="Employee"
+              alt={t("employee")}
               width="50"
               height="50"
               style={{ objectFit: "cover" }}
             />
           )}
         />
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Email" dataIndex="email" key="email" />
+        <Column title={t("name")} dataIndex="name" key="name" />
+        <Column title={t("email")} dataIndex="email" key="email" />
         <Column
-          title="Phone Number"
+          title={t("phoneNumber")}
           dataIndex="phoneNumber"
           key="phoneNumber"
         />
         <Column
-          title="Skills"
+          title={t("skills")}
           dataIndex="skills"
           key="skills"
           render={(text) => {
-            // Ensure text is an array and then join with ', '
             return Array.isArray(text) ? text.join(", ") : text;
           }}
         />
         <Column
-          title="Status"
+          title={t("status")}
           dataIndex="status"
           key="status"
           render={(text) => {
@@ -147,7 +168,7 @@ const EmployeeManagement = () => {
           }}
         />
         <Column
-          title="Actions"
+          title={t("actions")}
           key="actions"
           render={(text, record) => (
             <span>
