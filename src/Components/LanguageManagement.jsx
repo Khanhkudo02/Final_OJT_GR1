@@ -112,19 +112,19 @@ const LanguageManagement = () => {
           key="actions"
           render={(text, record) => (
             <Space>
-              <Button 
-                icon={<EyeOutlined />} 
-                style={{ color: "green", borderColor: "green" }} 
+              <Button
+                icon={<EyeOutlined />}
+                style={{ color: "green", borderColor: "green" }}
                 onClick={() => navigate(`/programing-language/view/${record.key}`)}
               />
-              <Button 
-                icon={<EditOutlined />} 
-                style={{ color: "blue", borderColor: "blue" }} 
+              <Button
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
                 onClick={() => navigate(`/programing-language/edit/${record.key}`)}
               />
-              <Button 
-                icon={<DeleteOutlined />} 
-                style={{ color: "red", borderColor: "red" }} 
+              <Button
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
               />
             </Space>

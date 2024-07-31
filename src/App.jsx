@@ -3,11 +3,14 @@ import React, { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ResetPassword from "../src/pages/ResetPassword";
 import AccountInfo from "./Components/AccountInfo.jsx";
+import AddEmployee from "./Components/AddEmployee";
 import AddLanguage from "./Components/AddLanguage";
 import AddPosition from "./Components/AddPosition";
 import ChangePassword from "./Components/ChangePassword";
+import EditEmployee from "./Components/EditEmployee";
 import EditLanguage from "./Components/EditLanguage";
 import EditPosition from "./Components/EditPosition";
+import EmployeeDetails from "./Components/EmployeeDetails";
 import EmployeeManagement from "./Components/EmployeeManagement";
 import LanguageDetails from "./Components/LanguageDetails";
 import LanguageManagement from "./Components/LanguageManagement";
@@ -81,6 +84,18 @@ const App = () => {
                         <Route
                           path="/employee-management"
                           element={<EmployeeManagement />}
+                        />
+                        <Route
+                          path="/employee-management/add"
+                          element={<AddEmployee />}
+                        />
+                        <Route
+                          path="/employee-management/edit/:id"
+                          element={<EditEmployee />}
+                        />
+                        <Route
+                          path="/employee-management/view/:id"
+                          element={<EmployeeDetails />}
                         />
                         <Route
                           path="/project-management"
