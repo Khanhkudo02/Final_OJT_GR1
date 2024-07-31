@@ -39,6 +39,15 @@ const EmployeeDetails = () => {
     ? formatSkill(employee.skills)
     : "No skills";
 
+  const formatDepartment = (department) => {
+    if (typeof department === "string") {
+      return department
+        .replace(/_/g, " ") // Thay dấu "_" bằng dấu cách
+        .replace(/\b\w/g, (char) => char.toUpperCase()); // Viết hoa chữ cái đầu
+    }
+    return department; // Nếu department không phải là chuỗi, trả về giá trị gốc
+  };
+
   return (
     <div className="employee-details">
       <h2>Employee Details</h2>
@@ -69,7 +78,7 @@ const EmployeeDetails = () => {
             <strong>Skills:</strong> {formattedSkills}
           </p>
           <p>
-            <strong>Department:</strong> {employee.department}
+            <strong>Department:</strong> {formatDepartment(employee.department)}
           </p>
           <p>
             <strong>Status:</strong>

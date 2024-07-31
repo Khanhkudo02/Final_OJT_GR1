@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Button, Table, message, Modal, Space } from "antd";
-import { fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServices";
+import {
+  fetchAllEmployees,
+  deleteEmployeeById,
+} from "../service/EmployeeServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/EmployeeManagement.scss";
 import "../assets/style/Global.scss";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -18,7 +26,9 @@ const EmployeeManagement = () => {
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      const filteredData = data.filter(employee => employee.role === 'employee');
+      const filteredData = data
+        .filter((employee) => employee.role === "employee")
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp theo createdAt
       setEmployees(filteredData);
     } catch (error) {
       console.error("Failed to fetch employees:", error);
@@ -80,9 +90,7 @@ const EmployeeManagement = () => {
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
         icon={<PlusOutlined />}
-      >
-       
-      </Button>
+      ></Button>
       <Table
         dataSource={paginatedData}
         rowKey="key"
@@ -108,9 +116,18 @@ const EmployeeManagement = () => {
             />
           )}
         />
-        <Column className="length-cell" title="Name" dataIndex="name" key="name" />
+        <Column
+          className="length-cell"
+          title="Name"
+          dataIndex="name"
+          key="name"
+        />
         <Column title="Email" dataIndex="email" key="email" />
-        <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
+        <Column
+          title="Phone Number"
+          dataIndex="phoneNumber"
+          key="phoneNumber"
+        />
         <Column
           className="length-cell"
           title="Skills"
@@ -119,14 +136,18 @@ const EmployeeManagement = () => {
           render={(text) => {
             if (Array.isArray(text)) {
               return text
-                .map(skill => 
+                .map((skill) =>
                   skill
-                    .replace(/_/g, ' ')
-                    .split(' ')
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                    .join(' ')
+                    .replace(/_/g, " ")
+                    .split(" ")
+                    .map(
+                      (word) =>
+                        word.charAt(0).toUpperCase() +
+                        word.slice(1).toLowerCase()
+                    )
+                    .join(" ")
                 )
-                .join(', ');
+                .join(", ");
             }
             return text;
           }}
@@ -154,12 +175,16 @@ const EmployeeManagement = () => {
               <Button
                 icon={<EyeOutlined />}
                 style={{ color: "green", borderColor: "green" }}
-                onClick={() => navigate(`/employee-management/view/${record.key}`)}
+                onClick={() =>
+                  navigate(`/employee-management/view/${record.key}`)
+                }
               />
               <Button
                 icon={<EditOutlined />}
                 style={{ color: "blue", borderColor: "blue" }}
-                onClick={() => navigate(`/employee-management/edit/${record.key}`)}
+                onClick={() =>
+                  navigate(`/employee-management/edit/${record.key}`)
+                }
               />
               <Button
                 icon={<DeleteOutlined />}
