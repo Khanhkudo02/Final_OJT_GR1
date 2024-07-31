@@ -14,6 +14,7 @@ import { NavLink } from "react-router-dom";
 import "../assets/style/Pages/Sidebar.scss";
 import LogoutButton from "./LogoutButton";
 import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const { Sider } = Layout;
 
@@ -81,6 +82,10 @@ const Sidebar = ({ role }) => {
     },
     {
       key: "8",
+      label: <LanguageSwitcher collapsed={collapsed} />,
+    },
+    {
+      key: "9",
       label: <LogoutButton collapsed={collapsed} />,
     },
   ];
