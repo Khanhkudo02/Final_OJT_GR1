@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Button, Table, message, Modal } from "antd";
-import { fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServices";
+import {
+  fetchAllEmployees,
+  deleteEmployeeById,
+} from "../service/EmployeeServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/EmployeeManagement.scss";
 import "../assets/style/Global.scss";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -18,7 +26,9 @@ const EmployeeManagement = () => {
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      const filteredData = data.filter(employee => employee.role === 'employee');
+      const filteredData = data.filter(
+        (employee) => employee.role === "employee"
+      );
       setEmployees(filteredData);
     } catch (error) {
       console.error("Failed to fetch employees:", error);
@@ -80,9 +90,7 @@ const EmployeeManagement = () => {
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
         icon={<PlusOutlined />}
-      >
-       
-      </Button>
+      ></Button>
       <Table
         dataSource={paginatedData}
         rowKey="key"
@@ -110,14 +118,18 @@ const EmployeeManagement = () => {
         />
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Email" dataIndex="email" key="email" />
-        <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
+        <Column
+          title="Phone Number"
+          dataIndex="phoneNumber"
+          key="phoneNumber"
+        />
         <Column
           title="Skills"
           dataIndex="skills"
           key="skills"
           render={(text) => {
             // Ensure text is an array and then join with ', '
-            return Array.isArray(text) ? text.join(', ') : text;
+            return Array.isArray(text) ? text.join(", ") : text;
           }}
         />
         <Column
@@ -142,12 +154,16 @@ const EmployeeManagement = () => {
               <Button
                 icon={<EyeOutlined />}
                 style={{ color: "green", borderColor: "green" }}
-                onClick={() => navigate(`/employee-management/view/${record.key}`)}
+                onClick={() =>
+                  navigate(`/employee-management/view/${record.key}`)
+                }
               />
               <Button
                 icon={<EditOutlined />}
                 style={{ color: "blue", borderColor: "blue" }}
-                onClick={() => navigate(`/employee-management/edit/${record.key}`)}
+                onClick={() =>
+                  navigate(`/employee-management/edit/${record.key}`)
+                }
               />
               <Button
                 icon={<DeleteOutlined />}
