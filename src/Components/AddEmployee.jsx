@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { Column } = Table;
@@ -42,6 +43,7 @@ const skillOptions = [
 ];
 
 const AddEmployee = () => {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -163,7 +165,7 @@ const AddEmployee = () => {
     <div className="add-employee">
       <h2>Add New Employee</h2>
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
           type="text"
           value={name}
@@ -179,7 +181,7 @@ const AddEmployee = () => {
         />
       </div>
       <div className="form-group">
-        <label>Password</label>
+        <label>{t("password")}</label>
         <Input
           type="password"
           value={password}
@@ -187,7 +189,7 @@ const AddEmployee = () => {
         />
       </div>
       <div className="form-group">
-        <label>Date of Birth</label>
+        <label>{t("dateOfBirth")}</label>
         <Input
           type="date"
           value={dateOfBirth}
@@ -195,7 +197,7 @@ const AddEmployee = () => {
         />
       </div>
       <div className="form-group">
-        <label>Address</label>
+        <label>{t("address")}</label>
         <Input
           type="text"
           value={address}
@@ -203,7 +205,7 @@ const AddEmployee = () => {
         />
       </div>
       <div className="form-group">
-        <label>Phone Number</label>
+        <label>{t("phoneNumber")}</label>
         <Input
           type="text"
           value={phoneNumber}
@@ -212,7 +214,7 @@ const AddEmployee = () => {
         />
       </div>
       <div className="form-group">
-        <label>Skills</label>
+        <label>{t("skills")}</label>
         <Select
           mode="multiple"
           value={skills}
@@ -228,18 +230,18 @@ const AddEmployee = () => {
         </Select>
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("status")}</label>
         <Select
           value={status}
           onChange={(value) => setStatus(value)}
           placeholder="Select Status"
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
+          <Option value="active">{t("active")}</Option>
+          <Option value="inactive">{t("inactive")}</Option>
         </Select>
       </div>
       <div className="form-group">
-        <label>Department</label>
+        <label>{t("department")}</label>
         <Select
           value={department}
           onChange={(value) => setDepartment(value)}
@@ -254,7 +256,7 @@ const AddEmployee = () => {
         </Select>
       </div>
       <div className="form-group">
-        <label>Images</label>
+        <label>{t("images")}</label>
         <Upload
           accept=".jpg,.jpeg,.png"
           beforeUpload={() => false} // Prevent automatic upload
@@ -264,7 +266,7 @@ const AddEmployee = () => {
         >
           <Button>
             <PlusOutlined />
-            Upload Images
+            {t("uploadImages")}
           </Button>
         </Upload>
         <div className="image-previews">
@@ -293,33 +295,33 @@ const AddEmployee = () => {
           !department
         }
       >
-        Save
+        {t("save")}
       </Button>
       <Button
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/employee-management")}
       >
-        Back to Employee Management
+        {t("backToEmployeeManagement")}
       </Button>
 
-      <h2>Existing Employees</h2>
+      <h2>{t("existingEmployees")}</h2>
       <Table dataSource={employees} rowKey="key" pagination={false}>
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Email" dataIndex="email" key="email" />
+        <Column title={t("name")} dataIndex="name" key="name" />
+        <Column title={t("email")} dataIndex="email" key="email" />
         <Column
-          title="Date of Birth"
+          title={t("dateOfBirth")}
           dataIndex="dateOfBirth"
           key="dateOfBirth"
         />
-        <Column title="Address" dataIndex="address" key="address" />
+        <Column title={t("address")} dataIndex="address" key="address" />
         <Column
-          title="Phone Number"
+          title={t("phoneNumber")}
           dataIndex="phoneNumber"
           key="phoneNumber"
         />
         <Column
           className="length-cell"
-          title="Skills"
+          title={t("skills")}
           dataIndex="skills"
           key="skills"
           render={(text) => {
@@ -342,7 +344,7 @@ const AddEmployee = () => {
           }}
         />
         <Column
-          title="Status"
+          title={t("status")}
           dataIndex="status"
           key="status"
           render={(text) => {
@@ -357,7 +359,7 @@ const AddEmployee = () => {
         />
         {/* <Column title="Department" dataIndex="department" key="department" /> */}
         <Column
-          title="Department"
+          title={t("department")}
           dataIndex="department"
           key="department"
           render={(text) => {
@@ -378,7 +380,7 @@ const AddEmployee = () => {
         />
 
         <Column
-          title="Actions"
+          title={t("actions")}
           key="actions"
           render={(text, record) => (
             <Space>
@@ -397,24 +399,24 @@ const AddEmployee = () => {
         />
       </Table>
       <Modal
-        title="View Employee"
+        title={t("viewEmployee")}
         open={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>
-            Close
+            {t("close")}
           </Button>,
         ]}
       >
         {selectedEmployee && (
           <div>
-            <p>Name: {selectedEmployee.name}</p>
-            <p>Email: {selectedEmployee.email}</p>
-            <p>Date of Birth: {selectedEmployee.dateOfBirth}</p>
-            <p>Address: {selectedEmployee.address}</p>
-            <p>Phone Number: {selectedEmployee.phoneNumber}</p>
+            <p>{t("name")}: {selectedEmployee.name}</p>
+            <p>{t("email")}: {selectedEmployee.email}</p>
+            <p>{t("dateOfBirth")}: {selectedEmployee.dateOfBirth}</p>
+            <p>{t("address")}: {selectedEmployee.address}</p>
+            <p>{t("phoneNumber")}: {selectedEmployee.phoneNumber}</p>
             <p>
-              Skills:{" "}
+              {t("skills")}:{" "}
               {Array.isArray(selectedEmployee.skills)
                 ? selectedEmployee.skills
                     .map(
@@ -433,7 +435,7 @@ const AddEmployee = () => {
                 : ""}
             </p>
             <p>
-              Status:{" "}
+              {t("status")}:{" "}
               {selectedEmployee.status
                 ? selectedEmployee.status.charAt(0).toUpperCase() +
                   selectedEmployee.status.slice(1).toLowerCase()
@@ -441,7 +443,7 @@ const AddEmployee = () => {
             </p>
 
             <p>
-              Department:{" "}
+              {t("department")}:{" "}
               {selectedEmployee.department
                 ? selectedEmployee.department
                     .replace(/_/g, " ") // Thay thế dấu gạch dưới bằng dấu cách
@@ -454,7 +456,7 @@ const AddEmployee = () => {
                     .join(" ") // Kết hợp các từ lại thành chuỗi với dấu cách giữa các từ
                 : ""}
             </p>
-            <p>Image:</p>
+            <p>{t("images")}:</p>
             {selectedEmployee.imageUrl && (
               <img
                 src={selectedEmployee.imageUrl}

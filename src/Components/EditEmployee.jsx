@@ -8,6 +8,7 @@ import {
 } from "../service/EmployeeServices";
 import { PlusOutlined } from "@ant-design/icons";
 import moment from "moment";
+import { useTranslation } from 'react-i18next';
 
 const { Option } = Select;
 
@@ -38,7 +39,7 @@ const skillOptions = [
 const EditEmployee = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [department, setDepartment] = useState([]);
@@ -145,28 +146,28 @@ const EditEmployee = () => {
 
   return (
     <div>
-      <h2>Edit Employee</h2>
+      <h2>{t("editEmployee")}</h2>
 
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
-          placeholder="Name"
+          placeholder={t("name")}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
       <div className="form-group">
-        <label>Email</label>
+        <label>{t("email")}</label>
         <Input
-          placeholder="Email"
+          placeholder={t("email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
       <div className="form-group">
-        <label>Department</label>
+        <label>{t("department")}</label>
         <Select
-          placeholder="Select Department"
+          placeholder={t("department")}
           value={department}
           onChange={(value) => setDepartment(value)}
         >
@@ -178,9 +179,9 @@ const EditEmployee = () => {
         </Select>
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("status")}</label>
         <Select
-          placeholder="Select Status"
+          placeholder={t("status")}
           value={status}
           onChange={(value) => setStatus(value)}
         >
@@ -189,7 +190,7 @@ const EditEmployee = () => {
         </Select>
       </div>
       <div className="form-group">
-        <label>Date of Birth</label>
+        <label>{t("dateOfBirth")}</label>
         <Input
           type="date"
           value={moment(dateOfBirth).format("YYYY-MM-DD")}
@@ -197,27 +198,27 @@ const EditEmployee = () => {
         />
       </div>
       <div className="form-group">
-        <label>Address</label>
+        <label>{t("address")}</label>
         <Input
-          placeholder="Address"
+          placeholder={t("address")}
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
       </div>
       <div className="form-group">
-        <label>Phone Number</label>
+        <label>{t("phoneNumber")}</label>
         <Input
-          placeholder="Phone Number"
+          placeholder={t("phoneNumber")}
           value={phoneNumber}
           onChange={handlePhoneNumberChange}
           maxLength={10}
         />
       </div>
       <div className="form-group">
-        <label>Skills</label>
+        <label>{t("skills")}</label>
         <Select
           mode="multiple"
-          placeholder="Select Skills"
+          placeholder={t("skills")}
           value={skills}
           onChange={(value) => setSkills(value)}
         >
@@ -229,7 +230,7 @@ const EditEmployee = () => {
         </Select>
       </div>
       <div className="form-group">
-        <label>Upload Image</label>
+        <label>{t("uploadImage")}</label>
         <Upload
           accept=".jpg,.jpeg,.png"
           beforeUpload={beforeUpload}
@@ -238,7 +239,7 @@ const EditEmployee = () => {
           listType="picture"
           showUploadList={false}
         >
-          <Button icon={<PlusOutlined />}>Upload Image</Button>
+          <Button icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
         </Upload>
         {fileList.length > 0 && (
           <div style={{ marginTop: 16 }}>
@@ -260,13 +261,13 @@ const EditEmployee = () => {
           skills.length === 0
         }
       >
-        Save
+        {t("save")}
       </Button>
       <Button
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/employee-management")}
       >
-        Back to Employee Management
+        {t("backToEmployeeManagement")}
       </Button>
     </div>
   );

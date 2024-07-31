@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchEmployeeById } from "../service/EmployeeServices";
 import { Button, Spin, message } from "antd";
+import { useTranslation } from 'react-i18next';
 
 const EmployeeDetails = () => {
   const { id } = useParams();
   const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadEmployee = async () => {
@@ -22,7 +24,7 @@ const EmployeeDetails = () => {
     };
 
     loadEmployee();
-  }, [id]);
+  }, [id, t]);
 
   if (loading) return <Spin size="large" />;
 
@@ -50,12 +52,12 @@ const EmployeeDetails = () => {
 
   return (
     <div className="employee-details">
-      <h2>Employee Details</h2>
+      <h2>{t('employeeDetails')}</h2>
       {employee ? (
         <div>
           {employee.imageUrl && (
             <div>
-              <strong>Image:</strong>
+              <strong>{t('image')}:</strong>
               <img
                 src={employee.imageUrl}
                 alt="Employee"
@@ -66,22 +68,22 @@ const EmployeeDetails = () => {
             </div>
           )}
           <p>
-            <strong>Name:</strong> {employee.name}
+            <strong>{t('name')}:</strong> {employee.name}
           </p>
           <p>
-            <strong>Email:</strong> {employee.email}
+            <strong>{t('email')}:</strong> {employee.email}
           </p>
           <p>
-            <strong>Phone Number:</strong> {employee.phoneNumber}
+            <strong>{t('phoneNumber')}:</strong> {employee.phoneNumber}
           </p>
           <p>
-            <strong>Skills:</strong> {formattedSkills}
+            <strong>{t('skills')}:</strong> {formattedSkills}
           </p>
           <p>
-            <strong>Department:</strong> {formatDepartment(employee.department)}
+            <strong>{t('department')}:</strong> {formatDepartment(employee.department)}
           </p>
           <p>
-            <strong>Status:</strong>
+            <strong>{t('status')}:</strong>
             <span
               className={
                 employee.status === "active"
@@ -100,11 +102,11 @@ const EmployeeDetails = () => {
             onClick={() => navigate("/employee-management")}
             style={{ marginTop: "16px" }}
           >
-            Back to Employee Management
+            {t('backToEmployeeManagement')}
           </Button>
         </div>
       ) : (
-        <p>Employee not found.</p>
+        <p>{t('employeeNotFound')}</p>
       )}
     </div>
   );
