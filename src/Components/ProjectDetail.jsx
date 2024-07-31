@@ -104,9 +104,18 @@ const ProjectDetail = () => {
     languages
   );
 
+  const formatCategory = (category) => 
+    category
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  
   const formattedCategories = Array.isArray(project.category)
-    ? project.category.join(", ")
-    : "No categories";
+    ? project.category.map(formatCategory).join(', ')
+    : project.category
+      ? formatCategory(project.category)
+      : "No categories";
+  
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
@@ -127,9 +136,6 @@ const ProjectDetail = () => {
           />
         </div>
       )}
-      <p>
-        <strong>ID:</strong> {project.key}
-      </p>
       <p>
         <strong>Name:</strong> {project.name}
       </p>

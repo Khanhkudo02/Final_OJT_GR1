@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Table, Modal, Upload } from "antd";
+import { Button, Input, Select, Table, Modal, Upload, Space } from "antd";
 import { postCreateEmployee, fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServices";
-import { PlusOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -121,6 +121,21 @@ const AddEmployee = () => {
         return false; // Prevent automatic upload
     };
 
+    const formatSkills = (skills) => {
+        return skills.map(skill => {
+            // Capitalize first letter and replace underscores with spaces
+            const formattedSkill = skill
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, char => char.toUpperCase());
+            return formattedSkill;
+        }).join(', ');
+    };
+
+    const getDepartmentLabel = (value) => {
+        const department = departmentOptions.find(dept => dept.value === value);
+        return department ? department.label : value;
+    };
+
     return (
         <div className="add-employee">
             <h2>Add New Employee</h2>
@@ -180,6 +195,7 @@ const AddEmployee = () => {
                     value={skills}
                     onChange={(value) => setSkills(value)}
                     placeholder="Select Skills"
+                    style={{ width: '100%' }}
                 >
                     {skillOptions.map(skill => (
                         <Option key={skill.value} value={skill.value}>
@@ -202,9 +218,10 @@ const AddEmployee = () => {
             <div className="form-group">
                 <label>Department</label>
                 <Select
+                    placeholder="Select Department"
                     value={department}
                     onChange={(value) => setDepartment(value)}
-                    placeholder="Select Department"
+                    style={{ width: '100%' }}
                 >
                     {departmentOptions.map(dept => (
                         <Option key={dept.value} value={dept.value}>
@@ -254,34 +271,46 @@ const AddEmployee = () => {
                 <Column title="Date of Birth" dataIndex="dateOfBirth" key="dateOfBirth" />
                 <Column title="Address" dataIndex="address" key="address" />
                 <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
+                <Column title="Skills" dataIndex="skills" key="skills" render={(skills) => formatSkills(skills)} />
                 <Column
-                    title="Skills"
-                    dataIndex="skills"
-                    key="skills"
-                    render={(skills) => (Array.isArray(skills) ? skills.join(', ') : '')}
+                    title="Status"
+                    dataIndex="status"
+                    key="status"
+                    render={(text) => {
+                        const className =
+                        text === "active" ? "status-active" : "status-inactive";
+                        return (
+                        <span className={className}>
+                            {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+                        </span>
+                        );
+                    }}
                 />
-                <Column title="Status" dataIndex="status" key="status" />
-                <Column title="Department" dataIndex="department" key="department" />
+                {/* <Column title="Department" dataIndex="department" key="department" /> */}
+                <Column title="Department" dataIndex="department" key="department" render={(text) => getDepartmentLabel(text)} />
                 <Column
                     title="Actions"
                     key="actions"
                     render={(text, record) => (
-                        <div>
-                            <Button onClick={() => handleViewEmployee(record)}>View</Button>
+                        <Space>
                             <Button
+                                icon={<EyeOutlined />}
+                                style={{ color: "green", borderColor: "green" }}
+                                onClick={() => handleViewEmployee(record)}
+                            />
+                            <Button
+                                icon={<DeleteOutlined />}
+                                style={{ color: "red", borderColor: "red" }}
                                 onClick={() => handleDeleteEmployee(record.key)}
-                                disabled={record.status !== "inactive"}
-                                style={{ marginLeft: 8 }}
-                            >
-                                Delete
-                            </Button>
-                        </div>
+                            />
+
+                        </Space>
                     )}
                 />
             </Table>
             <Modal
                 title="View Employee"
-                visible={viewModalVisible}
+                open={viewModalVisible}
                 onCancel={() => setViewModalVisible(false)}
                 footer={[
                     <Button key="close" onClick={() => setViewModalVisible(false)}>

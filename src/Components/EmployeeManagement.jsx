@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal } from "antd";
+import { Button, Table, message, Modal, Space } from "antd";
 import { fetchAllEmployees, deleteEmployeeById } from "../service/EmployeeServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/EmployeeManagement.scss";
@@ -108,18 +108,30 @@ const EmployeeManagement = () => {
             />
           )}
         />
-        <Column title="Name" dataIndex="name" key="name" />
+        <Column className="length-cell" title="Name" dataIndex="name" key="name" />
         <Column title="Email" dataIndex="email" key="email" />
         <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
         <Column
+          className="length-cell"
           title="Skills"
           dataIndex="skills"
           key="skills"
           render={(text) => {
-            // Ensure text is an array and then join with ', '
-            return Array.isArray(text) ? text.join(', ') : text;
+            if (Array.isArray(text)) {
+              return text
+                .map(skill => 
+                  skill
+                    .replace(/_/g, ' ')
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ')
+                )
+                .join(', ');
+            }
+            return text;
           }}
         />
+
         <Column
           title="Status"
           dataIndex="status"
@@ -138,7 +150,7 @@ const EmployeeManagement = () => {
           title="Actions"
           key="actions"
           render={(text, record) => (
-            <span>
+            <Space>
               <Button
                 icon={<EyeOutlined />}
                 style={{ color: "green", borderColor: "green" }}
@@ -154,7 +166,7 @@ const EmployeeManagement = () => {
                 style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
               />
-            </span>
+            </Space>
           )}
         />
       </Table>
