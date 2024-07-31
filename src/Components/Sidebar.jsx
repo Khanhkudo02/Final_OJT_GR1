@@ -104,7 +104,7 @@ const Sidebar = ({ role }) => {
     {
       key: "3",
       icon: <TeamOutlined />,
-      label: <NavLink to="/employee-management">Employee</NavLink>,
+      label: <NavLink to="/employee-management"> Employee List </NavLink>,
     },
     {
       key: "4",
