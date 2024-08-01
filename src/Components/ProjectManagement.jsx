@@ -1,17 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { Table, Tag, Space, Button, Avatar, Pagination, Tabs, Modal, message } from "antd";
-import { useNavigate } from "react-router-dom"; 
+import {
+  Table,
+  Tag,
+  Space,
+  Button,
+  Avatar,
+  Pagination,
+  Tabs,
+  Modal,
+  message,
+  Input,
+} from "antd";
+import { useNavigate } from "react-router-dom";
 import { fetchAllProjects, moveToArchive } from "../service/Project";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, InboxOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  InboxOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import moment from "moment"; // Thêm moment.js để xử lý định dạng ngày tháng
 import "../assets/style/Pages/ProjectManagement.scss";
 import "../assets/style/Global.scss";
+import { useTranslation } from "react-i18next";
 
 const statusColors = {
   COMPLETED: "green",
   ONGOING: "blue",
   "NOT STARTED": "orange",
-  PENDING: "yellow"
+  PENDING: "yellow",
 };
 
 const ProjectManagement = () => {
@@ -20,6 +39,8 @@ const ProjectManagement = () => {
   const [data, setData] = useState([]);
   const pageSize = 10;
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,9 +59,20 @@ const ProjectManagement = () => {
     setCurrentPage(1); // Reset to the first page when changing tabs
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
   const filteredData = data.filter((item) => {
-    if (filteredStatus === "All Projects") return true;
-    return item.status === filteredStatus.toUpperCase();
+    const matchesStatus =
+      filteredStatus === "All Projects" ||
+      item.status === filteredStatus.toUpperCase();
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.projectManager &&
+        item.projectManager.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesStatus && matchesSearch;
   });
 
   const paginatedData = filteredData.slice(
@@ -76,16 +108,16 @@ const ProjectManagement = () => {
 
   const handleDelete = (key) => {
     Modal.confirm({
-      title: 'Are you sure you want to archive this project?',
+      title: "Are you sure you want to archive this project?",
       onOk: async () => {
         try {
           await moveToArchive(key);
-          setData(prevData => prevData.filter(item => item.key !== key));
-          message.success('Project archived successfully');
+          setData((prevData) => prevData.filter((item) => item.key !== key));
+          message.success("Project archived successfully");
         } catch (error) {
-          message.error('Failed to archive project');
+          message.error("Failed to archive project");
         }
-      }
+      },
     });
   };
 
@@ -102,7 +134,9 @@ const ProjectManagement = () => {
       render: (date) => {
         if (!date) return "";
         const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
-        return dateObj.isValid() ? dateObj.format("DD/MM/YYYY") : "Invalid Date";
+        return dateObj.isValid()
+          ? dateObj.format("DD/MM/YYYY")
+          : "Invalid Date";
       },
     },
     {
@@ -112,7 +146,9 @@ const ProjectManagement = () => {
       render: (date) => {
         if (!date) return "";
         const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
-        return dateObj.isValid() ? dateObj.format("DD/MM/YYYY") : "Invalid Date";
+        return dateObj.isValid()
+          ? dateObj.format("DD/MM/YYYY")
+          : "Invalid Date";
       },
     },
     {
@@ -157,9 +193,9 @@ const ProjectManagement = () => {
             onClick={() => navigate(`/edit-project/${record.key}`)}
           />
           {record.status !== "ONGOING" && (
-            <Button 
-              icon={<DeleteOutlined />} 
-              style={{ color: "red", borderColor: "red" }} 
+            <Button
+              icon={<DeleteOutlined />}
+              style={{ color: "red", borderColor: "red" }}
               onClick={() => handleDelete(record.key)}
             />
           )}
@@ -180,25 +216,33 @@ const ProjectManagement = () => {
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <div className="project-management-header">
-        <Button 
-          className="btn" 
-          type="primary" 
-          icon={<PlusOutlined />} 
+        <Button
+          className="btn"
+          type="primary"
+          icon={<PlusOutlined />}
           onClick={() => navigate("/new-project")}
         />
-        <Button 
-          type="default" 
-          icon={<InboxOutlined />} 
+        <Button
+          type="default"
+          icon={<InboxOutlined />}
           onClick={() => navigate("/archived-projects")}
           style={{ marginLeft: "auto" }}
         />
+        <Input
+          placeholder={t("search")}
+          value={searchTerm}
+          onChange={handleSearchChange}
+          style={{ width: "250px", marginBottom: 16 }}
+          prefix={<SearchOutlined />}
+        />
       </div>
-      <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} items={tabItems} centered />
-      <Table 
-        columns={columns} 
-        dataSource={paginatedData} 
-        pagination={false} 
+      <Tabs
+        defaultActiveKey="All Projects"
+        onChange={handleTabChange}
+        items={tabItems}
+        centered
       />
+      <Table columns={columns} dataSource={paginatedData} pagination={false} />
       <div style={{ marginTop: "16px", textAlign: "right" }}>
         <Pagination
           current={currentPage}

@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -34,6 +34,7 @@ function AdminPage() {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [searchText, setSearchText] = useState("");
 
   const fetchUsers = async () => {
     try {
