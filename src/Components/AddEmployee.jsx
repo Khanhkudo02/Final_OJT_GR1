@@ -146,6 +146,7 @@ const AddEmployee = () => {
       // Do nothing, Ant Design will automatically show error message
     }
   };
+
   const getSkillLabel = (value) => {
     const skill = skillOptions.find((option) => option.value === value);
     return skill ? skill.label : value;
@@ -239,7 +240,10 @@ const AddEmployee = () => {
           name="status"
           rules={[{ required: true, message: t("pleaseSelectStatus") }]}
         >
-          <Select placeholder={t("selectStatus")} onBlur={() => handleFieldBlur("status")}>
+          <Select
+            placeholder={t("selectStatus")}
+            onBlur={() => handleFieldBlur("status")}
+          >
             <Option value="active">{t("active")}</Option>
             <Option value="inactive">{t("inactive")}</Option>
           </Select>
@@ -249,7 +253,11 @@ const AddEmployee = () => {
           name="department"
           rules={[{ required: true, message: t("pleaseSelectDepartment") }]}
         >
-          <Select placeholder={t("selectDepartment")} style={{ width: "100%" }} onBlur={() => handleFieldBlur("department")}>
+          <Select
+            placeholder={t("selectDepartment")}
+            style={{ width: "100%" }}
+            onBlur={() => handleFieldBlur("department")}
+          >
             {departmentOptions.map((dept) => (
               <Option key={dept.value} value={dept.value}>
                 {dept.label}
@@ -299,7 +307,9 @@ const AddEmployee = () => {
           title={t("skills")}
           dataIndex="skills"
           key="skills"
-          render={(skills) => skills.map(getSkillLabel).join(", ")}
+          render={(skills) =>
+            skills ? skills.map(getSkillLabel).join(", ") : ""
+          }
         />
         <Column
           title={t("department")}
@@ -335,7 +345,9 @@ const AddEmployee = () => {
             </p>
             <p>
               <strong>{t("skills")}:</strong>{" "}
-              {selectedEmployee.skills.map(getSkillLabel).join(", ")}
+              {selectedEmployee.skills
+                ? selectedEmployee.skills.map(getSkillLabel).join(", ")
+                : ""}
             </p>
             <p>
               <strong>{t("department")}:</strong>{" "}

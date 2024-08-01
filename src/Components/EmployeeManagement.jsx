@@ -5,8 +5,8 @@ import {
   EyeOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { Button, message, Modal, Space, Table } from "antd";
-import { Document, Packer, Paragraph, TextRun, ImageRun } from "docx";
+import { Button, message, Modal, Space, Table, Tabs } from "antd";
+import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,10 +18,10 @@ import {
   deleteEmployeeById,
   fetchAllEmployees,
 } from "../service/EmployeeServices";
-import axios from "axios";
 
 const { Column } = Table;
 const { confirm } = Modal;
+const { TabPane } = Tabs;
 
 const EmployeeManagement = () => {
   const { t } = useTranslation();
@@ -29,10 +29,12 @@ const EmployeeManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [activeTab, setActiveTab] = useState("all");
 
   const formatSkill = (skill) =>
     skill
-      .replace(/_/g, " ") // Thay thế dấu gạch dưới bằng dấu cách
+      .replace(/_/g, " ")
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
@@ -40,10 +42,10 @@ const EmployeeManagement = () => {
   const formatDepartment = (department) => {
     if (typeof department === "string") {
       return department
-        .replace(/_/g, " ") // Thay dấu "_" bằng dấu cách
-        .replace(/\b\w/g, (char) => char.toUpperCase()); // Viết hoa chữ cái đầu
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
     }
-    return department; // Nếu department không phải là chuỗi, trả về giá trị gốc
+    return department;
   };
 
   const loadEmployees = async () => {
@@ -51,7 +53,19 @@ const EmployeeManagement = () => {
       const data = await fetchAllEmployees();
       const filteredData = data
         .filter((employee) => employee.role === "employee")
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp theo createdAt
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      // Lọc dữ liệu theo tab
+      if (activeTab === "active") {
+        setFilteredEmployees(filteredData.filter((e) => e.status === "active"));
+      } else if (activeTab === "inactive") {
+        setFilteredEmployees(
+          filteredData.filter((e) => e.status === "inactive")
+        );
+      } else {
+        setFilteredEmployees(filteredData); // Tab "All Employees"
+      }
+
       setEmployees(filteredData);
     } catch (error) {
       console.error(t("errorFetchingEmployees"), error);
@@ -66,7 +80,7 @@ const EmployeeManagement = () => {
       message.success(t("employeeAddedSuccessfully"));
       localStorage.removeItem("employeeAdded");
     }
-  }, [t]);
+  }, [t, activeTab]);
 
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);
@@ -111,7 +125,7 @@ const EmployeeManagement = () => {
     XLSX.writeFile(wb, `${t("employees")}.xlsx`);
   };
 
-  const paginatedData = employees.slice(
+  const paginatedData = filteredEmployees.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -168,7 +182,8 @@ const EmployeeManagement = () => {
                     size: 24,
                   }),
                   new TextRun({
-                    text: formatDepartment(employee.department) || "Not provided",
+                    text:
+                      formatDepartment(employee.department) || "Not provided",
                     size: 24,
                   }),
                 ],
@@ -196,10 +211,10 @@ const EmployeeManagement = () => {
                   }),
                   new TextRun({
                     text: Array.isArray(employee.skills)
-                        ? employee.skills.map(formatSkill).join(", ")
-                        : employee.skills
-                        ? formatSkill(employee.skills)
-                        : "Not provided",
+                      ? employee.skills.map(formatSkill).join(", ")
+                      : employee.skills
+                      ? formatSkill(employee.skills)
+                      : "Not provided",
                     size: 24,
                   }),
                 ],
@@ -218,7 +233,8 @@ const EmployeeManagement = () => {
                   }),
                 ],
               }),
-              ...(Array.isArray(employee.projects) && employee.projects.length > 0
+              ...(Array.isArray(employee.projects) &&
+              employee.projects.length > 0
                 ? employee.projects.map((project, index) => [
                     new Paragraph({
                       children: [
@@ -254,7 +270,8 @@ const EmployeeManagement = () => {
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.description || "No description provided",
+                          text:
+                            project.description || "No description provided",
                           size: 24,
                         }),
                       ],
@@ -267,7 +284,9 @@ const EmployeeManagement = () => {
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.specification || "No specification provided",
+                          text:
+                            project.specification ||
+                            "No specification provided",
                           size: 24,
                         }),
                       ],
@@ -347,6 +366,23 @@ const EmployeeManagement = () => {
       >
         {t("exportToExcel")}
       </Button>
+
+      <Tabs
+        centered
+        defaultActiveKey="all"
+        onChange={(key) => setActiveTab(key)}
+      >
+        <TabPane tab={t("AllEmployees")} key="all">
+          {/* All Employees tab content */}
+        </TabPane>
+        <TabPane tab={t("active")} key="active">
+          {/* Active Employees tab content */}
+        </TabPane>
+        <TabPane tab={t("inactive")} key="inactive">
+          {/* Inactive Employees tab content */}
+        </TabPane>
+      </Tabs>
+
       <Table
         dataSource={paginatedData}
         rowKey="key"
