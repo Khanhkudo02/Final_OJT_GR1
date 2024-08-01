@@ -11,6 +11,7 @@ const statusColors = {
   COMPLETED: "green",
   ONGOING: "blue",
   "NOT STARTED": "orange",
+  PENDING: "yellow"
 };
 
 const ProjectManagement = () => {

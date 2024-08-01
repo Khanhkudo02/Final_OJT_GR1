@@ -150,5 +150,6 @@
   "failedToFetchEmployee": "Failed to fetch employee data.",
   "employeeImage": "Employee Image",
   "noSkills": "No skills",
-  "AllEmployees": "All Employees"
+  "AllEmployees": "All Employees",
+  "search": "Search....."
 }

@@ -75,17 +75,17 @@ const Sidebar = ({ role }) => {
       icon: <CodeOutlined />,
       label: <NavLink to="/programing-language">Programming Languages</NavLink>,
     },
+    // {
+    //   key: "7",
+    //   icon: <FileTextOutlined />,
+    //   label: <NavLink to="/cv">CV</NavLink>,
+    // },
     {
       key: "7",
-      icon: <FileTextOutlined />,
-      label: <NavLink to="/cv">CV</NavLink>,
-    },
-    {
-      key: "8",
       label: <LanguageSwitcher collapsed={collapsed} />,
     },
     {
-      key: "9",
+      key: "8",
       label: <LogoutButton collapsed={collapsed} />,
     },
   ];
