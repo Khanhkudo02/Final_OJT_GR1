@@ -1,4 +1,3 @@
-
 import { Button, Modal, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -198,7 +197,6 @@ const ProjectDetail = () => {
       <p>
         <strong>Languages Used:</strong> {displayedLanguages}
       </p>
-      
     </div>
   );
 };
