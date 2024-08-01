@@ -1,27 +1,68 @@
-// import React from 'react';
-// import { Modal, Button } from 'antd';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getTechnologyById } from "../service/TechnologyServices";
+import { Button, Spin, message } from "antd";
+import "../Components/TechnologyDetails.jsx"; // Assuming you have a similar stylesheet
 
-// const TechnologyDetails = ({ open, handleClose, technology }) => {
-//   return (
-//     <Modal
-//       title="Technology Details"
-//       visible={open}
-//       onCancel={handleClose}
-//       footer={[
-//         <Button key="close" onClick={handleClose}>
-//           Close
-//         </Button>
-//       ]}
-//     >
-//       {technology && (
-//         <div>
-//           <p><strong>Name:</strong> {technology.name}</p>
-//           <p><strong>Description:</strong> {technology.description}</p>
-//           <p><strong>Status:</strong> {technology.status}</p>
-//         </div>
-//       )}
-//     </Modal>
-//   );
-// };
+const TechnologyDetails = () => {
+  const { id } = useParams();
+  const [technology, setTechnology] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-// export default TechnologyDetails;
+  useEffect(() => {
+    const loadTechnology = async () => {
+      try {
+        const data = await getTechnologyById(id);
+        setTechnology(data);
+        setLoading(false);
+      } catch (error) {
+        message.error("Failed to fetch technology details.");
+        setLoading(false);
+      }
+    };
+
+    loadTechnology();
+  }, [id]);
+
+  if (loading) return <Spin size="large" />;
+
+  return (
+    <div className="technology-details">
+      <h2>Technology Details</h2>
+      {technology ? (
+        <div>
+          <p>
+            <strong>Name:</strong> {technology.name}
+          </p>
+          <p>
+            <strong>Description:</strong> {technology.description}
+          </p>
+          <p>
+            <strong>Status:</strong> {technology.status}
+          </p>
+          {technology.imageURL && (
+            <p>
+              <strong>Image:</strong> <br />
+              <img
+                src={technology.imageURL}
+                alt={technology.name}
+                style={{ width: 150, height: 150 }}
+              />
+            </p>
+          )}
+          <Button
+            type="primary"
+            onClick={() => navigate("/technology-management")}
+          >
+            Back to Technology Management
+          </Button>
+        </div>
+      ) : (
+        <p>Technology not found.</p>
+      )}
+    </div>
+  );
+};
+
+export default TechnologyDetails;

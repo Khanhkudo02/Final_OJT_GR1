@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, Select, Upload, Button, Layout } from "antd";
+import { Upload, Button, Input, Select, Layout } from "antd";
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 import { putUpdateTechnology, fetchTechnologyById } from "../service/TechnologyServices";
@@ -8,7 +8,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const { Header } = Layout;
 
-const EditTechnology = () => {
+const EditTechnology = () => {  
   const { id } = useParams(); // Get ID from URL
   const navigate = useNavigate();
 
@@ -20,7 +20,7 @@ const EditTechnology = () => {
   useEffect(() => {
     const loadTechnology = async () => {
       try {
-        console.log(`Loading technology with ID: ${id}`);
+        console.log(`Fetching technology with ID: ${id}`);
         const technology = await fetchTechnologyById(id);
         if (technology) {
           console.log("Loaded technology:", technology);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Table, Modal, Space, Upload } from "antd";
+import { Button, Input, Select, Table, Modal, Space } from "antd";
 import {
   postCreatePosition,
   fetchAllPositions,
@@ -8,9 +8,8 @@ import {
 import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Global.scss";
-import { storage } from "/Users/mac/Documents/Final_OJT_GR1/src/firebaseConfig.js";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import "../Components/AddPosition.jsx";
+import "../assets/style/Global.scss"
 
 const { Option } = Select;
 const { Column } = Table;
@@ -23,9 +22,7 @@ const AddPosition = () => {
   const [positions, setPositions] = useState([]);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState(null);
-  const [image, setImage] = useState(null);
-  const [imageURL, setImageURL] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
+
   const navigate = useNavigate();
 
   const loadPositions = async () => {
@@ -48,21 +45,13 @@ const AddPosition = () => {
     }
 
     try {
-      const positionData = {
-        name,
-        description,
-        department,
-        status,
-        imageURL,
-      };
-      await postCreatePosition(positionData);
+      await postCreatePosition(name, description, department, status);
       localStorage.setItem("positionAdded", "true");
       navigate("/position-management");
     } catch (error) {
       toast.error("Failed to add position.");
     }
   };
-
   const handleViewPosition = (position) => {
     setSelectedPosition(position);
     setViewModalVisible(true);
@@ -75,28 +64,6 @@ const AddPosition = () => {
       loadPositions(); // Reload the positions list
     } catch (error) {
       toast.error("Failed to delete position.");
-    }
-  };
-
-  const handleImageChange = (info) => {
-    if (info.file && info.file.originFileObj) {
-      setImage(info.file.originFileObj);
-      setImagePreview(URL.createObjectURL(info.file.originFileObj));
-    }
-  };
-
-  const handleUpload = () => {
-    if (image) {
-      const storageReference = storageRef(storage, `images/${image.name}`);
-      uploadBytes(storageReference, image)
-        .then((snapshot) => getDownloadURL(snapshot.ref))
-        .then((url) => {
-          setImageURL(url);
-        })
-        .catch((error) => {
-          console.error("Upload failed:", error);
-          toast.error("Failed to upload image.");
-        });
     }
   };
 
@@ -137,28 +104,6 @@ const AddPosition = () => {
           <Option value="active">Active</Option>
           <Option value="inactive">Inactive</Option>
         </Select>
-      </div>
-      <div className="form-group">
-        <label>Upload Image</label>
-        <Upload
-          accept=".jpg,.jpeg,.png"
-          beforeUpload={(file) => {
-            handleImageChange({ file });
-            return false; // Prevent automatic upload
-          }}
-          listType="picture"
-        >
-          <Button icon={<PlusOutlined />}>Upload Image</Button>
-        </Upload>
-        {imagePreview && <img src={imagePreview} alt="Image Preview" width="100%" />}
-        <Button
-          type="primary"
-          onClick={handleUpload}
-          disabled={!image}
-          style={{ marginTop: 16 }}
-        >
-          Upload
-        </Button>
       </div>
       <Button
         type="primary"
@@ -236,9 +181,6 @@ const AddPosition = () => {
             <p>
               <strong>Status:</strong> {selectedPosition.status}
             </p>
-            {selectedPosition.imageURL && (
-              <img src={selectedPosition.imageURL} alt="Position Image" width="100%" />
-            )}
           </div>
         )}
       </Modal>

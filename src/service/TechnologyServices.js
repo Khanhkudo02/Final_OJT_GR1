@@ -3,57 +3,66 @@ import { ref, set, push, update, get, remove } from "firebase/database";
 import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
 import { database, storage } from "../firebaseConfig";
 
-// Function to add a new technology
-export const addTechnology = async (name, description, status, imageFile) => {
+
+export const postCreateTechnology = async (name, description, status, imageFile) => {
+  // function implementation
+};
+export const fetchTechnologyById = async (id) => {
   try {
-    const newTechRef = push(ref(database, 'technologies'));
-
-    let imageURL = null;
-    if (imageFile) {
-      const imageName = `${Date.now()}_${imageFile.name}`;
-      const imageRef = storageRef(storage, `images/${imageName}`);
-
-      await uploadBytes(imageRef, imageFile);
-      imageURL = await getDownloadURL(imageRef);
+    const technologyRef = ref(database, `technologies/${id}`);
+    const snapshot = await get(technologyRef);
+    if (!snapshot.exists()) {
+      throw new Error("Technology not found.");
     }
-
-    await set(newTechRef, {
-      name,
-      description,
-      status,
-      imageURL
-    });
+    return snapshot.val();
   } catch (error) {
-    console.error("Error adding technology:", error);
+    console.error("Error fetching technology:", error);
     throw error;
   }
 };
 
-// Function to update an existing technology
-export const updateTechnology = async (id, name, description, status, imageFile) => {
+export const fetchAllTechnology = async () => {
   try {
-    const techRef = ref(database, `technologies/${id}`);
-    
-    let imageURL = null;
-    if (imageFile) {
-      const imageName = `${Date.now()}_${imageFile.name}`;
-      const imageRef = storageRef(storage, `images/${imageName}`);
+    const techRef = ref(database, 'technologies');
+    const snapshot = await get(techRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      return Object.keys(data).map((key) => ({
+        id: key,
+        ...data[key],
+      }));
+    } else {
+      return []; // Return an empty array if no data available
+    }
+  } catch (error) {
+    console.error("Error fetching technologies:", error);
+    throw error;
+  }
+};
 
-      await uploadBytes(imageRef, imageFile);
-      imageURL = await getDownloadURL(imageRef);
+// Function to update a technology
+export const putUpdateTechnology = async (id, name, description, status, imageFile) => {
+  try {
+    let imageUrl = null;
+    if (imageFile) {
+      const storageReference = storageRef(storage, `technologies/${Date.now()}_${imageFile.name}`);
+      await uploadBytes(storageReference, imageFile);
+      imageUrl = await getDownloadURL(storageReference);
     }
 
+    const techRef = ref(database, `technologies/${id}`);
     await update(techRef, {
       name,
       description,
       status,
-      imageURL
+      ...(imageUrl && { imageUrl })
     });
   } catch (error) {
     console.error("Error updating technology:", error);
     throw error;
   }
 };
+
 
 // Function to delete a technology
 export const deleteTechnology = async (id) => {
@@ -69,32 +78,24 @@ export const deleteTechnology = async (id) => {
 // Function to get a technology by ID
 export const getTechnologyById = async (id) => {
   try {
+    console.log(`Fetching technology with ID: ${id}`); // Debug
     const techRef = ref(database, `technologies/${id}`);
     const snapshot = await get(techRef);
+    console.log('Technology data:', snapshot.val()); // Debug
+
     if (snapshot.exists()) {
       return snapshot.val();
     } else {
-      throw new Error("No such document!");
+      throw new Error("No such technology!");
     }
   } catch (error) {
-    console.error("Error fetching technology:", error);
+    console.error("Failed to fetch technology by ID:", error);
     throw error;
   }
 };
-export const fetchAllTechnology = async () => {
-  try {
-    const techRef = ref(database, 'technologies');
-    const snapshot = await get(techRef);
-    if (snapshot.exists()) {
-      return snapshot.val(); // Return the data
-    } else {
-      throw new Error("No data available");
-    }
-  } catch (error) {
-    console.error("Error fetching technologies:", error);
-    throw error;
-  }
-};
-export const postCreateTechnology = async (name, description, status, imageFile) => {
-  // function implementation
-};
+
+
+
+
+
+

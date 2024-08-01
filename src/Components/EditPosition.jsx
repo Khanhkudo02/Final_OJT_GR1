@@ -48,9 +48,16 @@ const EditPosition = () => {
       toast.error("Please fill in all fields.");
       return;
     }
-  
+
     try {
-      await putUpdatePosition(id, name, description, department, status, imageFile);
+      await putUpdatePosition(
+        id,
+        name,
+        description,
+        department,
+        status,
+        imageFile
+      );
       toast.success("Position updated successfully!");
       navigate("/position-management");
     } catch (error) {
@@ -59,14 +66,7 @@ const EditPosition = () => {
     }
   };
 
-  const handleImageChange = ({ file }) => {
-    if (file.type === "image/png" || file.type === "image/svg+xml") {
-      setImageFile(file.originFileObj);
-    } else {
-      toast.error("Only PNG and SVG images are allowed.");
-    }
-  };
-
+  
   const beforeUpload = (file) => {
     handleImageChange({ file });
     return false;
@@ -110,18 +110,6 @@ const EditPosition = () => {
           <Option value="active">Active</Option>
           <Option value="inactive">Inactive</Option>
         </Select>
-      </div>
-      <div className="form-group">
-        <label>Upload Image (PNG or SVG only)</label>
-        <Upload
-          name="image"
-          listType="picture"
-          showUploadList={false}
-          beforeUpload={beforeUpload}
-          onChange={handleImageChange}
-        >
-          <Button icon={<PlusOutlined />}>Upload</Button>
-        </Upload>
       </div>
       <Button
         type="primary"

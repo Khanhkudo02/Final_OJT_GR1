@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Table, Modal, Space } from "antd";
-import { v4 as uuidv4 } from 'uuid';  // Import uuid
+import { Button, Input, Select, Table, Modal, Space, Upload } from "antd";
+import { v4 as uuidv4 } from 'uuid';
+import { storage, database } from "../firebaseConfig"; // Import Firebase config
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as databaseRef, set } from "firebase/database";
 import {
   postCreateTechnology,
   fetchAllTechnology,
@@ -9,8 +12,7 @@ import {
 import { EyeOutlined, DeleteOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Global.scss"
-import "../Components/AddTechnology.jsx";
+import "../assets/style/Global.scss";
 
 const { Option } = Select;
 const { Column } = Table;
@@ -40,18 +42,24 @@ const AddTechnology = () => {
   }, []);
 
   const handleAddTechnology = async () => {
-    if (!name || !description || !status) {
+    if (!name || !description || !status || !imageFile) {
       toast.error("Please fill in all fields.");
       return;
     }
 
     try {
-      const imageUrl = imageFile ? URL.createObjectURL(imageFile) : null;
-      const technologyId = uuidv4();  // Generate a unique identifier
+      const technologyId = uuidv4();
+
+      // Upload image to Firebase Storage
+      const storageReference = storageRef(storage, `technologies/${technologyId}/${imageFile.name}`);
+      await uploadBytes(storageReference, imageFile);
+      const imageUrl = await getDownloadURL(storageReference);
+
+      // Save technology details to Firebase Database
       await postCreateTechnology(technologyId, name, description, status, imageUrl);
       localStorage.setItem("technologyAdded", "true");
       toast.success("Technology added successfully!");
-      navigate("/technology-management");  // Navigate to technology management page
+      navigate("/technology-management");
     } catch (error) {
       toast.error("Failed to add technology.");
     }
@@ -71,9 +79,21 @@ const AddTechnology = () => {
       toast.error("Failed to delete technology.");
     }
   };
-  const postCreateTechnology = async (name, description, status, imageFile) => {
-    // function implementation
+
+  const handleImageChange = (info) => {
+    const file = info.file.originFileObj;
+    if (file && (file.type === "image/png" || file.type === "image/svg+xml")) {
+      setImageFile(file);
+    } else {
+      toast.error("Only PNG and SVG images are allowed.");
+    }
   };
+
+  const beforeUpload = (file) => {
+    handleImageChange({ file });
+    return false; // Prevent automatic upload
+  };
+
   return (
     <div className="add-technology">
       <h2>Add New Technology</h2>
@@ -106,16 +126,18 @@ const AddTechnology = () => {
       </div>
       <div className="form-group">
         <label>Image</label>
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={(event) => setImageFile(event.target.files[0])}
-        />
+        <Upload
+          beforeUpload={beforeUpload}
+          showUploadList={false}
+          customRequest={() => {}}
+        >
+          <Button icon={<PlusOutlined />}>Upload Image</Button>
+        </Upload>
       </div>
       <Button
         type="primary"
         onClick={handleAddTechnology}
-        disabled={!name || !description || !status}
+        disabled={!name || !description || !status || !imageFile}
       >
         Save
       </Button>
@@ -127,7 +149,7 @@ const AddTechnology = () => {
       </Button>
 
       <h2>Existing Technologies</h2>
-      <Table dataSource={technologies} rowKey="key" pagination={false}>
+      <Table dataSource={technologies} rowKey="id" pagination={false}>
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
         <Column
@@ -187,8 +209,7 @@ const AddTechnology = () => {
             {selectedTechnology.imageURL && (
               <p>
                 <strong>Image:</strong>
-                <img src={imageUrl} alt="Technology" style={{ width: "100%", height: "auto" }} />
-
+                <img src={selectedTechnology.imageURL} alt="Technology" style={{ width: "100%", height: "auto" }} />
               </p>
             )}
           </div>
