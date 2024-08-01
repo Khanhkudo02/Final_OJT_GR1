@@ -127,6 +127,42 @@ const NewProject = () => {
     }
   };
 
+  const formatBudget = (value) => {
+    // Remove all non-numeric characters except "$" and "VND"
+    let numericValue = value.replace(/[^\d$VND]/g, "");
+
+    // Check if the value has "$" or "VND"
+    const hasDollarSign = numericValue.startsWith("$");
+    const hasVND = numericValue.endsWith("VND");
+
+    // Remove "$" and "VND" for formatting
+    if (hasDollarSign) {
+      numericValue = numericValue.slice(1);
+    }
+    if (hasVND) {
+      numericValue = numericValue.slice(0, -3);
+    }
+
+    // Format the number with commas
+    numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    // Add "$" or "VND" back
+    if (hasDollarSign) {
+      numericValue = `$${numericValue}`;
+    }
+    if (hasVND) {
+      numericValue = `${numericValue}VND`;
+    }
+
+    return numericValue;
+  };
+
+  const handleBudgetChange = (e) => {
+    const { value } = e.target;
+    const formattedValue = formatBudget(value);
+    form.setFieldsValue({ budget: formattedValue });
+  };
+
   return (
     <div
       style={{
@@ -233,10 +269,10 @@ const NewProject = () => {
             { required: true, message: "Please input the project budget!" },
           ]}
         >
-          <InputNumber
-            min={0}
-            style={{ width: "100%" }}
+          <Input
             onBlur={() => handleFieldBlur("budget")}
+            onChange={handleBudgetChange}
+            maxLength={20}
           />
         </Form.Item>
 
