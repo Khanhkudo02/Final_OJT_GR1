@@ -5,9 +5,10 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
+  checkEmailExists,
   deleteEmployeeById,
   fetchAllEmployees,
-  postCreateEmployee,
+  postCreateEmployee
 } from "../service/EmployeeServices";
 
 const { Option } = Select;
@@ -63,39 +64,57 @@ const AddEmployee = () => {
   }, []);
 
   const handleAddEmployee = async (values) => {
-    const {
-      name,
-      email,
-      password,
-      dateOfBirth,
-      address,
-      phoneNumber,
-      skills,
-      status,
-      department,
-    } = values;
-
-    try {
-      await postCreateEmployee(
-        name,
-        email,
-        password,
-        dateOfBirth,
-        address,
-        phoneNumber,
-        skills,
-        status,
-        department,
-        "employee",
-        imageFiles[0]
-      ); // Pass the first image file only
+    const { name, email, password, dateOfBirth, address, phoneNumber, skills, status, department } = values;
+  
+    // Kiểm tra email đã tồn tại chưa
+  try {
+    const emailExists = await checkEmailExists(email);
+    if (emailExists) {
+      form.setFields([
+        {
+          name: 'email',
+          errors: [t("emailAlreadyExists")],
+        },
+      ]);
+      return; // Dừng xử lý tiếp
+    }
+      await postCreateEmployee(name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, "employee", imageFiles[0]);
       localStorage.setItem("employeeAdded", "true");
       navigate("/employee-management");
-      form.resetFields(); // Reset form fields after successful submission
+      form.resetFields();
     } catch (error) {
       toast.error(t("failedToAddEmployee"));
     }
   };
+  
+  const handleEmailChange = async (e) => {
+    const email = e.target.value;
+    form.setFieldsValue({ email });
+  
+    // Kiểm tra email khi người dùng nhập
+    try {
+      const emailExists = await checkEmailExists(email);
+      if (emailExists) {
+        form.setFields([
+          {
+            name: 'email',
+            errors: [t("emailAlreadyExists")],
+          },
+        ]);
+      } else {
+        form.setFields([
+          {
+            name: 'email',
+            errors: [],
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Failed to check email existence:", error);
+    }
+  };
+  
+
 
   const handleViewEmployee = (employee) => {
     setSelectedEmployee(employee);
@@ -176,7 +195,7 @@ const AddEmployee = () => {
             { type: "email", message: t("invalidEmail") },
           ]}
         >
-          <Input type="email" onBlur={() => handleFieldBlur("email")} />
+          <Input type="email" onBlur={() => handleFieldBlur("email")} onChange={handleEmailChange} />
         </Form.Item>
         <Form.Item
           label={t("password")}

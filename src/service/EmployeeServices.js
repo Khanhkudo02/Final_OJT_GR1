@@ -1,11 +1,22 @@
-import { ref, set, push, update, get, remove } from "firebase/database";
-import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
-import { database, storage } from '../firebaseConfig';
 import bcrypt from 'bcryptjs';
+import { get, push, ref, remove, set, update } from "firebase/database";
+import { deleteObject, getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
 import moment from 'moment';
+import { database, storage } from '../firebaseConfig';
 
 const db = database;
 const storageInstance = storage;
+
+const checkEmailExists = async (email) => {
+    const usersRef = ref(database, 'users');
+    const snapshot = await get(usersRef);
+    const users = snapshot.val();
+  
+    if (users) {
+      return Object.values(users).some(user => user.email === email);
+    }
+    return false;
+  };
 
 // Create new employee
 const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, role, imageFile) => {
@@ -162,4 +173,5 @@ const fetchEmployeeById = async (id) => {
     }
 };
 
-export { fetchAllEmployees, postCreateEmployee, putUpdateEmployee, deleteEmployeeById, fetchEmployeeById };
+export { checkEmailExists, deleteEmployeeById, fetchAllEmployees, fetchEmployeeById, postCreateEmployee, putUpdateEmployee };
+
