@@ -73,14 +73,12 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
 
         if (imageFile) {
             if (imageUrl) {
-                // Delete the old image
                 const oldImagePath = imageUrl.split("/o/")[1].split("?")[0];
                 const decodedOldImagePath = decodeURIComponent(oldImagePath);
                 const oldImageRef = storageRef(storageInstance, decodedOldImagePath);
                 await deleteObject(oldImageRef);
             }
 
-            // Upload the new image
             const timestamp = Date.now();
             const filename = `${timestamp}_${imageFile.name}`;
             const imageRef = storageRef(storageInstance, `employee/${id}/${filename}`);
@@ -90,7 +88,6 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
 
         const formattedDateOfBirth = dateOfBirth ? moment(dateOfBirth).format('YYYY-MM-DD') : null;
 
-        // Prepare the updates for the employee
         const updates = {
             name,
             email,
@@ -100,7 +97,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             skills,
             status,
             department,
-            imageUrl: imageUrl || currentData.imageUrl, // Use the new image URL or keep the old one
+            imageUrl: imageUrl || currentData.imageUrl,
         };
 
         if (currentData) {
@@ -108,7 +105,6 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             updates.isAdmin = currentData.isAdmin;
         }
 
-        // Update employee data
         await update(employeeRef, updates);
 
         return id;
@@ -117,6 +113,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
         throw error;
     }
 };
+
 
 
 // Delete employee

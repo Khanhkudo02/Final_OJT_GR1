@@ -118,18 +118,6 @@ const EditPosition = () => {
           <Option value="inactive">Inactive</Option>
         </Select>
       </div>
-      <div className="form-group">
-        <label>Upload Image (PNG or SVG only)</label>
-        <Upload
-          name="image"
-          listType="picture"
-          showUploadList={false}
-          beforeUpload={beforeUpload}
-          onChange={handleImageChange}
-        >
-          <Button icon={<PlusOutlined />}>Upload</Button>
-        </Upload>
-      </div>
       <Button
         type="primary"
         onClick={handleUpdatePosition}

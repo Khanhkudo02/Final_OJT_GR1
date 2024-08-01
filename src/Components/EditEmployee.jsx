@@ -18,7 +18,7 @@ const EditEmployee = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [oldImageUrl, setOldImageUrl] = useState("");
-  
+
   // Các tùy chọn được chuyển ngữ
   const departmentOptions = [
     { value: "accounting", label: t("departmentAccounting") },
@@ -58,7 +58,7 @@ const EditEmployee = () => {
             skills: employee.skills || [],
           });
 
-          setOldImageUrl(employee.imageUrl || ""); 
+          setOldImageUrl(employee.imageUrl || "");
 
           if (employee.imageUrl) {
             setFileList([
@@ -90,19 +90,26 @@ const EditEmployee = () => {
 
   const handleUpdateEmployee = async (values) => {
     try {
+      const formattedDateOfBirth = values.dateOfBirth
+        ? moment.isMoment(values.dateOfBirth)
+          ? values.dateOfBirth.format("YYYY-MM-DD")
+          : values.dateOfBirth
+        : null;
+
       await putUpdateEmployee(
         id,
         values.name,
         values.email,
-        values.dateOfBirth.format("YYYY-MM-DD"),
+        formattedDateOfBirth,
         values.address,
         values.phoneNumber,
         values.skills,
         values.status,
         values.department,
         fileList.length > 0 ? fileList[0].originFileObj : null,
-        oldImageUrl 
+        oldImageUrl
       );
+
       message.success(t("employeeUpdatedSuccessfully"));
       navigate("/employee-management");
     } catch (error) {
@@ -111,13 +118,14 @@ const EditEmployee = () => {
     }
   };
 
+
   const handleImageChange = ({ fileList }) => {
     setFileList(fileList);
   };
 
   const beforeUpload = (file) => {
     handleImageChange({ fileList: [file] });
-    return false; 
+    return false;
   };
 
   return (
