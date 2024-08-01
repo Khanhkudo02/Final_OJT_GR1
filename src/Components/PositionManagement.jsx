@@ -1,9 +1,10 @@
 import {
   DeleteOutlined,
   EditOutlined,
-  PlusOutlined
+  PlusOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
-import { Button, message, Modal, Space, Table, Tabs } from "antd";
+import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
@@ -12,6 +13,7 @@ import {
   deletePositionById,
   fetchAllPositions,
 } from "../service/PositionServices";
+import { useTranslation } from "react-i18next";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -24,6 +26,8 @@ const PositionManagement = () => {
   const navigate = useNavigate();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [dataPositionEdit, setDataPositionEdit] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useTranslation();
 
   const loadPositions = async () => {
     try {
@@ -86,9 +90,20 @@ const PositionManagement = () => {
     setCurrentPage(1); // Reset to first page when changing tabs
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // const filteredData = positions.filter((item) => {
+  //   if (filteredStatus === "All Positions") return true;
+  //   return item.status.toLowerCase() === filteredStatus.toLowerCase();
+  // });
+
   const filteredData = positions.filter((item) => {
-    if (filteredStatus === "All Positions") return true;
-    return item.status.toLowerCase() === filteredStatus.toLowerCase();
+    const matchesStatus = filteredStatus === "All Positions" || item.status.toLowerCase() === filteredStatus.toLowerCase();
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesStatus && matchesSearch;
   });
 
   const paginatedData = filteredData.slice(
@@ -112,6 +127,13 @@ const PositionManagement = () => {
         icon={<PlusOutlined />}
       >
       </Button>
+      <Input
+        placeholder={t("search")}
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ width: "250px", marginBottom: 16 }}
+        prefix={<SearchOutlined />}
+      />
       <Tabs
         defaultActiveKey="All Positions"
         onChange={handleTabChange}
@@ -167,13 +189,6 @@ const PositionManagement = () => {
           )}
         />
       </Table>
-      {dataPositionEdit && (
-        <ModalEditPosition
-          open={isEditModalVisible}
-          handleClose={() => setIsEditModalVisible(false)}
-          dataPositionEdit={dataPositionEdit}
-        />
-      )}
     </div>
   );
 };

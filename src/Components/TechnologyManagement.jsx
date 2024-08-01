@@ -1,5 +1,5 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Space, Table, Tabs, message } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Input, Space, Table, Tabs, message } from "antd";
 import React, { useEffect, useState } from "react";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/TechnologyManagement.scss";
@@ -7,6 +7,7 @@ import { fetchAllTechnology } from "../service/TechnologyServices";
 import ModalAddTechnology from "./ModalAddTechnology";
 import ModalDeleteTechnology from "./ModalDeleteTechnology";
 import ModalEditTechnology from "./ModalEditTechnology";
+import { useTranslation } from "react-i18next";
 
 const TechnologyManagement = () => {
   const [technologies, setTechnologies] = useState([]);
@@ -17,6 +18,8 @@ const TechnologyManagement = () => {
   const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
   const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
   const [filteredStatus, setFilteredStatus] = useState("All Techniques");
+  const [searchTerm, setSearchTerm] = useState("");
+  const { t } = useTranslation();
 
   const loadTechnologies = async () => {
     try {
@@ -76,9 +79,18 @@ const TechnologyManagement = () => {
   };
 
   const filteredData = data.filter((item) => {
-    if (filteredStatus === "All Techniques") return true;
-    return item.status.toLowerCase() === filteredStatus.toLowerCase();
+    if (
+      filteredStatus !== "All Techniques" &&
+      item.status.toLowerCase() !== filteredStatus.toLowerCase()
+    ) {
+      return false;
+    }
+    return item.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
 
   const tabItems = [
     { key: "All Techniques", label: "All Techniques" },
@@ -152,8 +164,14 @@ const TechnologyManagement = () => {
         onClick={showAddModal}
         icon={<PlusOutlined />}
       >
-        Add Technology
       </Button>
+      <Input
+        placeholder={t("search")}
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ width: "250px" }}
+        prefix={<SearchOutlined />}
+      />
       <Tabs
         defaultActiveKey="All Techniques"
         onChange={handleTabChange}
