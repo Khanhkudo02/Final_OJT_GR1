@@ -342,7 +342,7 @@ const EmployeeManagement = () => {
       <Button
         className="btn"
         type="primary"
-        style={{ marginBottom: 16, marginLeft: 16 }}
+        style={{ marginBottom: 16 }}
         onClick={exportToExcel}
       >
         {t("exportToExcel")}

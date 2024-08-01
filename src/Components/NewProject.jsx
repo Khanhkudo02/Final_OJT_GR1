@@ -5,7 +5,6 @@ import {
   DatePicker,
   Form,
   Input,
-  InputNumber,
   message,
   Select,
   Upload,
@@ -15,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
-import { fetchAllPositions } from "../service/PositionServices";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -38,8 +37,8 @@ const NewProject = () => {
     try {
       const projectData = {
         ...values,
-        startDate: values.startDate.format("DD-MM-YYYY"),
-        endDate: values.endDate.format("DD-MM-YYYY"),
+        startDate: values.startDate.format("YYYY-MM-DD"),
+        endDate: values.endDate.format("YYYY-MM-DD"),
         technologies: values.technologies,
         languages: values.languages,
       };
@@ -186,6 +185,13 @@ const NewProject = () => {
     form.setFieldsValue({ budget: formattedValue });
   };
 
+  const handleBudgetBlur = async () => {
+    const value = form.getFieldValue("budget");
+    if (!value.includes("$") && !value.includes("VND")) {
+      message.error("Budget must include either $ or VND");
+    }
+  };
+
   return (
     <div
       style={{
@@ -226,7 +232,7 @@ const NewProject = () => {
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
           <DatePicker
-            format="DD/MM/YYYY"
+            format="YYYY-MM-DD"
             onChange={(date) => setStartDate(date)}
             disabledDate={disabledStartDate}
             onBlur={() => handleFieldBlur("startDate")}
@@ -239,7 +245,7 @@ const NewProject = () => {
 rules={[{ required: true, message: "Please select the end date!" }]}
         >
           <DatePicker
-            format="DD/MM/YYYY"
+            format="YYYY-MM-DD"
             onChange={(date) => setEndDate(date)}
             disabledDate={disabledEndDate}
             onBlur={() => handleFieldBlur("endDate")}
@@ -308,7 +314,7 @@ rules={[{ required: true, message: "Please select the end date!" }]}
           ]}
         >
           <Input
-            onBlur={() => handleFieldBlur("budget")}
+            onBlur={handleBudgetBlur}
             onChange={handleBudgetChange}
             maxLength={20}
           />

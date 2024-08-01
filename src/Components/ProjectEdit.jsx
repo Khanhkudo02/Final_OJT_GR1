@@ -5,11 +5,11 @@ import {
   Button,
   Select,
   DatePicker,
-  InputNumber,
   message,
   Upload,
   Modal,
 } from "antd";
+import dayjs from "dayjs";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
 import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
@@ -111,26 +111,48 @@ const ProjectEdit = () => {
     loadLanguages();
   }, []);
 
-  // Load positions
-  useEffect(() => {
-    const loadPositions = async () => {
-      try {
-        const data = await fetchAllPositions();
-        const positionOptions = data.map((pos) => ({
-          label: pos.name,
-          value: pos.key, // Use key as value for Option
-        }));
-        setPositions(positionOptions);
-      } catch (err) {
-        setError("Failed to fetch positions");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const formatBudget = (value) => {
+    // Remove all non-numeric characters except "$" and "VND"
+    let numericValue = value.replace(/[^\d$VND]/g, "");
 
-    loadPositions();
-  }, []);
+    // Check if the value has "$" or "VND"
+    const hasDollarSign = numericValue.startsWith("$");
+    const hasVND = numericValue.endsWith("VND");
+
+    // Remove "$" and "VND" for formatting
+    if (hasDollarSign) {
+      numericValue = numericValue.slice(1);
+    }
+    if (hasVND) {
+      numericValue = numericValue.slice(0, -3);
+    }
+
+    // Format the number with commas
+    numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    // Add "$" or "VND" back
+    if (hasDollarSign) {
+      numericValue = `$${numericValue}`;
+    }
+    if (hasVND) {
+      numericValue = `${numericValue}VND`;
+    }
+
+    return numericValue;
+  };
+
+  const handleBudgetChange = (e) => {
+    const { value } = e.target;
+    const formattedValue = formatBudget(value);
+    form.setFieldsValue({ budget: formattedValue });
+  };
+
+  const handleBudgetBlur = async () => {
+    const value = form.getFieldValue("budget");
+    if (!value.includes("$") && !value.includes("VND")) {
+      message.error("Budget must include either $ or VND");
+    }
+  };
 
   const onFinish = async (values) => {
     Modal.confirm({
@@ -144,7 +166,8 @@ const ProjectEdit = () => {
             ...values,
             startDate: values.startDate.format("YYYY-MM-DD"),
             endDate: values.endDate.format("YYYY-MM-DD"),
-            imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl || null,
+            imageUrl:
+              fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
           };
           await putUpdateProject(
             id,
@@ -218,7 +241,7 @@ const ProjectEdit = () => {
           name="startDate"
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
-          <DatePicker format="DD/MM/YYYY" />
+          <DatePicker format="YYYY-MM-DD" />
         </Form.Item>
 
         <Form.Item
@@ -226,7 +249,7 @@ const ProjectEdit = () => {
           name="endDate"
           rules={[{ required: true, message: "Please select the end date!" }]}
         >
-          <DatePicker format="DD/MM/YYYY" />
+          <DatePicker format="YYYY-MM-DD" />
         </Form.Item>
 
         <Form.Item
@@ -290,11 +313,10 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project budget!" },
           ]}
         >
-          <InputNumber
-            min={0}
-            style={{ width: "100%" }}
-            formatter={formatNumber}
-            parser={parseNumber}
+          <Input
+            onBlur={handleBudgetBlur}
+            onChange={handleBudgetChange}
+            maxLength={20}
           />
         </Form.Item>
 
