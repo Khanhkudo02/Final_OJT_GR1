@@ -8,7 +8,7 @@ const db = database;
 const storageInstance = storage;
 
 // Create new employee
-const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, role, imageFile) => {
+const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, role, position, imageFile) => {
     try {
         const newEmployeeRef = push(ref(db, 'users'));
 
@@ -35,11 +35,12 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
             phoneNumber,
             skills,
             status,
-            department,  // Added department
+            department,
+            position,  // Add position attribute
             imageUrl,
             isAdmin: false,
             role: role || "employee", // Default to "employee" if role is not provided
-            createdAt: Date.now(), // Automatically set the createdAt attribute
+            createdAt: Date.now(),
         });
 
         return newEmployeeRef.key;
@@ -48,6 +49,7 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
         throw error;
     }
 };
+
 
 // Fetch all employees
 const fetchAllEmployees = async () => {
@@ -63,7 +65,7 @@ const fetchAllEmployees = async () => {
 };
 
 // Update existing employee
-const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, department, imageFile, oldImageUrl) => {
+const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, department, position, imageFile, oldImageUrl) => {
     try {
         const employeeRef = ref(db, `users/${id}`);
         const employeeSnapshot = await get(employeeRef);
@@ -97,6 +99,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             skills,
             status,
             department,
+            position,  // Add position attribute
             imageUrl: imageUrl || currentData.imageUrl,
         };
 
@@ -113,6 +116,7 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
         throw error;
     }
 };
+
 
 
 
