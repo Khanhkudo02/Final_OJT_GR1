@@ -1,16 +1,44 @@
-import { ref, set, push, update, get, remove } from "firebase/database";
-import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
-import { database, storage } from '../firebaseConfig';
-import bcrypt from 'bcryptjs';
-import moment from 'moment';
+import bcrypt from "bcryptjs";
+import { get, push, ref, remove, set, update } from "firebase/database";
+import {
+    deleteObject,
+    getDownloadURL,
+    ref as storageRef,
+    uploadBytes,
+} from "firebase/storage";
+import moment from "moment";
+import { database, storage } from "../firebaseConfig";
 
 const db = database;
 const storageInstance = storage;
 
+const checkEmailExists = async (email) => {
+    const usersRef = ref(database, "users");
+    const snapshot = await get(usersRef);
+    const users = snapshot.val();
+
+    if (users) {
+        return Object.values(users).some((user) => user.email === email);
+    }
+    return false;
+};
+
 // Create new employee
-const postCreateEmployee = async (name, email, password, dateOfBirth, address, phoneNumber, skills, status, department, role, position, imageFile) => {
+const postCreateEmployee = async (
+    name,
+    email,
+    password,
+    dateOfBirth,
+    address,
+    phoneNumber,
+    skills,
+    status,
+    department,
+    role,
+    imageFile
+) => {
     try {
-        const newEmployeeRef = push(ref(db, 'users'));
+        const newEmployeeRef = push(ref(db, "users"));
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -19,12 +47,17 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
         if (imageFile) {
             const timestamp = Date.now();
             const filename = `${timestamp}_${imageFile.name}`;
-            const imageRef = storageRef(storageInstance, `employee/${newEmployeeRef.key}/${filename}`);
+            const imageRef = storageRef(
+                storageInstance,
+                `employee/${newEmployeeRef.key}/${filename}`
+            );
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
 
-        const formattedDateOfBirth = dateOfBirth ? moment(dateOfBirth).format('YYYY-MM-DD') : null;
+        const formattedDateOfBirth = dateOfBirth
+            ? moment(dateOfBirth).format("YYYY-MM-DD")
+            : null;
 
         await set(newEmployeeRef, {
             name,
@@ -35,12 +68,11 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
             phoneNumber,
             skills,
             status,
-            department,
-            position,  // Add position attribute
+            department, // Added department
             imageUrl,
             isAdmin: false,
             role: role || "employee", // Default to "employee" if role is not provided
-            createdAt: Date.now(),
+            createdAt: Date.now(), // Automatically set the createdAt attribute
         });
 
         return newEmployeeRef.key;
@@ -50,22 +82,49 @@ const postCreateEmployee = async (name, email, password, dateOfBirth, address, p
     }
 };
 
-
 // Fetch all employees
 const fetchAllEmployees = async () => {
     try {
-        const employeesRef = ref(db, 'users');
+        const employeesRef = ref(db, "users");
         const snapshot = await get(employeesRef);
         const data = snapshot.val();
-        return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
+        return data
+            ? Object.entries(data).map(([key, value]) => ({ key, ...value }))
+            : [];
     } catch (error) {
         console.error("Failed to fetch employees:", error);
         throw error;
     }
 };
 
+const fetchAllPositions = async () => {
+    try {
+        const positionsRef = ref(db, "positions");
+        const snapshot = await get(positionsRef);
+        const data = snapshot.val();
+        return data
+            ? Object.entries(data).map(([key, value]) => ({ key, ...value }))
+            : [];
+    } catch (error) {
+        console.error("Failed to fetch positions:", error);
+        throw error;
+    }
+};
+
 // Update existing employee
-const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNumber, skills, status, department, position, imageFile, oldImageUrl) => {
+const putUpdateEmployee = async (
+    id,
+    name,
+    email,
+    dateOfBirth,
+    address,
+    phoneNumber,
+    skills,
+    status,
+    department,
+    imageFile,
+    oldImageUrl
+) => {
     try {
         const employeeRef = ref(db, `users/${id}`);
         const employeeSnapshot = await get(employeeRef);
@@ -83,12 +142,17 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
 
             const timestamp = Date.now();
             const filename = `${timestamp}_${imageFile.name}`;
-            const imageRef = storageRef(storageInstance, `employee/${id}/${filename}`);
+            const imageRef = storageRef(
+                storageInstance,
+                `employee/${id}/${filename}`
+            );
             const snapshot = await uploadBytes(imageRef, imageFile);
             imageUrl = await getDownloadURL(snapshot.ref);
         }
 
-        const formattedDateOfBirth = dateOfBirth ? moment(dateOfBirth).format('YYYY-MM-DD') : null;
+        const formattedDateOfBirth = dateOfBirth
+            ? moment(dateOfBirth).format("YYYY-MM-DD")
+            : null;
 
         const updates = {
             name,
@@ -99,7 +163,6 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
             skills,
             status,
             department,
-            position,  // Add position attribute
             imageUrl: imageUrl || currentData.imageUrl,
         };
 
@@ -117,9 +180,6 @@ const putUpdateEmployee = async (id, name, email, dateOfBirth, address, phoneNum
     }
 };
 
-
-
-
 // Delete employee
 const deleteEmployeeById = async (id) => {
     try {
@@ -133,7 +193,7 @@ const deleteEmployeeById = async (id) => {
         const employeeData = employeeSnapshot.val();
 
         // Check if the employee is inactive before attempting to delete
-        if (employeeData.status !== 'inactive') {
+        if (employeeData.status !== "inactive") {
             throw new Error("Only employees with status 'inactive' can be deleted.");
         }
 
@@ -166,4 +226,12 @@ const fetchEmployeeById = async (id) => {
     }
 };
 
-export { fetchAllEmployees, postCreateEmployee, putUpdateEmployee, deleteEmployeeById, fetchEmployeeById };
+export {
+    checkEmailExists,
+    deleteEmployeeById,
+    fetchAllEmployees,
+    fetchEmployeeById,
+    postCreateEmployee,
+    putUpdateEmployee,
+    fetchAllPositions, // Add this line
+};

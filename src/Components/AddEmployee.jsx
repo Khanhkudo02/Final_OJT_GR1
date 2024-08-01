@@ -9,6 +9,7 @@ import {
   deleteEmployeeById,
   fetchAllEmployees,
   postCreateEmployee,
+  fetchAllPositions, // Import the function
 } from "../service/EmployeeServices";
 
 const { Option } = Select;
@@ -16,23 +17,15 @@ const { Column } = Table;
 
 const AddEmployee = () => {
   const { t } = useTranslation();
-  const [form] = Form.useForm(); // Using Ant Design's Form
+  const [form] = Form.useForm();
   const [employees, setEmployees] = useState([]);
+  const [positions, setPositions] = useState([]); // State for positions
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
 
   const navigate = useNavigate();
-
-  const departmentOptions = [
-    { value: "accounting", label: t("departmentAccounting") },
-    { value: "audit", label: t("departmentAudit") },
-    { value: "sales", label: t("departmentSales") },
-    { value: "administration", label: t("departmentAdministration") },
-    { value: "human_resource", label: t("departmentHumanResources") },
-    { value: "customer_service", label: t("departmentCustomerService") },
-  ];
 
   const skillOptions = [
     { value: "active_listening", label: t("skillActiveListening") },
@@ -52,15 +45,26 @@ const AddEmployee = () => {
       const data = await fetchAllEmployees();
       const filteredData = data.filter(
         (employee) => employee.role === "employee"
-      ); // Filter by role "employee"
+      );
       setEmployees(filteredData);
     } catch (error) {
       console.error("Failed to fetch employees:", error);
     }
   };
 
+  const loadPositions = async () => {
+    try {
+      const data = await fetchAllPositions();
+      const activePositions = data.filter(position => position.status === 'active'); // Lọc trạng thái active
+      setPositions(activePositions.map(position => ({ value: position.key, label: position.name })));
+    } catch (error) {
+      console.error("Failed to fetch positions:", error);
+    }
+  };
+
   useEffect(() => {
     loadEmployees();
+    loadPositions(); // Load positions when component mounts
   }, []);
 
   const handleAddEmployee = async (values) => {
@@ -74,9 +78,9 @@ const AddEmployee = () => {
       skills,
       status,
       department,
+      position,
     } = values;
 
-    // Kiểm tra email đã tồn tại chưa
     try {
       const emailExists = await checkEmailExists(email);
       if (emailExists) {
@@ -86,7 +90,7 @@ const AddEmployee = () => {
             errors: [t("emailAlreadyExists")],
           },
         ]);
-        return; // Dừng xử lý tiếp
+        return;
       }
       await postCreateEmployee(
         name,
@@ -98,6 +102,7 @@ const AddEmployee = () => {
         skills,
         status,
         department,
+        position,
         "employee",
         imageFiles[0]
       );
@@ -113,7 +118,6 @@ const AddEmployee = () => {
     const email = e.target.value;
     form.setFieldsValue({ email });
 
-    // Kiểm tra email khi người dùng nhập
     try {
       const emailExists = await checkEmailExists(email);
       if (emailExists) {
@@ -145,7 +149,7 @@ const AddEmployee = () => {
     try {
       await deleteEmployeeById(id);
       toast.success(t("employeeDeletedSuccessfully"));
-      loadEmployees(); // Reload the employees list
+      loadEmployees();
     } catch (error) {
       toast.error(t("failedToDeleteEmployee"));
     }
@@ -153,9 +157,7 @@ const AddEmployee = () => {
 
   const handlePhoneNumberChange = (e) => {
     const value = e.target.value;
-    // Remove all non-numeric characters
     const numericValue = value.replace(/\D/g, "");
-    // Limit to 10 digits
     if (numericValue.length <= 10) {
       form.setFieldsValue({ phoneNumber: numericValue });
     }
@@ -163,10 +165,8 @@ const AddEmployee = () => {
 
   const handleImageChange = (info) => {
     if (info.fileList) {
-      // Save files to state
       setImageFiles(info.fileList.map((file) => file.originFileObj));
 
-      // Generate preview URLs
       const previewUrls = info.fileList.map((file) => {
         if (file.originFileObj) {
           return URL.createObjectURL(file.originFileObj);
@@ -175,14 +175,13 @@ const AddEmployee = () => {
       });
       setImagePreviews(previewUrls);
     }
-    return false; // Prevent automatic upload
+    return false;
   };
 
   const handleFieldBlur = async (fieldName) => {
     try {
       await form.validateFields([fieldName]);
     } catch (error) {
-      // Do nothing, Ant Design will automatically show error message
     }
   };
 
@@ -250,7 +249,7 @@ const AddEmployee = () => {
           name="phoneNumber"
           rules={[
             { required: true, message: t("pleaseEnterPhoneNumber") },
-            { len: 10, message: t("phoneNumberLength") },
+            { pattern: /^[0-9]+$/, message: t("phoneNumberInvalid") },
           ]}
         >
           <Input
@@ -265,12 +264,7 @@ const AddEmployee = () => {
           name="skills"
           rules={[{ required: true, message: t("pleaseSelectSkills") }]}
         >
-          <Select
-            mode="multiple"
-            placeholder={t("selectSkills")}
-            style={{ width: "100%" }}
-            onBlur={() => handleFieldBlur("skills")}
-          >
+          <Select mode="multiple" placeholder={t("selectSkills")}>
             {skillOptions.map((skill) => (
               <Option key={skill.value} value={skill.value}>
                 {skill.label}
@@ -283,10 +277,7 @@ const AddEmployee = () => {
           name="status"
           rules={[{ required: true, message: t("pleaseSelectStatus") }]}
         >
-          <Select
-            placeholder={t("selectStatus")}
-            onBlur={() => handleFieldBlur("status")}
-          >
+          <Select onBlur={() => handleFieldBlur("status")}>
             <Option value="active">{t("active")}</Option>
             <Option value="inactive">{t("inactive")}</Option>
           </Select>
@@ -296,14 +287,24 @@ const AddEmployee = () => {
           name="department"
           rules={[{ required: true, message: t("pleaseSelectDepartment") }]}
         >
-          <Select
-            placeholder={t("selectDepartment")}
-            style={{ width: "100%" }}
-            onBlur={() => handleFieldBlur("department")}
-          >
-            {departmentOptions.map((dept) => (
-              <Option key={dept.value} value={dept.value}>
-                {dept.label}
+          <Select onBlur={() => handleFieldBlur("department")}>
+            <Option value="Accounting">{t("accounting")}</Option>
+            <Option value="Audit">{t("audit")}</Option>
+            <Option value="Sales">{t("sales")}</Option>
+            <Option value="Administration">{t("administration")}</Option>
+            <Option value="Human Resources">{t("humanResources")}</Option>
+            <Option value="Customer Service">{t("customerService")}</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          label={t("position")}
+          name="position"
+          rules={[{ required: true, message: t("pleaseSelectPosition") }]}
+        >
+          <Select onBlur={() => handleFieldBlur("position")}>
+            {positions.map((position) => (
+              <Option key={position.value} value={position.value}>
+                {position.label}
               </Option>
             ))}
           </Select>
@@ -334,54 +335,50 @@ const AddEmployee = () => {
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            {t("submit")}
+            {t("Add Employee")}
           </Button>
         </Form.Item>
       </Form>
-      <Table dataSource={employees} rowKey="id" style={{ marginTop: "20px" }}>
+
+      {/* Modal for viewing employee details */}
+      <Modal
+        title={t("employeeDetails")}
+        visible={viewModalVisible}
+        onCancel={() => setViewModalVisible(false)}
+        footer={null}
+      >
+        {selectedEmployee && (
+          <div>
+            <p>{t("name")}: {selectedEmployee.name}</p>
+            <p>{t("email")}: {selectedEmployee.email}</p>
+            <p>{t("position")}: {selectedEmployee.position}</p>
+            {/* Add more fields as necessary */}
+          </div>
+        )}
+      </Modal>
+
+      {/* Table for displaying employees */}
+      <Table dataSource={employees} rowKey="id">
         <Column title={t("name")} dataIndex="name" key="name" />
         <Column title={t("email")} dataIndex="email" key="email" />
+        <Column title={t("phoneNumber")} dataIndex="phoneNumber" key="phoneNumber" />
+        <Column title={t("status")} dataIndex="status" key="status" />
         <Column
-          title={t("phoneNumber")}
-          dataIndex="phoneNumber"
-          key="phoneNumber"
-        />
-        <Column
-          title={t("skills")}
-          dataIndex="skills"
-          key="skills"
-          render={(skills) =>
-            skills ? skills.map(getSkillLabel).join(", ") : ""
-          }
-        />
-        <Column
-          title={t("department")}
-          dataIndex="department"
-          key="department"
-          render={(dept) => {
-            if (typeof dept === "string") {
-              return t(
-                `department${dept.charAt(0).toUpperCase() + dept.slice(1)}`
-              );
-            }
-            return "";
-          }}
-        />
-        <Column
-          title={t("action")}
-          key="action"
+          title={t("actions")}
+          key="actions"
           render={(text, record) => (
             <Space size="middle">
               <Button
+                type="link"
                 icon={<EyeOutlined />}
                 onClick={() => handleViewEmployee(record)}
               >
                 {t("view")}
               </Button>
               <Button
+                type="link"
                 icon={<DeleteOutlined />}
                 onClick={() => handleDeleteEmployee(record.id)}
-                danger
               >
                 {t("delete")}
               </Button>
@@ -389,68 +386,7 @@ const AddEmployee = () => {
           )}
         />
       </Table>
-      <Modal
-        title={t("employeeDetails")}
-        visible={viewModalVisible}
-        onCancel={() => setViewModalVisible(false)}
-        footer={null}
-      >
-        {selectedEmployee ? (
-          <div>
-            <p>
-              <strong>{t("name")}:</strong> {selectedEmployee.name}
-            </p>
-            <p>
-              <strong>{t("email")}:</strong> {selectedEmployee.email}
-            </p>
-            <p>
-              <strong>{t("phoneNumber")}:</strong>{" "}
-              {selectedEmployee.phoneNumber}
-            </p>
-            <p>
-              <strong>{t("skills")}:</strong>{" "}
-              {selectedEmployee.skills
-                ? selectedEmployee.skills.map(getSkillLabel).join(", ")
-                : ""}
-            </p>
-            <p>
-              <strong>{t("department")}:</strong>{" "}
-              {t(
-                `department${selectedEmployee.department.charAt(0).toUpperCase() +
-                selectedEmployee.department.slice(1)
-                }`
-              )}
-            </p>
-            <p>
-              <strong>{t("status")}:</strong>{" "}
-              {selectedEmployee.status === "active"
-                ? t("active")
-                : t("inactive")}
-            </p>
-            <p>
-              <strong>{t("address")}:</strong> {selectedEmployee.address}
-            </p>
-            <p>
-              <strong>{t("dateOfBirth")}:</strong>{" "}
-              {selectedEmployee.dateOfBirth}
-            </p>
-            <div className="image-previews">
-              {selectedEmployee.images &&
-                selectedEmployee.images.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`employee-${index}`}
-                    style={{ width: "100px", height: "100px", margin: "5px" }}
-                  />
-                ))}
-            </div>
-          </div>
-        ) : (
-          <p>{t("employeeNotFound")}</p>
-        )}
-      </Modal>
-    </div>
+    </div >
   );
 };
 
