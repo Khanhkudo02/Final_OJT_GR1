@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
+import { fetchAllPositions } from "../service/PositionServices"; // Import fetchAllPositions
 import dayjs from "dayjs";
 
 const { Option } = Select;
@@ -242,7 +243,7 @@ const NewProject = () => {
         <Form.Item
           label="End Date"
           name="endDate"
-rules={[{ required: true, message: "Please select the end date!" }]}
+          rules={[{ required: true, message: "Please select the end date!" }]}
         >
           <DatePicker
             format="YYYY-MM-DD"
@@ -265,7 +266,7 @@ rules={[{ required: true, message: "Please select the end date!" }]}
           name="email"
           rules={[
             { required: true, message: "Please input the client email!" },
-            { type: 'email', message: 'Please enter a valid email!' }
+            { type: "email", message: "Please enter a valid email!" },
           ]}
         >
           <Input placeholder="input placeholder" />
@@ -276,7 +277,10 @@ rules={[{ required: true, message: "Please select the end date!" }]}
           name="phoneNumber"
           rules={[
             { required: true, message: "Please input the phone number!" },
-            { pattern: /^[0-9]+$/, message: 'Please enter a valid phone number!' }
+            {
+              pattern: /^[0-9]+$/,
+              message: "Please enter a valid phone number!",
+            },
           ]}
         >
           <Input placeholder="input placeholder" />
@@ -295,7 +299,9 @@ rules={[{ required: true, message: "Please select the end date!" }]}
         <Form.Item
           label="Team Members"
           name="teamMembers"
-          rules={[{ required: true, message: "Please list the team members!" }]}
+          rules={[
+            { required: true, message: "Please list the team members!" },
+          ]}
         >
           <Select mode="multiple" placeholder="Select team members">
             {positions.map((pos) => (
@@ -357,7 +363,7 @@ rules={[{ required: true, message: "Please select the end date!" }]}
         >
           <Select
             mode="multiple"
-placeholder="Select categories"
+            placeholder="Select categories"
             onBlur={() => handleFieldBlur("category")}
           >
             <Option value="WEB DESIGN">Web Design</Option>
