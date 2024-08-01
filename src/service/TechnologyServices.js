@@ -1,102 +1,101 @@
-import { ref as dbRef, get, push, remove, set, update } from "firebase/database";
-import { deleteObject, ref as storageRef } from "firebase/storage";
+// service/TechnologyServices.js
+import { ref, set, push, update, get, remove } from "firebase/database";
+import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
 import { database, storage } from "../firebaseConfig";
 
-// Create new technology
-const postCreateTechnology = async (name, description, status, imageUrls) => {
-  try {
-    const newTechnologyRef = push(dbRef(database, "technologies"));
 
-    // Save the technology data along with image URLs (if available)
-    await set(newTechnologyRef, {
-      name,
-      description,
-      status,
-      imageURLs: imageUrls, // Store image URLs as an array
-      createdAt: Date.now(),
-    });
-
-    return newTechnologyRef.key;
-  } catch (error) {
-    console.error("Failed to create technology:", error);
-    throw error;
-  }
+export const postCreateTechnology = async (name, description, status, imageFile) => {
+  // function implementation
 };
-
-// Fetch all technologies
-const fetchAllTechnology = async () => {
+export const fetchTechnologyById = async (id) => {
   try {
-    const technologiesRef = dbRef(database, "technologies");
-    const snapshot = await get(technologiesRef);
-    const data = snapshot.val();
-    return data
-      ? Object.entries(data).map(([key, value]) => ({ key, ...value }))
-      : [];
-  } catch (error) {
-    console.error("Failed to fetch technologies:", error);
-    throw error;
-  }
-};
-
-// Update existing technology
-const putUpdateTechnology = async (id, name, description, status, imageURLs, oldImageURLs) => {
-  try {
-    const technologyRef = dbRef(database, `technologies/${id}`);
-
-    // Update technology data
-    await update(technologyRef, {
-      name,
-      description,
-      status,
-      imageURLs,
-    });
-
-    // Delete old images from Firebase Storage if needed
-    const imagesToDelete = oldImageURLs.filter(url => !imageURLs.includes(url));
-    await Promise.all(imagesToDelete.map(async (url) => {
-      const oldImagePath = url.split("/o/")[1].split("?")[0];
-      const decodedOldImagePath = decodeURIComponent(oldImagePath);
-      const oldImageRef = storageRef(storage, decodedOldImagePath);
-      await deleteObject(oldImageRef);
-    }));
-
-    return id;
-  } catch (error) {
-    console.error("Failed to update technology:", error);
-    throw error;
-  }
-};
-
-// Delete technology
-const deleteTechnology = async (id) => {
-  try {
-    const technologyRef = dbRef(database, `technologies/${id}`);
-    const technologySnapshot = await get(technologyRef);
-
-    if (!technologySnapshot.exists()) {
-      throw new Error("Technology not found");
+    const technologyRef = ref(database, `technologies/${id}`);
+    const snapshot = await get(technologyRef);
+    if (!snapshot.exists()) {
+      throw new Error("Technology not found.");
     }
+    return snapshot.val();
+  } catch (error) {
+    console.error("Error fetching technology:", error);
+    throw error;
+  }
+};
 
-    // Delete images from Firebase Storage
-    const imageUrls = technologySnapshot.val().imageURLs;
-    if (Array.isArray(imageUrls)) {
-      await Promise.all(imageUrls.map(async (url) => {
-        const imagePath = url.split("/o/")[1].split("?")[0];
-        const decodedImagePath = decodeURIComponent(imagePath);
-        const imageStorageRef = storageRef(storage, decodedImagePath);
-        await deleteObject(imageStorageRef);
+export const fetchAllTechnology = async () => {
+  try {
+    const techRef = ref(database, 'technologies');
+    const snapshot = await get(techRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      return Object.keys(data).map((key) => ({
+        id: key,
+        ...data[key],
       }));
     } else {
-      console.warn("imageURLs is not an array or is undefined");
+      return []; // Return an empty array if no data available
     }
-
-    // Delete technology from Realtime Database
-    await remove(technologyRef);
   } catch (error) {
-    console.error("Failed to delete technology:", error);
+    console.error("Error fetching technologies:", error);
     throw error;
   }
 };
 
-export { deleteTechnology, fetchAllTechnology, postCreateTechnology, putUpdateTechnology };
+// Function to update a technology
+export const putUpdateTechnology = async (id, name, description, status, imageFile) => {
+  try {
+    let imageUrl = null;
+    if (imageFile) {
+      const storageReference = storageRef(storage, `technologies/${Date.now()}_${imageFile.name}`);
+      await uploadBytes(storageReference, imageFile);
+      imageUrl = await getDownloadURL(storageReference);
+    }
+
+    const techRef = ref(database, `technologies/${id}`);
+    await update(techRef, {
+      name,
+      description,
+      status,
+      ...(imageUrl && { imageUrl })
+    });
+  } catch (error) {
+    console.error("Error updating technology:", error);
+    throw error;
+  }
+};
+
+
+// Function to delete a technology
+export const deleteTechnology = async (id) => {
+  try {
+    const techRef = ref(database, `technologies/${id}`);
+    await remove(techRef);
+  } catch (error) {
+    console.error("Error deleting technology:", error);
+    throw error;
+  }
+};
+
+// Function to get a technology by ID
+export const getTechnologyById = async (id) => {
+  try {
+    console.log(`Fetching technology with ID: ${id}`); // Debug
+    const techRef = ref(database, `technologies/${id}`);
+    const snapshot = await get(techRef);
+    console.log('Technology data:', snapshot.val()); // Debug
+
+    if (snapshot.exists()) {
+      return snapshot.val();
+    } else {
+      throw new Error("No such technology!");
+    }
+  } catch (error) {
+    console.error("Failed to fetch technology by ID:", error);
+    throw error;
+  }
+};
+
+
+
+
+
 

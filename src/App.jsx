@@ -11,6 +11,10 @@ import PositionManagement from "./Components/PositionManagement";
 import ProjectManagement from "./Components/ProjectManagement";
 import Sidebar from "./Components/Sidebar";
 import TechnologyManagement from "./Components/TechnologyManagement";
+import AddTechnology from './Components/AddTechnology';
+import EditTechnology from './Components/EditTechnology';
+// import EditTechnology from './Components/EditTechnology';
+import TechnologyDetails from "./Components/TechnologyDetails";
 import Admin from "./pages/Admin";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
@@ -129,6 +133,18 @@ const App = () => {
                         <Route
                           path="/technology-management"
                           element={<TechnologyManagement />}
+                        />
+                        <Route 
+                          path="/technology-management/add" 
+                          element={<AddTechnology />} 
+                          />
+                        <Route 
+                          path="/technology-management/edit/:id" 
+                          element={<EditTechnology />} 
+                        />
+                        <Route 
+                          path="/technology-management/view/:id" 
+                          element={<TechnologyDetails />} 
                         />
                         <Route
                           path="/programing-language"

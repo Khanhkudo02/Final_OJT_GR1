@@ -10,7 +10,7 @@ const storageInstance = storage;
 
 // Create new position
 const postCreatePosition = async (name, description, department, status, imageFile) => {
-  try {
+  try { 
     const newPositionRef = push(ref(db, 'positions'));
 
     let imageUrl = null;

@@ -66,14 +66,7 @@ const EditPosition = () => {
     }
   };
 
-  const handleImageChange = ({ file }) => {
-    if (file.type === "image/png" || file.type === "image/svg+xml") {
-      setImageFile(file.originFileObj);
-    } else {
-      toast.error("Only PNG and SVG images are allowed.");
-    }
-  };
-
+  
   const beforeUpload = (file) => {
     handleImageChange({ file });
     return false;
