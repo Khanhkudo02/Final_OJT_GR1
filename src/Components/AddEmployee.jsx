@@ -139,6 +139,13 @@ const AddEmployee = () => {
     return false; // Prevent automatic upload
   };
 
+  const handleFieldBlur = async (fieldName) => {
+    try {
+      await form.validateFields([fieldName]);
+    } catch (error) {
+      // Do nothing, Ant Design will automatically show error message
+    }
+  };
   const getSkillLabel = (value) => {
     const skill = skillOptions.find((option) => option.value === value);
     return skill ? skill.label : value;
@@ -158,7 +165,7 @@ const AddEmployee = () => {
           name="name"
           rules={[{ required: true, message: t("pleaseEnterName") }]}
         >
-          <Input type="text" />
+          <Input type="text" onBlur={() => handleFieldBlur("name")} />
         </Form.Item>
         <Form.Item
           label={t("email")}
@@ -168,7 +175,7 @@ const AddEmployee = () => {
             { type: "email", message: t("invalidEmail") },
           ]}
         >
-          <Input type="email" />
+          <Input type="email" onBlur={() => handleFieldBlur("email")} />
         </Form.Item>
         <Form.Item
           label={t("password")}
@@ -178,21 +185,21 @@ const AddEmployee = () => {
             { min: 6, message: t("passwordMinLength") },
           ]}
         >
-          <Input type="password" />
+          <Input type="password" onBlur={() => handleFieldBlur("password")} />
         </Form.Item>
         <Form.Item
           label={t("dateOfBirth")}
           name="dateOfBirth"
           rules={[{ required: true, message: t("pleaseEnterDateOfBirth") }]}
         >
-          <Input type="date" />
+          <Input type="date" onBlur={() => handleFieldBlur("dateOfBirth")} />
         </Form.Item>
         <Form.Item
           label={t("address")}
           name="address"
           rules={[{ required: true, message: t("pleaseEnterAddress") }]}
         >
-          <Input type="text" />
+          <Input type="text" onBlur={() => handleFieldBlur("address")} />
         </Form.Item>
         <Form.Item
           label={t("phoneNumber")}
@@ -206,6 +213,7 @@ const AddEmployee = () => {
             type="text"
             maxLength={10}
             onChange={handlePhoneNumberChange}
+            onBlur={() => handleFieldBlur("phoneNumber")}
           />
         </Form.Item>
         <Form.Item
@@ -217,6 +225,7 @@ const AddEmployee = () => {
             mode="multiple"
             placeholder={t("selectSkills")}
             style={{ width: "100%" }}
+            onBlur={() => handleFieldBlur("skills")}
           >
             {skillOptions.map((skill) => (
               <Option key={skill.value} value={skill.value}>
@@ -230,7 +239,7 @@ const AddEmployee = () => {
           name="status"
           rules={[{ required: true, message: t("pleaseSelectStatus") }]}
         >
-          <Select placeholder={t("selectStatus")}>
+          <Select placeholder={t("selectStatus")} onBlur={() => handleFieldBlur("status")}>
             <Option value="active">{t("active")}</Option>
             <Option value="inactive">{t("inactive")}</Option>
           </Select>
@@ -240,7 +249,7 @@ const AddEmployee = () => {
           name="department"
           rules={[{ required: true, message: t("pleaseSelectDepartment") }]}
         >
-          <Select placeholder={t("selectDepartment")} style={{ width: "100%" }}>
+          <Select placeholder={t("selectDepartment")} style={{ width: "100%" }} onBlur={() => handleFieldBlur("department")}>
             {departmentOptions.map((dept) => (
               <Option key={dept.value} value={dept.value}>
                 {dept.label}
