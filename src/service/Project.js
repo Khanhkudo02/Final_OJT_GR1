@@ -11,6 +11,35 @@ import { database, storage } from "../firebaseConfig";
 const db = database;
 const storageInstance = storage;
 
+const formatBudget = (value) => {
+  if (typeof value !== "string") {
+    value = String(value);
+  }
+
+  // Kiểm tra nếu value không tồn tại hoặc là một chuỗi trống
+  if (!value) return "";
+
+  // Check if the value has "$" or "VND"
+  const hasDollarSign = value.startsWith("$");
+  const hasVND = value.endsWith("VND");
+
+  // Remove "$" and "VND" for formatting
+  let numericValue = value.replace(/[^\d]/g, "");
+
+  // Format the number with commas
+  numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  // Add "$" or "VND" back
+  if (hasDollarSign) {
+    numericValue = `$${numericValue}`;
+  }
+  if (hasVND) {
+    numericValue = `${numericValue}VND`;
+  }
+
+  return numericValue;
+};
+
 const postCreateProject = async (projectData, imageFile) => {
   try {
     const newProjectRef = push(ref(db, "projects"));
@@ -24,6 +53,9 @@ const postCreateProject = async (projectData, imageFile) => {
       const snapshot = await uploadBytes(imageRef, imageFile);
       imageUrl = await getDownloadURL(snapshot.ref);
     }
+
+    // Định dạng ngân sách trước khi lưu trữ
+    projectData.budget = formatBudget(projectData.budget);
 
     await set(newProjectRef, {
       ...projectData,
@@ -78,6 +110,9 @@ const putUpdateProject = async (id, projectData, imageFile) => {
       const snapshot = await uploadBytes(imageRef, imageFile);
       imageUrl = await getDownloadURL(snapshot.ref);
     }
+
+    // Định dạng ngân sách trước khi lưu trữ
+    projectData.budget = formatBudget(projectData.budget);
 
     await update(projectRef, {
       ...projectData,

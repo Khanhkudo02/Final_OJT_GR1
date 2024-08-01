@@ -149,5 +149,7 @@
   "imagePreview": "Xem trước hình ảnh",
   "failedToFetchEmployee": "Lấy dữ liệu nhân viên thất bại.",
   "employeeImage": "Hình Ảnh Nhân Viên",
-  "noSkills": "Không có kỹ năng"
+  "noSkills": "Không có kỹ năng",
+  "AllEmployees": "Tất cả nhân viên",
+  "search": "Nhập từ khóa tìm kiếm"
 }

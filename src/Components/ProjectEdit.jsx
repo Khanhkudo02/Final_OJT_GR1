@@ -5,17 +5,18 @@ import {
   Button,
   Select,
   DatePicker,
-  InputNumber,
   message,
   Upload,
   Modal,
-} from 'antd';
-import dayjs from 'dayjs';
+} from "antd";
+import dayjs from "dayjs";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import moment from "moment";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
+import { fetchAllEmployees } from "../service/EmployeeServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -28,6 +29,8 @@ const ProjectEdit = () => {
   const [fileList, setFileList] = useState([]);
   const [technologies, setTechnologies] = useState([]);
   const [languages, setLanguages] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [statusOptions, setStatusOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -40,8 +43,8 @@ const ProjectEdit = () => {
           setProject(projectData);
           form.setFieldsValue({
             ...projectData,
-            startDate: dayjs(projectData.startDate),
-            endDate: dayjs(projectData.endDate),
+            startDate: moment(projectData.startDate),
+            endDate: moment(projectData.endDate),
           });
 
           // Set fileList for existing attachments
@@ -55,6 +58,8 @@ const ProjectEdit = () => {
               },
             ]);
           }
+
+          updateStatusOptions(projectData.status);
         } else {
           message.error("Project not found");
           navigate("/project-management");
@@ -73,7 +78,6 @@ const ProjectEdit = () => {
     const loadTechnologies = async () => {
       try {
         const data = await fetchAllTechnology();
-        // Convert data from Firebase to format for Select
         const techOptions = data.map((tech) => ({
           label: tech.name,
           value: tech.key, // Use key as value for Option
@@ -94,7 +98,6 @@ const ProjectEdit = () => {
     const loadLanguages = async () => {
       try {
         const data = await fetchAllLanguages();
-        // Convert data from Firebase to format for Select
         const languageOptions = data.map((lang) => ({
           label: lang.name,
           value: lang.key, // Use key as value for Option
@@ -111,29 +114,86 @@ const ProjectEdit = () => {
     loadLanguages();
   }, []);
 
-  // const onFinish = async (values) => {
-  //   Modal.confirm({
-  //     title: "Confirm Changes",
-  //     content: "Do you agree with the changes you have made?",
-  //     okText: "Yes",
-  //     cancelText: "No",
-  //     onOk: async () => {
-  //       try {
-  //         const projectData = {
-  //           ...values,
-  //           startDate: values.startDate.format('YYYY-MM-DD'),
-  //           endDate: values.endDate.format('YYYY-MM-DD'),
-  //           imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl,
-  //         };
-  //         await putUpdateProject(id, projectData, fileList.length > 0 ? fileList[0].originFileObj : null);
-  //         message.success('Project updated successfully');
-  //         navigate(`/project/${id}`);
-  //       } catch (error) {
-  //         message.error('Failed to update project');
-  //       }
-  //     },
-  //   });
-  // };
+  // Load employees
+  useEffect(() => {
+    const loadEmployees = async () => {
+      try {
+        const data = await fetchAllEmployees();
+        const employeeOptions = data
+          .filter((emp) => emp.role === "employee")
+          .map((emp) => ({
+            label: emp.name,
+            value: emp.key, // Use key as value for Option
+          }));
+        setEmployees(employeeOptions);
+      } catch (err) {
+        setError("Failed to fetch employees");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEmployees();
+  }, []);
+
+  const formatBudget = (value) => {
+    let numericValue = value.replace(/[^\d$VND]/g, "");
+    const hasDollarSign = numericValue.startsWith("$");
+    const hasVND = numericValue.endsWith("VND");
+
+    if (hasDollarSign) {
+      numericValue = numericValue.slice(1);
+    }
+    if (hasVND) {
+      numericValue = numericValue.slice(0, -3);
+    }
+
+    numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    if (hasDollarSign) {
+      numericValue = `$${numericValue}`;
+    }
+    if (hasVND) {
+      numericValue = `${numericValue}VND`;
+    }
+
+    return numericValue;
+  };
+
+  const handleBudgetChange = (e) => {
+    const { value } = e.target;
+    const formattedValue = formatBudget(value);
+    form.setFieldsValue({ budget: formattedValue });
+  };
+
+  const handleBudgetBlur = async () => {
+    const value = form.getFieldValue("budget");
+    if (!value.includes("$") && !value.includes("VND")) {
+      message.error("Budget must include either $ or VND");
+    }
+  };
+
+  const updateStatusOptions = (currentStatus) => {
+    let options = [];
+    switch (currentStatus) {
+      case "ONGOING":
+        options = ["PENDING", "COMPLETED"];
+        break;
+      case "PENDING":
+        options = ["ONGOING"];
+        break;
+      case "COMPLETED":
+        options = ["ONGOING"];
+        break;
+      case "NOT STARTED":
+        options = ["ONGOING", "PENDING"];
+        break;
+      default:
+        options = ["NOT STARTED", "ONGOING", "COMPLETED", "PENDING"];
+        break;
+    }
+    setStatusOptions(options);
+  };
 
   const onFinish = async (values) => {
     Modal.confirm({
@@ -145,8 +205,8 @@ const ProjectEdit = () => {
         try {
           const projectData = {
             ...values,
-            startDate: values.startDate.format("DD-MM-YYYY"),
-            endDate: values.endDate.format("DD-MM-YYYY"),
+            startDate: values.startDate.format("YYYY-MM-DD"),
+            endDate: values.endDate.format("YYYY-MM-DD"),
             imageUrl:
               fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
           };
@@ -181,7 +241,7 @@ const ProjectEdit = () => {
         margin: "auto",
       }}
     >
-      <Button type="default" onClick={() => navigate(`/project/${id}`)}>
+      <Button type="default" icon={<ArrowLeftOutlined />} onClick={() => navigate(`/project/${id}`)}>
         Back
       </Button>
       <h2>Edit Project</h2>
@@ -214,7 +274,7 @@ const ProjectEdit = () => {
           name="startDate"
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
-          <DatePicker format="DD/MM/YYYY"/>
+          <DatePicker format="YYYY-MM-DD" />
         </Form.Item>
 
         <Form.Item
@@ -222,11 +282,11 @@ const ProjectEdit = () => {
           name="endDate"
           rules={[{ required: true, message: "Please select the end date!" }]}
         >
-          <DatePicker format="DD/MM/YYYY"/>
+          <DatePicker format="YYYY-MM-DD" />
         </Form.Item>
 
         <Form.Item
-          label="Client Name"
+          label="Name"
           name="clientName"
           rules={[{ required: true, message: "Please input the client name!" }]}
         >
@@ -234,16 +294,25 @@ const ProjectEdit = () => {
         </Form.Item>
 
         <Form.Item
-          label="Client Contact"
-          name="clientContact"
+          label="Email"
+          name="email"
           rules={[
-            {
-              required: true,
-              message: "Please input the client contact information!",
-            },
+            { required: true, message: "Please input the client email!" },
+            { type: "email", message: "Please enter a valid email!" },
           ]}
         >
-          <Input />
+          <Input placeholder="emailname@gmail.com" />
+        </Form.Item>
+
+        <Form.Item
+          label="Phone Number"
+          name="phoneNumber"
+          rules={[
+            { required: true, message: "Please input the phone number!" },
+            { pattern: /^[0-9]{10}$/, message: 'Please enter a valid 10-digit phone number!' }
+          ]}
+        >
+          <Input placeholder="0123456789" />
         </Form.Item>
 
         <Form.Item
@@ -259,9 +328,17 @@ const ProjectEdit = () => {
         <Form.Item
           label="Team Members"
           name="teamMembers"
-          rules={[{ required: true, message: "Please list the team members!" }]}
+          rules={[
+            { required: true, message: "Please select the team members!" },
+          ]}
         >
-          <TextArea rows={2} />
+          <Select mode="multiple" placeholder="Select team members">
+            {employees.map((emp) => (
+              <Option key={emp.value} value={emp.value}>
+                {emp.label}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
@@ -271,7 +348,11 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project budget!" },
           ]}
         >
-          <InputNumber min={0} style={{ width: "100%" }} />
+          <Input
+            onBlur={handleBudgetBlur}
+            onChange={handleBudgetChange}
+            maxLength={20}
+          />
         </Form.Item>
 
         <Form.Item
@@ -282,9 +363,11 @@ const ProjectEdit = () => {
           ]}
         >
           <Select>
-            <Option value="NOT STARTED">Not Started</Option>
-            <Option value="ONGOING">Ongoing</Option>
-            <Option value="COMPLETED">Completed</Option>
+            {statusOptions.map((status) => (
+              <Option key={status} value={status}>
+                {status}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 

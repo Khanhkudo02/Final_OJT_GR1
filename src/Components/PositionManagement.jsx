@@ -1,9 +1,10 @@
 import {
   DeleteOutlined,
   EditOutlined,
-  PlusOutlined
+  PlusOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
-import { Button, message, Modal, Space, Table } from "antd";
+import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
@@ -12,6 +13,7 @@ import {
   deletePositionById,
   fetchAllPositions,
 } from "../service/PositionServices";
+import { useTranslation } from "react-i18next";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -20,9 +22,12 @@ const PositionManagement = () => {
   const [positions, setPositions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [filteredStatus, setFilteredStatus] = useState("All Positions");
   const navigate = useNavigate();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [dataPositionEdit, setDataPositionEdit] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useTranslation();
 
   const loadPositions = async () => {
     try {
@@ -42,6 +47,7 @@ const PositionManagement = () => {
       localStorage.removeItem("positionAdded"); // Xóa thông báo sau khi đã hiển thị
     }
   }, []);
+
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);
     setPageSize(pagination.pageSize);
@@ -55,10 +61,10 @@ const PositionManagement = () => {
   const showAddPage = () => {
     navigate("/positions/add");
   };
+
   const handleDelete = (record) => {
     if (record.status !== "inactive") {
       message.error("Only inactive positions can be deleted.");
-
       return;
     }
 
@@ -78,10 +84,39 @@ const PositionManagement = () => {
       },
     });
   };
-  const paginatedData = positions.slice(
+
+  const handleTabChange = (key) => {
+    setFilteredStatus(key);
+    setCurrentPage(1); // Reset to first page when changing tabs
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // const filteredData = positions.filter((item) => {
+  //   if (filteredStatus === "All Positions") return true;
+  //   return item.status.toLowerCase() === filteredStatus.toLowerCase();
+  // });
+
+  const filteredData = positions.filter((item) => {
+    const matchesStatus = filteredStatus === "All Positions" || item.status.toLowerCase() === filteredStatus.toLowerCase();
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
+
+  const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  
+  const tabItems = [
+    { key: "All Positions", label: "All Positions" },
+    { key: "active", label: "Active" },
+    { key: "inactive", label: "Inactive" },
+  ];
+
   return (
     <div>
       <Button
@@ -92,13 +127,26 @@ const PositionManagement = () => {
         icon={<PlusOutlined />}
       >
       </Button>
+      <Input
+        placeholder={t("search")}
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ width: "250px", marginBottom: 16 }}
+        prefix={<SearchOutlined />}
+      />
+      <Tabs
+        defaultActiveKey="All Positions"
+        onChange={handleTabChange}
+        items={tabItems}
+        centered
+      />
       <Table
         dataSource={paginatedData}
         rowKey="key"
         pagination={{
           current: currentPage,
           pageSize: pageSize,
-          total: positions.length,
+          total: filteredData.length,
           onChange: (page, pageSize) =>
             handleTableChange({ current: page, pageSize }),
         }}
@@ -141,13 +189,6 @@ const PositionManagement = () => {
           )}
         />
       </Table>
-      {dataPositionEdit && (
-        <ModalEditPosition
-          open={isEditModalVisible}
-          handleClose={() => setIsEditModalVisible(false)}
-          dataPositionEdit={dataPositionEdit}
-        />
-      )}
     </div>
   );
 };

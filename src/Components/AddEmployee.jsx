@@ -1,14 +1,11 @@
-import {
-  DeleteOutlined,
-  EyeOutlined,
-  PlusOutlined
-} from "@ant-design/icons";
+import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Modal, Select, Space, Table, Upload } from "antd";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
+  checkEmailExists,
   deleteEmployeeById,
   fetchAllEmployees,
   postCreateEmployee,
@@ -67,9 +64,30 @@ const AddEmployee = () => {
   }, []);
 
   const handleAddEmployee = async (values) => {
-    const { name, email, password, dateOfBirth, address, phoneNumber, skills, status, department } = values;
+    const {
+      name,
+      email,
+      password,
+      dateOfBirth,
+      address,
+      phoneNumber,
+      skills,
+      status,
+      department,
+    } = values;
 
+    // Kiểm tra email đã tồn tại chưa
     try {
+      const emailExists = await checkEmailExists(email);
+      if (emailExists) {
+        form.setFields([
+          {
+            name: "email",
+            errors: [t("emailAlreadyExists")],
+          },
+        ]);
+        return; // Dừng xử lý tiếp
+      }
       await postCreateEmployee(
         name,
         email,
@@ -82,12 +100,39 @@ const AddEmployee = () => {
         department,
         "employee",
         imageFiles[0]
-      ); // Pass the first image file only
+      );
       localStorage.setItem("employeeAdded", "true");
       navigate("/employee-management");
-      form.resetFields(); // Reset form fields after successful submission
+      form.resetFields();
     } catch (error) {
       toast.error(t("failedToAddEmployee"));
+    }
+  };
+
+  const handleEmailChange = async (e) => {
+    const email = e.target.value;
+    form.setFieldsValue({ email });
+
+    // Kiểm tra email khi người dùng nhập
+    try {
+      const emailExists = await checkEmailExists(email);
+      if (emailExists) {
+        form.setFields([
+          {
+            name: "email",
+            errors: [t("emailAlreadyExists")],
+          },
+        ]);
+      } else {
+        form.setFields([
+          {
+            name: "email",
+            errors: [],
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Failed to check email existence:", error);
     }
   };
 
@@ -133,6 +178,14 @@ const AddEmployee = () => {
     return false; // Prevent automatic upload
   };
 
+  const handleFieldBlur = async (fieldName) => {
+    try {
+      await form.validateFields([fieldName]);
+    } catch (error) {
+      // Do nothing, Ant Design will automatically show error message
+    }
+  };
+
   const getSkillLabel = (value) => {
     const skill = skillOptions.find((option) => option.value === value);
     return skill ? skill.label : value;
@@ -152,51 +205,59 @@ const AddEmployee = () => {
           name="name"
           rules={[{ required: true, message: t("pleaseEnterName") }]}
         >
-          <Input type="text" />
+          <Input type="text" onBlur={() => handleFieldBlur("name")} />
         </Form.Item>
         <Form.Item
           label={t("email")}
           name="email"
-          rules={[{ required: true, message: t("pleaseEnterEmail") }, { type: "email", message: t("invalidEmail") }]}
+          rules={[
+            { required: true, message: t("pleaseEnterEmail") },
+            { type: "email", message: t("invalidEmail") },
+          ]}
         >
-          <Input type="email" />
+          <Input
+            type="email"
+            onBlur={() => handleFieldBlur("email")}
+            onChange={handleEmailChange}
+          />
         </Form.Item>
         <Form.Item
           label={t("password")}
           name="password"
           rules={[
             { required: true, message: t("pleaseEnterPassword") },
-            { min: 6, message: t("passwordMinLength") }
+            { min: 6, message: t("passwordMinLength") },
           ]}
         >
-          <Input type="password" />
+          <Input type="password" onBlur={() => handleFieldBlur("password")} />
         </Form.Item>
         <Form.Item
           label={t("dateOfBirth")}
           name="dateOfBirth"
           rules={[{ required: true, message: t("pleaseEnterDateOfBirth") }]}
         >
-          <Input type="date" />
+          <Input type="date" onBlur={() => handleFieldBlur("dateOfBirth")} />
         </Form.Item>
         <Form.Item
           label={t("address")}
           name="address"
           rules={[{ required: true, message: t("pleaseEnterAddress") }]}
         >
-          <Input type="text" />
+          <Input type="text" onBlur={() => handleFieldBlur("address")} />
         </Form.Item>
         <Form.Item
           label={t("phoneNumber")}
           name="phoneNumber"
           rules={[
             { required: true, message: t("pleaseEnterPhoneNumber") },
-            { len: 10, message: t("phoneNumberLength") }
+            { len: 10, message: t("phoneNumberLength") },
           ]}
         >
           <Input
             type="text"
             maxLength={10}
             onChange={handlePhoneNumberChange}
+            onBlur={() => handleFieldBlur("phoneNumber")}
           />
         </Form.Item>
         <Form.Item
@@ -208,6 +269,7 @@ const AddEmployee = () => {
             mode="multiple"
             placeholder={t("selectSkills")}
             style={{ width: "100%" }}
+            onBlur={() => handleFieldBlur("skills")}
           >
             {skillOptions.map((skill) => (
               <Option key={skill.value} value={skill.value}>
@@ -221,7 +283,10 @@ const AddEmployee = () => {
           name="status"
           rules={[{ required: true, message: t("pleaseSelectStatus") }]}
         >
-          <Select placeholder={t("selectStatus")}>
+          <Select
+            placeholder={t("selectStatus")}
+            onBlur={() => handleFieldBlur("status")}
+          >
             <Option value="active">{t("active")}</Option>
             <Option value="inactive">{t("inactive")}</Option>
           </Select>
@@ -231,7 +296,11 @@ const AddEmployee = () => {
           name="department"
           rules={[{ required: true, message: t("pleaseSelectDepartment") }]}
         >
-          <Select placeholder={t("selectDepartment")} style={{ width: "100%" }}>
+          <Select
+            placeholder={t("selectDepartment")}
+            style={{ width: "100%" }}
+            onBlur={() => handleFieldBlur("department")}
+          >
             {departmentOptions.map((dept) => (
               <Option key={dept.value} value={dept.value}>
                 {dept.label}
@@ -272,15 +341,41 @@ const AddEmployee = () => {
       <Table dataSource={employees} rowKey="id" style={{ marginTop: "20px" }}>
         <Column title={t("name")} dataIndex="name" key="name" />
         <Column title={t("email")} dataIndex="email" key="email" />
-        <Column title={t("phoneNumber")} dataIndex="phoneNumber" key="phoneNumber" />
-        <Column title={t("skills")} dataIndex="skills" key="skills" render={skills => skills.map(getSkillLabel).join(", ")} />
-        <Column title={t("department")} dataIndex="department" key="department" render={dept => t(`department${dept.charAt(0).toUpperCase() + dept.slice(1)}`)} />
+        <Column
+          title={t("phoneNumber")}
+          dataIndex="phoneNumber"
+          key="phoneNumber"
+        />
+        <Column
+          title={t("skills")}
+          dataIndex="skills"
+          key="skills"
+          render={(skills) =>
+            skills ? skills.map(getSkillLabel).join(", ") : ""
+          }
+        />
+        <Column
+          title={t("department")}
+          dataIndex="department"
+          key="department"
+          render={(dept) => {
+            if (typeof dept === "string") {
+              return t(
+                `department${dept.charAt(0).toUpperCase() + dept.slice(1)}`
+              );
+            }
+            return "";
+          }}
+        />
         <Column
           title={t("action")}
           key="action"
           render={(text, record) => (
             <Space size="middle">
-              <Button icon={<EyeOutlined />} onClick={() => handleViewEmployee(record)}>
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() => handleViewEmployee(record)}
+              >
                 {t("view")}
               </Button>
               <Button
@@ -302,23 +397,54 @@ const AddEmployee = () => {
       >
         {selectedEmployee ? (
           <div>
-            <p><strong>{t("name")}:</strong> {selectedEmployee.name}</p>
-            <p><strong>{t("email")}:</strong> {selectedEmployee.email}</p>
-            <p><strong>{t("phoneNumber")}:</strong> {selectedEmployee.phoneNumber}</p>
-            <p><strong>{t("skills")}:</strong> {selectedEmployee.skills.map(getSkillLabel).join(", ")}</p>
-            <p><strong>{t("department")}:</strong> {t(`department${selectedEmployee.department.charAt(0).toUpperCase() + selectedEmployee.department.slice(1)}`)}</p>
-            <p><strong>{t("status")}:</strong> {selectedEmployee.status === "active" ? t("active") : t("inactive")}</p>
-            <p><strong>{t("address")}:</strong> {selectedEmployee.address}</p>
-            <p><strong>{t("dateOfBirth")}:</strong> {selectedEmployee.dateOfBirth}</p>
+            <p>
+              <strong>{t("name")}:</strong> {selectedEmployee.name}
+            </p>
+            <p>
+              <strong>{t("email")}:</strong> {selectedEmployee.email}
+            </p>
+            <p>
+              <strong>{t("phoneNumber")}:</strong>{" "}
+              {selectedEmployee.phoneNumber}
+            </p>
+            <p>
+              <strong>{t("skills")}:</strong>{" "}
+              {selectedEmployee.skills
+                ? selectedEmployee.skills.map(getSkillLabel).join(", ")
+                : ""}
+            </p>
+            <p>
+              <strong>{t("department")}:</strong>{" "}
+              {t(
+                `department${
+                  selectedEmployee.department.charAt(0).toUpperCase() +
+                  selectedEmployee.department.slice(1)
+                }`
+              )}
+            </p>
+            <p>
+              <strong>{t("status")}:</strong>{" "}
+              {selectedEmployee.status === "active"
+                ? t("active")
+                : t("inactive")}
+            </p>
+            <p>
+              <strong>{t("address")}:</strong> {selectedEmployee.address}
+            </p>
+            <p>
+              <strong>{t("dateOfBirth")}:</strong>{" "}
+              {selectedEmployee.dateOfBirth}
+            </p>
             <div className="image-previews">
-              {selectedEmployee.images && selectedEmployee.images.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`employee-${index}`}
-                  style={{ width: "100px", height: "100px", margin: "5px" }}
-                />
-              ))}
+              {selectedEmployee.images &&
+                selectedEmployee.images.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`employee-${index}`}
+                    style={{ width: "100px", height: "100px", margin: "5px" }}
+                  />
+                ))}
             </div>
           </div>
         ) : (

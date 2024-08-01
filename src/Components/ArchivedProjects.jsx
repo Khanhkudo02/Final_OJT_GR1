@@ -100,7 +100,6 @@ const ArchivedProjects = () => {
         onClick={() => navigate("/project-management")}
         style={{ marginBottom: "16px" }}
       >
-        Back to Project Management
       </Button>
       <Table 
         columns={columns} 

@@ -5,7 +5,7 @@ import {
   EyeOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { Button, message, Modal, Space, Table } from "antd";
+import { Button, message, Modal, Space, Table, Tabs } from "antd";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 import React, { useEffect, useState } from "react";
@@ -21,6 +21,7 @@ import {
 
 const { Column } = Table;
 const { confirm } = Modal;
+const { TabPane } = Tabs;
 
 const EmployeeManagement = () => {
   const { t } = useTranslation();
@@ -28,13 +29,43 @@ const EmployeeManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [activeTab, setActiveTab] = useState("all");
+
+  const formatSkill = (skill) =>
+    skill
+      .replace(/_/g, " ")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+  const formatDepartment = (department) => {
+    if (typeof department === "string") {
+      return department
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+    return department;
+  };
 
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
       const filteredData = data
         .filter((employee) => employee.role === "employee")
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp theo createdAt
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      // Lọc dữ liệu theo tab
+      if (activeTab === "active") {
+        setFilteredEmployees(filteredData.filter((e) => e.status === "active"));
+      } else if (activeTab === "inactive") {
+        setFilteredEmployees(
+          filteredData.filter((e) => e.status === "inactive")
+        );
+      } else {
+        setFilteredEmployees(filteredData); // Tab "All Employees"
+      }
+
       setEmployees(filteredData);
     } catch (error) {
       console.error(t("errorFetchingEmployees"), error);
@@ -49,7 +80,7 @@ const EmployeeManagement = () => {
       message.success(t("employeeAddedSuccessfully"));
       localStorage.removeItem("employeeAdded");
     }
-  }, [t]);
+  }, [t, activeTab]);
 
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);
@@ -94,55 +125,228 @@ const EmployeeManagement = () => {
     XLSX.writeFile(wb, `${t("employees")}.xlsx`);
   };
 
-  const paginatedData = employees.slice(
+  const paginatedData = filteredEmployees.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  const exportToWord = () => {
-    const doc = new Document({
-      sections: [
-        {
-          properties: {},
-          children: employees.map(
-            (employee) =>
+  const exportToWord = async (employee) => {
+    try {
+      // Create a new Document
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [
+              // Name and Address Section
               new Paragraph({
                 children: [
-                  new TextRun(`Name: ${employee.name}`),
                   new TextRun({
-                    text: "\n",
-                    break: 1,
-                  }),
-                  new TextRun(`Email: ${employee.email}`),
-                  new TextRun({
-                    text: "\n",
-                    break: 1,
-                  }),
-                  new TextRun(`Phone Number: ${employee.phoneNumber}`),
-                  new TextRun({
-                    text: "\n",
-                    break: 1,
-                  }),
-                  new TextRun(`Skills: ${employee.skills.join(", ")}`),
-                  new TextRun({
-                    text: "\n",
-                    break: 1,
-                  }),
-                  new TextRun(`Status: ${employee.status}`),
-                  new TextRun({
-                    text: "\n\n",
-                    break: 2,
+                    text: employee.name || "Name not available",
+                    bold: true,
+                    size: 32, // Optional: Adjust font size
                   }),
                 ],
-              })
-          ),
-        },
-      ],
-    });
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Address: ",
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text: employee.address || "Address not available",
+                    size: 24,
+                  }),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Email: ",
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text: employee.email || "Email not available",
+                    size: 24,
+                  }),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Department: ",
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text:
+                      formatDepartment(employee.department) || "Not provided",
+                    size: 24,
+                  }),
+                ],
+              }),
 
-    Packer.toBlob(doc).then((blob) => {
-      saveAs(blob, `${t("employees")}_CVs.docx`);
-    });
+              // Add a blank paragraph to create space
+              new Paragraph({}),
+
+              // WORKING EXPERIENCE Section
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "WORKING EXPERIENCE",
+                    bold: true,
+                    size: 24,
+                  }),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Skill: ",
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text: Array.isArray(employee.skills)
+                      ? employee.skills.map(formatSkill).join(", ")
+                      : employee.skills
+                      ? formatSkill(employee.skills)
+                      : "Not provided",
+                    size: 24,
+                  }),
+                ],
+              }),
+
+              // Add a blank paragraph to create space
+              new Paragraph({}),
+
+              // TYPICAL PROJECTS Section
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "TYPICAL PROJECTS",
+                    bold: true,
+                    size: 24,
+                  }),
+                ],
+              }),
+              ...(Array.isArray(employee.projects) &&
+              employee.projects.length > 0
+                ? employee.projects.map((project, index) => [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Project name: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text: project.name || "No name provided",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Role: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text: project.role || "No role provided",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Description: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text:
+                            project.description || "No description provided",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Specification: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text:
+                            project.specification ||
+                            "No specification provided",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Languages and frameworks: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text: Array.isArray(project.languagesAndFrameworks)
+                            ? project.languagesAndFrameworks.join(", ")
+                            : "Not provided",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Technologies: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text: Array.isArray(project.technologies)
+                            ? project.technologies.join(", ")
+                            : "Not provided",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    // Add a blank paragraph to create space between projects
+                    new Paragraph({}),
+                  ])
+                : [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Not yet joined the project",
+                          size: 24,
+                          italics: true,
+                        }),
+                      ],
+                    }),
+                  ]),
+            ],
+          },
+        ],
+      });
+
+      // Save the document as a .docx file
+      Packer.toBlob(doc).then((blob) => {
+        saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
+      });
+    } catch (error) {
+      console.error("Error exporting to Word:", error);
+    }
   };
 
   return (
@@ -157,11 +361,28 @@ const EmployeeManagement = () => {
       <Button
         className="btn"
         type="primary"
-        style={{ marginBottom: 16, marginLeft: 16 }}
+        style={{ marginBottom: 16 }}
         onClick={exportToExcel}
       >
         {t("exportToExcel")}
       </Button>
+
+      <Tabs
+        centered
+        defaultActiveKey="all"
+        onChange={(key) => setActiveTab(key)}
+      >
+        <TabPane tab={t("AllEmployees")} key="all">
+          {/* All Employees tab content */}
+        </TabPane>
+        <TabPane tab={t("active")} key="active">
+          {/* Active Employees tab content */}
+        </TabPane>
+        <TabPane tab={t("inactive")} key="inactive">
+          {/* Inactive Employees tab content */}
+        </TabPane>
+      </Tabs>
+
       <Table
         dataSource={paginatedData}
         rowKey="key"
@@ -195,22 +416,22 @@ const EmployeeManagement = () => {
           key="phoneNumber"
         />
         <Column
-  title={t("skills")}
-  dataIndex="skills"
-  key="skills"
-  render={(text) => {
-    if (Array.isArray(text)) {
-      return text
-        .map((skill) =>
-          t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
-            defaultValue: skill.replace(/_/g, " "),
-          })
-        )
-        .join(", ");
-    }
-    return text;
-  }}
-/>
+          title={t("skills")}
+          dataIndex="skills"
+          key="skills"
+          render={(text) => {
+            if (Array.isArray(text)) {
+              return text
+                .map((skill) =>
+                  t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
+                    defaultValue: skill.replace(/_/g, " "),
+                  })
+                )
+                .join(", ");
+            }
+            return text;
+          }}
+        />
         <Column
           title={t("status")}
           dataIndex="status"
@@ -252,7 +473,7 @@ const EmployeeManagement = () => {
               <Button
                 icon={<ExportOutlined />}
                 style={{ color: "black", borderColor: "black" }}
-                onClick={() => exportToWord()}
+                onClick={() => exportToWord(record)}
               />
             </Space>
           )}

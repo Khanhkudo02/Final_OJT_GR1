@@ -149,5 +149,7 @@
   "imagePreview": "Image Preview",
   "failedToFetchEmployee": "Failed to fetch employee data.",
   "employeeImage": "Employee Image",
-  "noSkills": "No skills"
+  "noSkills": "No skills",
+  "AllEmployees": "All Employees",
+  "search": "Search....."
 }
