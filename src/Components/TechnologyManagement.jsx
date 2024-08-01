@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal, Space } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
+import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { fetchAllTechnology, deleteTechnology } from "../service/TechnologyServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/TechnologyManagement.scss";
 import "../assets/style/Global.scss";
+import { useTranslation } from "react-i18next";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -13,7 +14,12 @@ const TechnologyManagement = () => {
   const [technologies, setTechnologies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [filteredStatus, setFilteredStatus] = useState("All Technology");
   const navigate = useNavigate();
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [dataPositionEdit, setDataPositionEdit] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useTranslation();
 
   const loadTechnologies = async () => {
     try {
@@ -70,10 +76,32 @@ const TechnologyManagement = () => {
     });
   };
 
-  const paginatedData = technologies.slice(
+  const handleTabChange = (key) => {
+    setFilteredStatus(key);
+    setCurrentPage(1); // Reset to first page when changing tabs
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const filteredData = technologies.filter((item) => {
+    const matchesStatus = filteredStatus === "All Technology" || item.status.toLowerCase() === filteredStatus.toLowerCase();
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
+
+  const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  const tabItems = [
+    { key: "All Technology", label: "All Technology" },
+    { key: "active", label: "Active" },
+    { key: "inactive", label: "Inactive" },
+  ];
 
   return (
     <div>
@@ -82,16 +110,29 @@ const TechnologyManagement = () => {
         type="primary"
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
+        icon={<PlusOutlined />}
       >
-        Add New Technology
       </Button>
+      <Input
+        placeholder={t("search")}
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ width: "250px", marginBottom: 16 }}
+        prefix={<SearchOutlined />}
+      />
+      <Tabs
+        defaultActiveKey="All Technology"
+        onChange={handleTabChange}
+        items={tabItems}
+        centered
+      />
       <Table
         dataSource={paginatedData}
         rowKey="key"
         pagination={{
           current: currentPage,
           pageSize: pageSize,
-          total: technologies.length,
+          total: filteredData.length,
           onChange: (page, pageSize) =>
             handleTableChange({ current: page, pageSize }),
         }}
