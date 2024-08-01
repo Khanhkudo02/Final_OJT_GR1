@@ -9,6 +9,7 @@ import {
   Tabs,
   Modal,
   message,
+  Input,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import { fetchAllProjects, moveToArchive } from "../service/Project";
@@ -18,14 +19,18 @@ import {
   DeleteOutlined,
   PlusOutlined,
   InboxOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
+import moment from "moment"; // Thêm moment.js để xử lý định dạng ngày tháng
 import "../assets/style/Pages/ProjectManagement.scss";
 import "../assets/style/Global.scss";
+import { useTranslation } from "react-i18next";
 
 const statusColors = {
   COMPLETED: "green",
   ONGOING: "blue",
   "NOT STARTED": "orange",
+  PENDING: "yellow",
 };
 
 const ProjectManagement = () => {
@@ -34,6 +39,8 @@ const ProjectManagement = () => {
   const [data, setData] = useState([]);
   const pageSize = 10;
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,9 +59,20 @@ const ProjectManagement = () => {
     setCurrentPage(1); // Reset to the first page when changing tabs
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
   const filteredData = data.filter((item) => {
-    if (filteredStatus === "All Projects") return true;
-    return item.status === filteredStatus.toUpperCase();
+    const matchesStatus =
+      filteredStatus === "All Projects" ||
+      item.status === filteredStatus.toUpperCase();
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.projectManager &&
+        item.projectManager.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesStatus && matchesSearch;
   });
 
   const paginatedData = filteredData.slice(
@@ -145,8 +163,10 @@ const ProjectManagement = () => {
       key: "startDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = new Date(date);
-        return dateObj.toLocaleDateString("en-GB");
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
+        return dateObj.isValid()
+          ? dateObj.format("DD/MM/YYYY")
+          : "Invalid Date";
       },
     },
     {
@@ -155,8 +175,10 @@ const ProjectManagement = () => {
       key: "endDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = new Date(date);
-        return dateObj.toLocaleDateString("en-GB");
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
+        return dateObj.isValid()
+          ? dateObj.format("DD/MM/YYYY")
+          : "Invalid Date";
       },
     },
     {
@@ -241,6 +263,13 @@ const ProjectManagement = () => {
           icon={<InboxOutlined />}
           onClick={() => navigate("/archived-projects")}
           style={{ marginLeft: "auto" }}
+        />
+        <Input
+          placeholder={t("search")}
+          value={searchTerm}
+          onChange={handleSearchChange}
+          style={{ width: "250px", marginBottom: 16 }}
+          prefix={<SearchOutlined />}
         />
       </div>
       <Tabs

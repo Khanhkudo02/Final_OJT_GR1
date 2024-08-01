@@ -39,6 +39,14 @@ body {
   margin-bottom: 10px;
 }
 
+.ant-input-affix-wrapper {
+  margin-left: 5px;
+}
+
+.ant-input-group-addon {
+  display: none !important;
+}
+
 .status-active {
   color: green;
   font-weight: 700;
