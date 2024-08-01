@@ -305,27 +305,6 @@ const AddEmployee = () => {
             return "";
           }}
         />
-        <Column
-          title={t("action")}
-          key="action"
-          render={(text, record) => (
-            <Space size="middle">
-              <Button
-                icon={<EyeOutlined />}
-                onClick={() => handleViewEmployee(record)}
-              >
-                {t("view")}
-              </Button>
-              <Button
-                icon={<DeleteOutlined />}
-                onClick={() => handleDeleteEmployee(record.id)}
-                danger
-              >
-                {t("delete")}
-              </Button>
-            </Space>
-          )}
-        />
       </Table>
       <Modal
         title={t("employeeDetails")}
@@ -352,9 +331,8 @@ const AddEmployee = () => {
             <p>
               <strong>{t("department")}:</strong>{" "}
               {t(
-                `department${
-                  selectedEmployee.department.charAt(0).toUpperCase() +
-                  selectedEmployee.department.slice(1)
+                `department${selectedEmployee.department.charAt(0).toUpperCase() +
+                selectedEmployee.department.slice(1)
                 }`
               )}
             </p>
