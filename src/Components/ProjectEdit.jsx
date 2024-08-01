@@ -16,7 +16,7 @@ import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
-import { fetchAllPositions } from "../service/PositionServices";
+import { fetchAllEmployees } from "../service/EmployeeServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -29,9 +29,10 @@ const ProjectEdit = () => {
   const [fileList, setFileList] = useState([]);
   const [technologies, setTechnologies] = useState([]);
   const [languages, setLanguages] = useState([]);
-  const [positions, setPositions] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -111,15 +112,33 @@ const ProjectEdit = () => {
     loadLanguages();
   }, []);
 
-  const formatBudget = (value) => {
-    // Remove all non-numeric characters except "$" and "VND"
-    let numericValue = value.replace(/[^\d$VND]/g, "");
+  // Load employees
+  useEffect(() => {
+    const loadEmployees = async () => {
+      try {
+        const data = await fetchAllEmployees();
+        const employeeOptions = data
+          .filter((emp) => emp.role === "employee")
+          .map((emp) => ({
+            label: emp.name,
+            value: emp.key, // Use key as value for Option
+          }));
+        setEmployees(employeeOptions);
+      } catch (err) {
+        setError("Failed to fetch employees");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEmployees();
+  }, []);
 
-    // Check if the value has "$" or "VND"
+  const formatBudget = (value) => {
+    let numericValue = value.replace(/[^\d$VND]/g, "");
     const hasDollarSign = numericValue.startsWith("$");
     const hasVND = numericValue.endsWith("VND");
 
-    // Remove "$" and "VND" for formatting
     if (hasDollarSign) {
       numericValue = numericValue.slice(1);
     }
@@ -127,10 +146,8 @@ const ProjectEdit = () => {
       numericValue = numericValue.slice(0, -3);
     }
 
-    // Format the number with commas
     numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-    // Add "$" or "VND" back
     if (hasDollarSign) {
       numericValue = `$${numericValue}`;
     }
@@ -297,12 +314,14 @@ const ProjectEdit = () => {
         <Form.Item
           label="Team Members"
           name="teamMembers"
-          rules={[{ required: true, message: "Please list the team members!" }]}
+          rules={[
+            { required: true, message: "Please select the team members!" },
+          ]}
         >
           <Select mode="multiple" placeholder="Select team members">
-            {positions.map((pos) => (
-              <Option key={pos.value} value={pos.value}>
-                {pos.label}
+            {employees.map((emp) => (
+              <Option key={emp.value} value={emp.value}>
+                {emp.label}
               </Option>
             ))}
           </Select>
@@ -333,6 +352,7 @@ const ProjectEdit = () => {
             <Option value="NOT STARTED">Not Started</Option>
             <Option value="ONGOING">Ongoing</Option>
             <Option value="COMPLETED">Completed</Option>
+            <Option value="COMPLETED">Pending</Option>
           </Select>
         </Form.Item>
 
