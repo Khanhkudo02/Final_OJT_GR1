@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { Button, Space, Table, message } from "antd";
-import ModalAddTechnology from "./ModalAddTechnology";
-import ModalEditTechnology from "./ModalEditTechnology";
-import ModalDeleteTechnology from "./ModalDeleteTechnology";
-import { fetchAllTechnology } from "../service/TechnologyServices";
-import "../assets/style/Pages/TechnologyManagement.scss";
-import "../assets/style/Global.scss";
 import {
-  EyeOutlined,
-  EditOutlined,
   DeleteOutlined,
+  EditOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-
-const { Column } = Table;
+import { Button, Space, Table, message } from "antd";
+import React, { useEffect, useState } from "react";
+import "../assets/style/Global.scss";
+import "../assets/style/Pages/TechnologyManagement.scss";
+import { fetchAllTechnology } from "../service/TechnologyServices";
+import ModalAddTechnology from "./ModalAddTechnology";
+import ModalDeleteTechnology from "./ModalDeleteTechnology";
+import ModalEditTechnology from "./ModalEditTechnology";
 
 const TechnologyManagement = () => {
   const [technologies, setTechnologies] = useState([]);
@@ -23,7 +20,6 @@ const TechnologyManagement = () => {
   const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
   const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
 
-  // Function to fetch technologies and update state
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
@@ -33,60 +29,54 @@ const TechnologyManagement = () => {
     }
   };
 
-  // Load technologies when component mounts
   useEffect(() => {
     loadTechnologies();
   }, []);
 
-  // Show edit modal with technology data
   const showEditModal = (record) => {
     setDataTechnologyEdit(record);
     setIsEditModalOpen(true);
   };
 
-  // Show add modal
   const showAddModal = () => {
     setIsAddModalOpen(true);
   };
 
-  // Show delete modal if technology is inactive
   const showDeleteModal = (record) => {
     if (record.status && record.status.toLowerCase() === "inactive") {
-      setTechnologyIdToDelete(record.key); // Make sure `record.key` is the correct ID
+      setTechnologyIdToDelete(record.key);
       setIsDeleteModalOpen(true);
     } else {
       message.error("Only inactive technologies can be deleted.");
     }
   };
 
-  // Close edit modal and reload technologies
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setDataTechnologyEdit(null);
     setTimeout(loadTechnologies, 100);
   };
 
-  // Close add modal and reload technologies
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false);
     setTimeout(loadTechnologies, 100);
   };
 
-  // Close delete modal and reload technologies
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setTechnologyIdToDelete(null);
     setTimeout(loadTechnologies, 100);
   };
 
-  // Define columns for Table
   const columns = [
     {
       title: "Image",
-      dataIndex: "imageURL",
-      key: "imageURL",
-      render: (text) => (
-        <img src={text} alt="Technology" style={{ width: 50, height: 50 }} />
+      dataIndex: "imageURLs",
+      key: "imageURLs",
+      render: (urls) => (
+        Array.isArray(urls) && urls.length > 0 ? (
+          <img src={urls[0]} alt="Technology" style={{ width: 50, height: 50 }} />
+        ) : null
       ),
     },
     {
@@ -104,8 +94,7 @@ const TechnologyManagement = () => {
       dataIndex: "status",
       key: "status",
       render: (text) => {
-        const className =
-          text === "active" ? "status-active" : "status-inactive";
+        const className = text === "active" ? "status-active" : "status-inactive";
         return (
           <span className={className}>
             {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
@@ -135,8 +124,7 @@ const TechnologyManagement = () => {
 
   return (
     <div>
-      <Button className="btn" type="primary" onClick={showAddModal}>
-        Add Technology
+      <Button className="btn" type="primary" onClick={showAddModal} icon={<PlusOutlined />}>
       </Button>
       <Table
         columns={columns}

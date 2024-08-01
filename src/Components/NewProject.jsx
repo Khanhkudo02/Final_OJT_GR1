@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from "react";
+import { UploadOutlined } from "@ant-design/icons";
 import {
-  Form,
-  Input,
   Button,
-  Select,
   Checkbox,
   DatePicker,
+  Form,
+  Input,
   InputNumber,
   message,
+  Select,
   Upload,
-  Space,
 } from "antd";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { postCreateProject } from "../service/Project";
-import { UploadOutlined } from "@ant-design/icons";
-import { fetchAllTechnology } from "../service/TechnologyServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
+import { postCreateProject } from "../service/Project";
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -30,6 +29,8 @@ const NewProject = () => {
   const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
   const [fileList, setFileList] = useState([]);
+  const [startDate, setStartDate] = useState(null); // State to store selected start date
+  const [endDate, setEndDate] = useState(null); // State to store selected end date
 
   const onFinish = async (values) => {
     try {
@@ -94,7 +95,7 @@ const NewProject = () => {
         }));
         setLanguages(languageOptions);
       } catch (err) {
-        setError("Failed to fetch languages");
+setError("Failed to fetch languages");
         console.error(err);
       } finally {
         setLoading(false);
@@ -103,6 +104,64 @@ const NewProject = () => {
 
     loadLanguages();
   }, []);
+
+  const disabledStartDate = (startDate) => {
+    if (!endDate) {
+      return false;
+    }
+    return startDate && startDate.isAfter(endDate, "day");
+  };
+
+  const disabledEndDate = (endDate) => {
+    if (!startDate) {
+      return false;
+    }
+    return endDate && endDate.isBefore(startDate, "day");
+  };
+
+  const handleFieldBlur = async (fieldName) => {
+    try {
+      await form.validateFields([fieldName]);
+    } catch (error) {
+      console.error(`Validation failed for ${fieldName}:`, error);
+    }
+  };
+
+  const formatBudget = (value) => {
+    // Remove all non-numeric characters except "$" and "VND"
+    let numericValue = value.replace(/[^\d$VND]/g, "");
+
+    // Check if the value has "$" or "VND"
+    const hasDollarSign = numericValue.startsWith("$");
+    const hasVND = numericValue.endsWith("VND");
+
+    // Remove "$" and "VND" for formatting
+    if (hasDollarSign) {
+      numericValue = numericValue.slice(1);
+    }
+    if (hasVND) {
+      numericValue = numericValue.slice(0, -3);
+    }
+
+    // Format the number with commas
+    numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    // Add "$" or "VND" back
+    if (hasDollarSign) {
+      numericValue = `$${numericValue}`;
+    }
+    if (hasVND) {
+      numericValue = `${numericValue}VND`;
+    }
+
+    return numericValue;
+  };
+
+  const handleBudgetChange = (e) => {
+    const { value } = e.target;
+    const formattedValue = formatBudget(value);
+    form.setFieldsValue({ budget: formattedValue });
+  };
 
   return (
     <div
@@ -122,7 +181,7 @@ const NewProject = () => {
             { required: true, message: "Please input the project name!" },
           ]}
         >
-          <Input />
+          <Input onBlur={() => handleFieldBlur("name")} />
         </Form.Item>
 
         <Form.Item
@@ -135,7 +194,7 @@ const NewProject = () => {
             },
           ]}
         >
-          <TextArea rows={4} />
+          <TextArea rows={4} onBlur={() => handleFieldBlur("description")} />
         </Form.Item>
 
         <Form.Item
@@ -143,36 +202,55 @@ const NewProject = () => {
           name="startDate"
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
-          <DatePicker format="DD/MM/YYYY" />
+          <DatePicker
+            format="DD/MM/YYYY"
+            onChange={(date) => setStartDate(date)}
+            disabledDate={disabledStartDate}
+            onBlur={() => handleFieldBlur("startDate")}
+          />
         </Form.Item>
 
         <Form.Item
           label="End Date"
           name="endDate"
-          rules={[{ required: true, message: "Please select the end date!" }]}
+rules={[{ required: true, message: "Please select the end date!" }]}
         >
-          <DatePicker format="DD/MM/YYYY" />
+          <DatePicker
+            format="DD/MM/YYYY"
+            onChange={(date) => setEndDate(date)}
+            disabledDate={disabledEndDate}
+            onBlur={() => handleFieldBlur("endDate")}
+          />
         </Form.Item>
 
         <Form.Item
-          label="Client Name"
+          label="Name"
           name="clientName"
           rules={[{ required: true, message: "Please input the client name!" }]}
         >
-          <Input />
+          <Input onBlur={() => handleFieldBlur("clientName")} />
         </Form.Item>
 
         <Form.Item
-          label="Client Contact"
-          name="clientContact"
+          label="Email"
+          name="email"
           rules={[
-            {
-              required: true,
-              message: "Please input the client contact information!",
-            },
+            { required: true, message: "Please input the client email!" },
+            { type: 'email', message: 'Please enter a valid email!' }
           ]}
         >
-          <Input />
+          <Input placeholder="input placeholder" />
+        </Form.Item>
+
+        <Form.Item
+          label="Phone Number"
+          name="phoneNumber"
+          rules={[
+            { required: true, message: "Please input the phone number!" },
+            { pattern: /^[0-9]+$/, message: 'Please enter a valid phone number!' }
+          ]}
+        >
+          <Input placeholder="input placeholder" />
         </Form.Item>
 
         <Form.Item
@@ -182,7 +260,7 @@ const NewProject = () => {
             { required: true, message: "Please input the project manager!" },
           ]}
         >
-          <Input />
+          <Input onBlur={() => handleFieldBlur("projectManager")} />
         </Form.Item>
 
         <Form.Item
@@ -190,7 +268,7 @@ const NewProject = () => {
           name="teamMembers"
           rules={[{ required: true, message: "Please list the team members!" }]}
         >
-          <TextArea rows={2} />
+          <TextArea rows={2} onBlur={() => handleFieldBlur("teamMembers")} />
         </Form.Item>
 
         <Form.Item
@@ -200,7 +278,11 @@ const NewProject = () => {
             { required: true, message: "Please input the project budget!" },
           ]}
         >
-          <InputNumber min={0} style={{ width: "100%" }} />
+          <Input
+            onBlur={() => handleFieldBlur("budget")}
+            onChange={handleBudgetChange}
+            maxLength={20}
+          />
         </Form.Item>
 
         <Form.Item
@@ -210,7 +292,7 @@ const NewProject = () => {
             { required: true, message: "Please select the project status!" },
           ]}
         >
-          <Select>
+          <Select onBlur={() => handleFieldBlur("status")}>
             <Option value="NOT STARTED">Not Started</Option>
             <Option value="ONGOING">Ongoing</Option>
             <Option value="COMPLETED">Completed</Option>
@@ -224,7 +306,7 @@ const NewProject = () => {
             { required: true, message: "Please select the project priority!" },
           ]}
         >
-          <Select>
+          <Select onBlur={() => handleFieldBlur("priority")}>
             <Option value="HIGH">High</Option>
             <Option value="MEDIUM">Medium</Option>
             <Option value="LOW">Low</Option>
@@ -238,7 +320,11 @@ const NewProject = () => {
             { required: true, message: "Please select the project category!" },
           ]}
         >
-          <Select mode="multiple" placeholder="Select categories">
+          <Select
+            mode="multiple"
+placeholder="Select categories"
+            onBlur={() => handleFieldBlur("category")}
+          >
             <Option value="WEB DESIGN">Web Design</Option>
             <Option value="MOBILE APP">Mobile App Development</Option>
             <Option value="UI/UX">UI/UX</Option>
@@ -247,7 +333,11 @@ const NewProject = () => {
 
         {/* Select technologies */}
         <Form.Item label="Technologies Used" name="technologies">
-          <Select mode="multiple" placeholder="Select technologies">
+          <Select
+            mode="multiple"
+            placeholder="Select technologies"
+            onBlur={() => handleFieldBlur("technologies")}
+          >
             {technologies.map((tech) => (
               <Option key={tech.value} value={tech.value}>
                 {tech.label}
@@ -258,7 +348,11 @@ const NewProject = () => {
 
         {/* Select programming languages */}
         <Form.Item label="Programming Languages Used" name="languages">
-          <Select mode="multiple" placeholder="Select languages">
+          <Select
+            mode="multiple"
+            placeholder="Select languages"
+            onBlur={() => handleFieldBlur("languages")}
+          >
             {languages.map((lang) => (
               <Option key={lang.value} value={lang.value}>
                 {lang.label}
@@ -272,6 +366,7 @@ const NewProject = () => {
             fileList={fileList}
             beforeUpload={() => false}
             onChange={handleImageChange}
+            onBlur={() => handleFieldBlur("attachments")}
           >
             <Button icon={<UploadOutlined />}>Click to Upload</Button>
           </Upload>

@@ -1,5 +1,5 @@
-import { ref as dbRef, set, push, update, get, remove } from "firebase/database";
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref as dbRef, get, push, remove, set, update } from "firebase/database";
+import { deleteObject, ref as storageRef } from "firebase/storage";
 import { database, storage } from "../firebaseConfig";
 
 // Create new technology
@@ -79,13 +79,15 @@ const deleteTechnology = async (id) => {
 
     // Delete images from Firebase Storage
     const imageUrls = technologySnapshot.val().imageURLs;
-    if (imageUrls) {
+    if (Array.isArray(imageUrls)) {
       await Promise.all(imageUrls.map(async (url) => {
         const imagePath = url.split("/o/")[1].split("?")[0];
         const decodedImagePath = decodeURIComponent(imagePath);
         const imageStorageRef = storageRef(storage, decodedImagePath);
         await deleteObject(imageStorageRef);
       }));
+    } else {
+      console.warn("imageURLs is not an array or is undefined");
     }
 
     // Delete technology from Realtime Database
@@ -96,4 +98,5 @@ const deleteTechnology = async (id) => {
   }
 };
 
-export { fetchAllTechnology, postCreateTechnology, putUpdateTechnology, deleteTechnology };
+export { deleteTechnology, fetchAllTechnology, postCreateTechnology, putUpdateTechnology };
+

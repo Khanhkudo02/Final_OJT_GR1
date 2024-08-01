@@ -38,7 +38,7 @@ function AccountInfo() {
 
   return (
     <div className="account-info-container">
-      <Card title={t("userProfile")}>
+      <Card title={t("userProfile")} className="account-info-card">
         <Descriptions bordered column={1}>
           <Descriptions.Item label={t("email")}>
             {userData.email}

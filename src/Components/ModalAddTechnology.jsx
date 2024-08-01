@@ -44,7 +44,7 @@ const ModalAddTechnology = ({ open, handleClose }) => {
 
       toast.success("Technology added successfully!");
 
-      // Reset form fields to default values
+      // Reset form fields
       setName("");
       setDescription("");
       setStatus("active");
@@ -66,8 +66,11 @@ const ModalAddTechnology = ({ open, handleClose }) => {
       open={open}
       onCancel={() => {
         handleClose();
-        setImagePreviews([]);
+        setName("");
+        setDescription("");
         setStatus("active");
+        setImages([]);
+        setImagePreviews([]);
       }}
       footer={[
         <Button key="back" onClick={handleClose}>

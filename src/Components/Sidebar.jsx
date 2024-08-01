@@ -14,6 +14,7 @@ import { NavLink } from "react-router-dom";
 import "../assets/style/Pages/Sidebar.scss";
 import LogoutButton from "./LogoutButton";
 import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const { Sider } = Layout;
 
@@ -81,6 +82,10 @@ const Sidebar = ({ role }) => {
     },
     {
       key: "8",
+      label: <LanguageSwitcher collapsed={collapsed} />,
+    },
+    {
+      key: "9",
       label: <LogoutButton collapsed={collapsed} />,
     },
   ];
@@ -102,17 +107,22 @@ const Sidebar = ({ role }) => {
       ],
     },
     {
-      key: "2",
+      key: "3",
+      icon: <TeamOutlined />,
+      label: <NavLink to="/employee-management"> Employee List </NavLink>,
+    },
+    {
+      key: "4",
       icon: <ProjectOutlined />,
       label: <NavLink to="/project-management">Project Management</NavLink>,
     },
     {
-      key: "3",
+      key: "5",
       icon: <FileTextOutlined />,
       label: <NavLink to="/cv">CV</NavLink>,
     },
     {
-      key: "4",
+      key: "6",
       label: <LogoutButton collapsed={collapsed} />,
     },
   ];

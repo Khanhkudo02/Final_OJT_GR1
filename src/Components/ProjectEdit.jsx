@@ -16,6 +16,7 @@ import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
+import { fetchAllPositions } from "../service/PositionServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -28,6 +29,7 @@ const ProjectEdit = () => {
   const [fileList, setFileList] = useState([]);
   const [technologies, setTechnologies] = useState([]);
   const [languages, setLanguages] = useState([]);
+  const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -73,7 +75,6 @@ const ProjectEdit = () => {
     const loadTechnologies = async () => {
       try {
         const data = await fetchAllTechnology();
-        // Convert data from Firebase to format for Select
         const techOptions = data.map((tech) => ({
           label: tech.name,
           value: tech.key, // Use key as value for Option
@@ -94,7 +95,6 @@ const ProjectEdit = () => {
     const loadLanguages = async () => {
       try {
         const data = await fetchAllLanguages();
-        // Convert data from Firebase to format for Select
         const languageOptions = data.map((lang) => ({
           label: lang.name,
           value: lang.key, // Use key as value for Option
@@ -111,6 +111,27 @@ const ProjectEdit = () => {
     loadLanguages();
   }, []);
 
+  // Load positions
+  useEffect(() => {
+    const loadPositions = async () => {
+      try {
+        const data = await fetchAllPositions();
+        const positionOptions = data.map((pos) => ({
+          label: pos.name,
+          value: pos.key, // Use key as value for Option
+        }));
+        setPositions(positionOptions);
+      } catch (err) {
+        setError("Failed to fetch positions");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPositions();
+  }, []);
+
   const onFinish = async (values) => {
     Modal.confirm({
       title: "Confirm Changes",
@@ -123,8 +144,7 @@ const ProjectEdit = () => {
             ...values,
             startDate: values.startDate.format("YYYY-MM-DD"),
             endDate: values.endDate.format("YYYY-MM-DD"),
-            imageUrl:
-              fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
+            imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl || null,
           };
           await putUpdateProject(
             id,
@@ -142,6 +162,14 @@ const ProjectEdit = () => {
 
   const handleImageChange = ({ fileList }) => {
     setFileList(fileList);
+  };
+
+  const formatNumber = (value) => {
+    return new Intl.NumberFormat("vi-VN").format(value);
+  };
+
+  const parseNumber = (value) => {
+    return value.replace(/\D/g, "");
   };
 
   if (!project) {
@@ -169,7 +197,7 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project name!" },
           ]}
         >
-          <Input placeholder="input placeholder"/>
+          <Input />
         </Form.Item>
 
         <Form.Item
@@ -182,7 +210,7 @@ const ProjectEdit = () => {
             },
           ]}
         >
-          <TextArea rows={4} placeholder="input placeholder"/>
+          <TextArea rows={4} />
         </Form.Item>
 
         <Form.Item
@@ -206,18 +234,18 @@ const ProjectEdit = () => {
           name="clientName"
           rules={[{ required: true, message: "Please input the client name!" }]}
         >
-          <Input placeholder="input placeholder"/>
+          <Input />
         </Form.Item>
 
         <Form.Item
           label="Email"
           name="email"
           rules={[
-            { required: true, message: "Please input the email address!" },
-            { type: "email", message: "Please enter a valid email address!" }
+            { required: true, message: "Please input the client email!" },
+            { type: 'email', message: 'Please enter a valid email!' }
           ]}
         >
-          <Input placeholder="NameManeger@gmail.com"/>
+          <Input placeholder="input placeholder" />
         </Form.Item>
 
         <Form.Item
@@ -225,10 +253,10 @@ const ProjectEdit = () => {
           name="phoneNumber"
           rules={[
             { required: true, message: "Please input the phone number!" },
-            { pattern: /^\d+$/, message: "Please enter a valid phone number!" }
+            { pattern: /^[0-9]+$/, message: 'Please enter a valid phone number!' }
           ]}
         >
-          <Input placeholder=""/>
+          <Input placeholder="input placeholder" />
         </Form.Item>
 
         <Form.Item
@@ -238,7 +266,7 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project manager!" },
           ]}
         >
-          <Input placeholder="input placeholder"/>
+          <Input />
         </Form.Item>
 
         <Form.Item
@@ -246,7 +274,13 @@ const ProjectEdit = () => {
           name="teamMembers"
           rules={[{ required: true, message: "Please list the team members!" }]}
         >
-          <TextArea rows={2} placeholder="input placeholder"/>
+          <Select mode="multiple" placeholder="Select team members">
+            {positions.map((pos) => (
+              <Option key={pos.value} value={pos.value}>
+                {pos.label}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
@@ -256,7 +290,12 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project budget!" },
           ]}
         >
-          <InputNumber min={0} style={{ width: "100%" }} />
+          <InputNumber
+            min={0}
+            style={{ width: "100%" }}
+            formatter={formatNumber}
+            parser={parseNumber}
+          />
         </Form.Item>
 
         <Form.Item
@@ -300,8 +339,6 @@ const ProjectEdit = () => {
             <Option value="UI/UX">UI/UX</Option>
           </Select>
         </Form.Item>
-
-       
 
         {/* Select technologies */}
         <Form.Item label="Technologies Used" name="technologies">
