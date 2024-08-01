@@ -1,8 +1,4 @@
-import {
-  DeleteOutlined,
-  EyeOutlined,
-  PlusOutlined
-} from "@ant-design/icons";
+import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Modal, Select, Space, Table, Upload } from "antd";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -67,7 +63,17 @@ const AddEmployee = () => {
   }, []);
 
   const handleAddEmployee = async (values) => {
-    const { name, email, password, dateOfBirth, address, phoneNumber, skills, status, department } = values;
+    const {
+      name,
+      email,
+      password,
+      dateOfBirth,
+      address,
+      phoneNumber,
+      skills,
+      status,
+      department,
+    } = values;
 
     try {
       await postCreateEmployee(
@@ -157,7 +163,10 @@ const AddEmployee = () => {
         <Form.Item
           label={t("email")}
           name="email"
-          rules={[{ required: true, message: t("pleaseEnterEmail") }, { type: "email", message: t("invalidEmail") }]}
+          rules={[
+            { required: true, message: t("pleaseEnterEmail") },
+            { type: "email", message: t("invalidEmail") },
+          ]}
         >
           <Input type="email" />
         </Form.Item>
@@ -166,7 +175,7 @@ const AddEmployee = () => {
           name="password"
           rules={[
             { required: true, message: t("pleaseEnterPassword") },
-            { min: 6, message: t("passwordMinLength") }
+            { min: 6, message: t("passwordMinLength") },
           ]}
         >
           <Input type="password" />
@@ -190,7 +199,7 @@ const AddEmployee = () => {
           name="phoneNumber"
           rules={[
             { required: true, message: t("pleaseEnterPhoneNumber") },
-            { len: 10, message: t("phoneNumberLength") }
+            { len: 10, message: t("phoneNumberLength") },
           ]}
         >
           <Input
@@ -272,15 +281,39 @@ const AddEmployee = () => {
       <Table dataSource={employees} rowKey="id" style={{ marginTop: "20px" }}>
         <Column title={t("name")} dataIndex="name" key="name" />
         <Column title={t("email")} dataIndex="email" key="email" />
-        <Column title={t("phoneNumber")} dataIndex="phoneNumber" key="phoneNumber" />
-        <Column title={t("skills")} dataIndex="skills" key="skills" render={skills => skills.map(getSkillLabel).join(", ")} />
-        <Column title={t("department")} dataIndex="department" key="department" render={dept => t(`department${dept.charAt(0).toUpperCase() + dept.slice(1)}`)} />
+        <Column
+          title={t("phoneNumber")}
+          dataIndex="phoneNumber"
+          key="phoneNumber"
+        />
+        <Column
+          title={t("skills")}
+          dataIndex="skills"
+          key="skills"
+          render={(skills) => skills.map(getSkillLabel).join(", ")}
+        />
+        <Column
+          title={t("department")}
+          dataIndex="department"
+          key="department"
+          render={(dept) => {
+            if (typeof dept === "string") {
+              return t(
+                `department${dept.charAt(0).toUpperCase() + dept.slice(1)}`
+              );
+            }
+            return "";
+          }}
+        />
         <Column
           title={t("action")}
           key="action"
           render={(text, record) => (
             <Space size="middle">
-              <Button icon={<EyeOutlined />} onClick={() => handleViewEmployee(record)}>
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() => handleViewEmployee(record)}
+              >
                 {t("view")}
               </Button>
               <Button
@@ -302,23 +335,52 @@ const AddEmployee = () => {
       >
         {selectedEmployee ? (
           <div>
-            <p><strong>{t("name")}:</strong> {selectedEmployee.name}</p>
-            <p><strong>{t("email")}:</strong> {selectedEmployee.email}</p>
-            <p><strong>{t("phoneNumber")}:</strong> {selectedEmployee.phoneNumber}</p>
-            <p><strong>{t("skills")}:</strong> {selectedEmployee.skills.map(getSkillLabel).join(", ")}</p>
-            <p><strong>{t("department")}:</strong> {t(`department${selectedEmployee.department.charAt(0).toUpperCase() + selectedEmployee.department.slice(1)}`)}</p>
-            <p><strong>{t("status")}:</strong> {selectedEmployee.status === "active" ? t("active") : t("inactive")}</p>
-            <p><strong>{t("address")}:</strong> {selectedEmployee.address}</p>
-            <p><strong>{t("dateOfBirth")}:</strong> {selectedEmployee.dateOfBirth}</p>
+            <p>
+              <strong>{t("name")}:</strong> {selectedEmployee.name}
+            </p>
+            <p>
+              <strong>{t("email")}:</strong> {selectedEmployee.email}
+            </p>
+            <p>
+              <strong>{t("phoneNumber")}:</strong>{" "}
+              {selectedEmployee.phoneNumber}
+            </p>
+            <p>
+              <strong>{t("skills")}:</strong>{" "}
+              {selectedEmployee.skills.map(getSkillLabel).join(", ")}
+            </p>
+            <p>
+              <strong>{t("department")}:</strong>{" "}
+              {t(
+                `department${
+                  selectedEmployee.department.charAt(0).toUpperCase() +
+                  selectedEmployee.department.slice(1)
+                }`
+              )}
+            </p>
+            <p>
+              <strong>{t("status")}:</strong>{" "}
+              {selectedEmployee.status === "active"
+                ? t("active")
+                : t("inactive")}
+            </p>
+            <p>
+              <strong>{t("address")}:</strong> {selectedEmployee.address}
+            </p>
+            <p>
+              <strong>{t("dateOfBirth")}:</strong>{" "}
+              {selectedEmployee.dateOfBirth}
+            </p>
             <div className="image-previews">
-              {selectedEmployee.images && selectedEmployee.images.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`employee-${index}`}
-                  style={{ width: "100px", height: "100px", margin: "5px" }}
-                />
-              ))}
+              {selectedEmployee.images &&
+                selectedEmployee.images.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`employee-${index}`}
+                    style={{ width: "100px", height: "100px", margin: "5px" }}
+                  />
+                ))}
             </div>
           </div>
         ) : (

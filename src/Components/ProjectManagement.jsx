@@ -3,6 +3,7 @@ import { Table, Tag, Space, Button, Avatar, Pagination, Tabs, Modal, message } f
 import { useNavigate } from "react-router-dom"; 
 import { fetchAllProjects, moveToArchive } from "../service/Project";
 import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, InboxOutlined } from "@ant-design/icons";
+import moment from "moment"; // Thêm moment.js để xử lý định dạng ngày tháng
 import "../assets/style/Pages/ProjectManagement.scss";
 import "../assets/style/Global.scss";
 
@@ -99,8 +100,8 @@ const ProjectManagement = () => {
       key: "startDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = new Date(date);
-        return dateObj.toLocaleDateString("en-GB");
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
+        return dateObj.isValid() ? dateObj.format("DD/MM/YYYY") : "Invalid Date";
       },
     },
     {
@@ -109,8 +110,8 @@ const ProjectManagement = () => {
       key: "endDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = new Date(date);
-        return dateObj.toLocaleDateString("en-GB");
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
+        return dateObj.isValid() ? dateObj.format("DD/MM/YYYY") : "Invalid Date";
       },
     },
     {

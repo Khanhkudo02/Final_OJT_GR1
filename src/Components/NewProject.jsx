@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
+import { fetchAllPositions } from "../service/PositionServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -22,6 +23,7 @@ const { TextArea } = Input;
 const NewProject = () => {
   const [technologies, setTechnologies] = useState([]);
   const [languages, setLanguages] = useState([]);
+  const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [form] = Form.useForm();
@@ -95,7 +97,7 @@ const NewProject = () => {
         }));
         setLanguages(languageOptions);
       } catch (err) {
-setError("Failed to fetch languages");
+        setError("Failed to fetch languages");
         console.error(err);
       } finally {
         setLoading(false);
@@ -103,6 +105,27 @@ setError("Failed to fetch languages");
     };
 
     loadLanguages();
+  }, []);
+
+  // Load positions
+  useEffect(() => {
+    const loadPositions = async () => {
+      try {
+        const data = await fetchAllPositions();
+        const positionOptions = data.map((pos) => ({
+          label: pos.name,
+          value: pos.key, // Use key as value for Option
+        }));
+        setPositions(positionOptions);
+      } catch (err) {
+        setError("Failed to fetch positions");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPositions();
   }, []);
 
   const disabledStartDate = (startDate) => {
@@ -268,7 +291,13 @@ rules={[{ required: true, message: "Please select the end date!" }]}
           name="teamMembers"
           rules={[{ required: true, message: "Please list the team members!" }]}
         >
-          <TextArea rows={2} onBlur={() => handleFieldBlur("teamMembers")} />
+          <Select mode="multiple" placeholder="Select team members">
+            {positions.map((pos) => (
+              <Option key={pos.value} value={pos.value}>
+                {pos.label}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
