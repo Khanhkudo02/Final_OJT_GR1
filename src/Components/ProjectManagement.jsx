@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Table, Tag, Space, Button, Avatar, Pagination, Tabs, Modal, message } from "antd";
-import { useNavigate } from "react-router-dom"; 
+import {
+  Table,
+  Tag,
+  Space,
+  Button,
+  Avatar,
+  Pagination,
+  Tabs,
+  Modal,
+  message,
+} from "antd";
+import { useNavigate } from "react-router-dom";
 import { fetchAllProjects, moveToArchive } from "../service/Project";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, InboxOutlined } from "@ant-design/icons";
-import moment from "moment"; // Thêm moment.js để xử lý định dạng ngày tháng
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  InboxOutlined,
+} from "@ant-design/icons";
 import "../assets/style/Pages/ProjectManagement.scss";
 import "../assets/style/Global.scss";
 
@@ -11,7 +26,6 @@ const statusColors = {
   COMPLETED: "green",
   ONGOING: "blue",
   "NOT STARTED": "orange",
-  PENDING: "yellow"
 };
 
 const ProjectManagement = () => {
@@ -76,17 +90,47 @@ const ProjectManagement = () => {
 
   const handleDelete = (key) => {
     Modal.confirm({
-      title: 'Are you sure you want to archive this project?',
+      title: "Are you sure you want to archive this project?",
       onOk: async () => {
         try {
           await moveToArchive(key);
-          setData(prevData => prevData.filter(item => item.key !== key));
-          message.success('Project archived successfully');
+          setData((prevData) => prevData.filter((item) => item.key !== key));
+          message.success("Project archived successfully");
         } catch (error) {
-          message.error('Failed to archive project');
+          message.error("Failed to archive project");
         }
-      }
+      },
     });
+  };
+
+  const formatBudget = (value) => {
+    // Chuyển đổi value thành chuỗi nếu nó không phải là chuỗi
+    if (typeof value !== "string") {
+      value = String(value);
+    }
+
+    // Kiểm tra nếu value không tồn tại hoặc là một chuỗi trống
+    if (!value) return "";
+
+    // Check if the value has "$" or "VND"
+    const hasDollarSign = value.startsWith("$");
+    const hasVND = value.endsWith("VND");
+
+    // Remove "$" and "VND" for formatting
+    let numericValue = value.replace(/[^\d]/g, "");
+
+    // Format the number with commas
+    numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    // Add "$" or "VND" back
+    if (hasDollarSign) {
+      numericValue = `$${numericValue}`;
+    }
+    if (hasVND) {
+      numericValue = `${numericValue}VND`;
+    }
+
+    return numericValue;
   };
 
   const columns = [
@@ -101,8 +145,8 @@ const ProjectManagement = () => {
       key: "startDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
-        return dateObj.isValid() ? dateObj.format("DD/MM/YYYY") : "Invalid Date";
+        const dateObj = new Date(date);
+        return dateObj.toLocaleDateString("en-GB");
       },
     },
     {
@@ -111,8 +155,8 @@ const ProjectManagement = () => {
       key: "endDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
-        return dateObj.isValid() ? dateObj.format("DD/MM/YYYY") : "Invalid Date";
+        const dateObj = new Date(date);
+        return dateObj.toLocaleDateString("en-GB");
       },
     },
     {
@@ -130,6 +174,12 @@ const ProjectManagement = () => {
           </Space>
         </div>
       ),
+    },
+    {
+      title: "Budget",
+      dataIndex: "budget",
+      key: "budget",
+      render: formatBudget,
     },
     {
       title: "Status",
@@ -157,9 +207,9 @@ const ProjectManagement = () => {
             onClick={() => navigate(`/edit-project/${record.key}`)}
           />
           {record.status !== "ONGOING" && (
-            <Button 
-              icon={<DeleteOutlined />} 
-              style={{ color: "red", borderColor: "red" }} 
+            <Button
+              icon={<DeleteOutlined />}
+              style={{ color: "red", borderColor: "red" }}
               onClick={() => handleDelete(record.key)}
             />
           )}
@@ -180,25 +230,26 @@ const ProjectManagement = () => {
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <div className="project-management-header">
-        <Button 
-          className="btn" 
-          type="primary" 
-          icon={<PlusOutlined />} 
+        <Button
+          className="btn"
+          type="primary"
+          icon={<PlusOutlined />}
           onClick={() => navigate("/new-project")}
         />
-        <Button 
-          type="default" 
-          icon={<InboxOutlined />} 
+        <Button
+          type="default"
+          icon={<InboxOutlined />}
           onClick={() => navigate("/archived-projects")}
           style={{ marginLeft: "auto" }}
         />
       </div>
-      <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} items={tabItems} centered />
-      <Table 
-        columns={columns} 
-        dataSource={paginatedData} 
-        pagination={false} 
+      <Tabs
+        defaultActiveKey="All Projects"
+        onChange={handleTabChange}
+        items={tabItems}
+        centered
       />
+      <Table columns={columns} dataSource={paginatedData} pagination={false} />
       <div style={{ marginTop: "16px", textAlign: "right" }}>
         <Pagination
           current={currentPage}
