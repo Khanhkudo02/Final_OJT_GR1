@@ -269,10 +269,7 @@ const NewProject = () => {
           name="phoneNumber"
           rules={[
             { required: true, message: "Please input the phone number!" },
-            {
-              pattern: /^[0-9]+$/,
-              message: "Please enter a valid phone number!",
-            },
+            { pattern: /^[0-9]{10}$/, message: 'Please enter a valid 10-digit phone number!' }
           ]}
         >
           <Input placeholder="0123456789" />
