@@ -1,21 +1,23 @@
 import { Layout, theme } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ResetPassword from "../src/pages/ResetPassword";
 import AccountInfo from "./Components/AccountInfo.jsx";
 import ChangePassword from "./Components/ChangePassword";
 import EmployeeManagement from "./Components/EmployeeManagement";
+import LanguageManagement from "./Components/LanguageManagement";
 import NewProject from "./Components/NewProject";
 import PositionManagement from "./Components/PositionManagement";
-import LanguageManagement from "./Components/LanguageManagement";
 import ProjectManagement from "./Components/ProjectManagement";
 import Sidebar from "./Components/Sidebar";
 import TechnologyManagement from "./Components/TechnologyManagement";
+import AddTechnology from './Components/AddTechnology';
 import Admin from "./pages/Admin";
 import ForgetPassword from "./pages/ForgetPassword";
 import Login from "./pages/LoginPage";
 import PageCV from "./pages/PageCV";
 import ProjectDetail from "./Components/ProjectDetail";
+import ArchivedProjects from "./Components/ArchivedProjects";
 import AddPosition from "./Components/AddPosition";
 import ProjectEdit from "./Components/ProjectEdit";
 import EditPosition from "./Components/EditPosition";
@@ -34,7 +36,6 @@ const App = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  // Initialize user state with local storage data
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
@@ -105,8 +106,11 @@ const App = () => {
                           path="/project/:id"
                           element={<ProjectDetail />}
                         />
-                        <Route path="/edit-project/:id" element={<ProjectEdit />} />
-
+                        <Route 
+                          path="/edit-project/:id" 
+                          element={<ProjectEdit />} 
+                        />
+                        <Route path="/archived-projects" element={<ArchivedProjects />} />
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
@@ -127,6 +131,10 @@ const App = () => {
                           path="/technology-management"
                           element={<TechnologyManagement />}
                         />
+                        <Route 
+                          path="/technology-management/add" 
+                          element={<AddTechnology />} 
+                          />
                         <Route
                           path="/programing-language"
                           element={<LanguageManagement />}

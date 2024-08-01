@@ -9,11 +9,11 @@ import {
   message,
   Upload,
   Modal,
-} from "antd";
+} from 'antd';
+import dayjs from 'dayjs';
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
 import { UploadOutlined } from "@ant-design/icons";
-import moment from "moment";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 
@@ -40,8 +40,8 @@ const ProjectEdit = () => {
           setProject(projectData);
           form.setFieldsValue({
             ...projectData,
-            startDate: moment(projectData.startDate),
-            endDate: moment(projectData.endDate),
+            startDate: dayjs(projectData.startDate),
+            endDate: dayjs(projectData.endDate),
           });
 
           // Set fileList for existing attachments
@@ -145,8 +145,8 @@ const ProjectEdit = () => {
         try {
           const projectData = {
             ...values,
-            startDate: values.startDate.format("YYYY-MM-DD"),
-            endDate: values.endDate.format("YYYY-MM-DD"),
+            startDate: values.startDate.format("DD-MM-YYYY"),
+            endDate: values.endDate.format("DD-MM-YYYY"),
             imageUrl:
               fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
           };
@@ -214,7 +214,7 @@ const ProjectEdit = () => {
           name="startDate"
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
-          <DatePicker format="DD/MM/YYYY" />
+          <DatePicker format="DD/MM/YYYY"/>
         </Form.Item>
 
         <Form.Item
@@ -222,7 +222,7 @@ const ProjectEdit = () => {
           name="endDate"
           rules={[{ required: true, message: "Please select the end date!" }]}
         >
-          <DatePicker format="DD/MM/YYYY" />
+          <DatePicker format="DD/MM/YYYY"/>
         </Form.Item>
 
         <Form.Item

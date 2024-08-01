@@ -48,16 +48,9 @@ const EditPosition = () => {
       toast.error("Please fill in all fields.");
       return;
     }
-
+  
     try {
-      await putUpdatePosition(
-        id,
-        name,
-        description,
-        department,
-        status,
-        imageFile
-      );
+      await putUpdatePosition(id, name, description, department, status, imageFile);
       toast.success("Position updated successfully!");
       navigate("/position-management");
     } catch (error) {

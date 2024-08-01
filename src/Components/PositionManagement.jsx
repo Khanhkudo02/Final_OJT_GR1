@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal, Space } from "antd";
 import {
-  fetchAllPositions,
-  deletePositionById,
-} from "../service/PositionServices";
-import { useNavigate } from "react-router-dom";
-import "../assets/style/Pages/PositionManagement.scss";
-import "../assets/style/Global.scss";
-import {
-  EyeOutlined,
-  EditOutlined,
   DeleteOutlined,
-  PlusOutlined,
+  EditOutlined,
+  PlusOutlined
 } from "@ant-design/icons";
+import { Button, message, Modal, Space, Table } from "antd";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../assets/style/Global.scss";
+import "../assets/style/Pages/PositionManagement.scss";
+import {
+  deletePositionById,
+  fetchAllPositions,
+} from "../service/PositionServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -90,8 +89,8 @@ const PositionManagement = () => {
         type="primary"
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
+        icon={<PlusOutlined />}
       >
-        Add New Position
       </Button>
       <Table
         dataSource={paginatedData}

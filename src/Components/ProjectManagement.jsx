@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Table, Tag, Space, Button, Avatar, Pagination, Tabs } from "antd";
-import { useNavigate } from "react-router-dom";
-import { fetchAllProjects } from "../service/Project";
-import {
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { Table, Tag, Space, Button, Avatar, Pagination, Tabs, Modal, message } from "antd";
+import { useNavigate } from "react-router-dom"; 
+import { fetchAllProjects, moveToArchive } from "../service/Project";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, InboxOutlined } from "@ant-design/icons";
 import "../assets/style/Pages/ProjectManagement.scss";
 import "../assets/style/Global.scss";
 
@@ -27,7 +22,6 @@ const ProjectManagement = () => {
   useEffect(() => {
     const fetchData = async () => {
       const projects = await fetchAllProjects();
-      // setData(projects);
       setData(projects.reverse());
     };
     fetchData();
@@ -76,6 +70,21 @@ const ProjectManagement = () => {
       "#52c41a",
     ];
     return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  const handleDelete = (key) => {
+    Modal.confirm({
+      title: 'Are you sure you want to archive this project?',
+      onOk: async () => {
+        try {
+          await moveToArchive(key);
+          setData(prevData => prevData.filter(item => item.key !== key));
+          message.success('Project archived successfully');
+        } catch (error) {
+          message.error('Failed to archive project');
+        }
+      }
+    });
   };
 
   const columns = [
@@ -146,10 +155,10 @@ const ProjectManagement = () => {
             onClick={() => navigate(`/edit-project/${record.key}`)}
           />
           {record.status !== "ONGOING" && (
-            <Button
-              icon={<DeleteOutlined />}
-              style={{ color: "red", borderColor: "red" }}
-              onClick={() => console.log("Delete", record.key)}
+            <Button 
+              icon={<DeleteOutlined />} 
+              style={{ color: "red", borderColor: "red" }} 
+              onClick={() => handleDelete(record.key)}
             />
           )}
         </Space>
@@ -168,19 +177,26 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button
-        className="btn"
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => navigate("/new-project")}
+      <div className="project-management-header">
+        <Button 
+          className="btn" 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={() => navigate("/new-project")}
+        />
+        <Button 
+          type="default" 
+          icon={<InboxOutlined />} 
+          onClick={() => navigate("/archived-projects")}
+          style={{ marginLeft: "auto" }}
+        />
+      </div>
+      <Tabs defaultActiveKey="All Projects" onChange={handleTabChange} items={tabItems} centered />
+      <Table 
+        columns={columns} 
+        dataSource={paginatedData} 
+        pagination={false} 
       />
-      <Tabs
-        defaultActiveKey="All Projects"
-        onChange={handleTabChange}
-        centered
-        items={tabItems}
-      />
-      <Table columns={columns} dataSource={paginatedData} pagination={false} />
       <div style={{ marginTop: "16px", textAlign: "right" }}>
         <Pagination
           current={currentPage}

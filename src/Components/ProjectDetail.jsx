@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { fetchAllProjects, deleteProject } from "../service/Project";
-import { fetchAllTechnology } from "../service/TechnologyServices";
-import { fetchAllLanguages } from "../service/LanguageServices";
 import { Button, Modal, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchAllLanguages } from "../service/LanguageServices";
+import { deleteProjectPermanently, fetchAllProjects } from "../service/Project";
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -69,7 +69,7 @@ const ProjectDetail = () => {
   const handleDelete = async () => {
     try {
       if (project && project.key) {
-        await deleteProject(project.key);
+        await deleteProjectPermanently(project.key);
         message.success("Project deleted successfully");
         navigate("/project-management");
       } else {
@@ -104,9 +104,18 @@ const ProjectDetail = () => {
     languages
   );
 
+  const formatCategory = (category) => 
+    category
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  
   const formattedCategories = Array.isArray(project.category)
-    ? project.category.join(", ")
-    : "No categories";
+    ? project.category.map(formatCategory).join(', ')
+    : project.category
+      ? formatCategory(project.category)
+      : "No categories";
+  
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
@@ -127,9 +136,6 @@ const ProjectDetail = () => {
           />
         </div>
       )}
-      <p>
-        <strong>ID:</strong> {project.key}
-      </p>
       <p>
         <strong>Name:</strong> {project.name}
       </p>

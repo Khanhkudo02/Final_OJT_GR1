@@ -1,12 +1,20 @@
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Modal, Select, Space, Table } from "antd";
-import bcrypt from 'bcryptjs'; // Thay vì import bcrypt
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Form,
+  Input,
+  message,
+  Modal,
+  Select,
+  Space,
+  Table,
+} from "antd";
+import bcrypt from "bcryptjs"; // Thay vì import bcrypt
 import { get, getDatabase, ref, remove, set, update } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import ExportExcel from "../Components/ExportExcel";
 import LanguageSwitcher from "../Components/LanguageSwitcher";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/Admin.scss";
@@ -39,7 +47,7 @@ function AdminPage() {
           ...data,
         }));
         // Lọc người dùng có role là admin
-        const adminUsers = usersArray.filter(user => user.role === "admin");
+        const adminUsers = usersArray.filter((user) => user.role === "admin");
         adminUsers.sort(
           (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
         );
@@ -199,7 +207,7 @@ function AdminPage() {
     } catch (error) {
       message.error(t("errorDeletingUser"));
     }
-  };  
+  };
 
   const handleEditUser = (user) => {
     setEmail(user.email);
@@ -279,14 +287,14 @@ function AdminPage() {
       key: "actions",
       render: (_, record) => (
         <Space key={record.id}>
-          <Button 
-            icon={<EditOutlined />} 
-            style={{ color: "blue", borderColor: "blue" }} 
+          <Button
+            icon={<EditOutlined />}
+            style={{ color: "blue", borderColor: "blue" }}
             onClick={() => handleEditUser(record)}
           />
-          <Button 
-            icon={<DeleteOutlined />} 
-            style={{ color: "red", borderColor: "red" }} 
+          <Button
+            icon={<DeleteOutlined />}
+            style={{ color: "red", borderColor: "red" }}
             onClick={() => handleDeleteUser(record.id)}
           />
           {/* Đã loại bỏ nút reset mật khẩu */}
@@ -297,17 +305,14 @@ function AdminPage() {
 
   return (
     <div className="admin-page-container">
-      <LanguageSwitcher />
       <h1>{t("adminPage")}</h1>
       <div className="admin-actions">
         <Button
           className="btn"
           type="primary"
           onClick={() => setModalVisible(true)}
-        >
-          {t("addUser")}
-        </Button>
-        <ExportExcel data={users} fileName="File Excel" />
+          icon={<PlusOutlined />}
+        ></Button>
       </div>
       <Modal
         title={editMode ? t("editUser") : t("addUser")}
@@ -345,19 +350,19 @@ function AdminPage() {
           >
             <Input />
           </Form.Item>
-          {editMode &&(
+          {editMode && (
             <Form.Item
-            label={t("role")}
-            name="role"
-            initialValue={role}
-            rules={[{ required: true, message: t("pleaseSelectRole") }]}
-          >
-            <Select onChange={(value) => setRole(value)}>
-              <Option value="admin">{t("admin")}</Option>
-            </Select>
-          </Form.Item>
+              label={t("role")}
+              name="role"
+              initialValue={role}
+              rules={[{ required: true, message: t("pleaseSelectRole") }]}
+            >
+              <Select onChange={(value) => setRole(value)}>
+                <Option value="admin">{t("admin")}</Option>
+              </Select>
+            </Form.Item>
           )}
-          
+
           {editMode && (
             <Form.Item
               label={t("status")}
@@ -387,4 +392,4 @@ function AdminPage() {
   );
 }
 
-export default AdminPage; 
+export default AdminPage;

@@ -1,168 +1,143 @@
 import React, { useState, useEffect } from "react";
-import { Button, Space, Table, message } from "antd";
-import ModalAddTechnology from "./ModalAddTechnology";
-import ModalEditTechnology from "./ModalEditTechnology";
-import ModalDeleteTechnology from "./ModalDeleteTechnology";
-import { fetchAllTechnology } from "../service/TechnologyServices";
+import { Button, Table, message, Modal, Space } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { fetchAllTechnology, deleteTechnology } from "../service/TechnologyServices";
+import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/TechnologyManagement.scss";
 import "../assets/style/Global.scss";
-import {
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
 
 const { Column } = Table;
+const { confirm } = Modal;
 
 const TechnologyManagement = () => {
   const [technologies, setTechnologies] = useState([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [dataTechnologyEdit, setDataTechnologyEdit] = useState(null);
-  const [technologyIdToDelete, setTechnologyIdToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const navigate = useNavigate();
 
-  // Function to fetch technologies and update state
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
-      setTechnologies(data.sort((a, b) => b.createdAt - a.createdAt));
+      const techArray = Object.keys(data).map((key) => ({
+        key,  // Add the key as the ID
+        ...data[key],  // Spread the data
+      }));
+      setTechnologies(techArray);
     } catch (error) {
       console.error("Failed to fetch technologies:", error);
     }
   };
 
-  // Load technologies when component mounts
   useEffect(() => {
     loadTechnologies();
+
+    const technologyAdded = localStorage.getItem("technologyAdded");
+    if (technologyAdded === "true") {
+      message.success("Technology added successfully!");
+      localStorage.removeItem("technologyAdded"); // Clear notification after displaying
+    }
   }, []);
 
-  // Show edit modal with technology data
-  const showEditModal = (record) => {
-    setDataTechnologyEdit(record);
-    setIsEditModalOpen(true);
+  const handleTableChange = (pagination) => {
+    setCurrentPage(pagination.current);
+    setPageSize(pagination.pageSize);
   };
 
-  // Show add modal
-  const showAddModal = () => {
-    setIsAddModalOpen(true);
+  const showAddPage = () => {
+    navigate("/technology-management/add");
   };
 
-  // Show delete modal if technology is inactive
-  const showDeleteModal = (record) => {
-    if (record.status && record.status.toLowerCase() === "inactive") {
-      setTechnologyIdToDelete(record.key); // Make sure `record.key` is the correct ID
-      setIsDeleteModalOpen(true);
-    } else {
+  const handleDelete = (record) => {
+    if (record.status.toLowerCase() !== "inactive") {
       message.error("Only inactive technologies can be deleted.");
+      return;
     }
-  };
 
-  // Close edit modal and reload technologies
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false);
-    setDataTechnologyEdit(null);
-    setTimeout(loadTechnologies, 100);
-  };
-
-  // Close add modal and reload technologies
-  const handleCloseAddModal = () => {
-    setIsAddModalOpen(false);
-    setTimeout(loadTechnologies, 100);
-  };
-
-  // Close delete modal and reload technologies
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-    setTechnologyIdToDelete(null);
-    setTimeout(loadTechnologies, 100);
-  };
-
-  // Define columns for Table
-  const columns = [
-    {
-      title: "Image",
-      dataIndex: "imageURL",
-      key: "imageURL",
-      render: (text) => (
-        <img src={text} alt="Technology" style={{ width: 50, height: 50 }} />
-      ),
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (text) => {
-        const className =
-          text === "active" ? "status-active" : "status-inactive";
-        return (
-          <span className={className}>
-            {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
-          </span>
-        );
+    confirm({
+      title: "Are you sure you want to delete this technology?",
+      onOk: async () => {
+        try {
+          await deleteTechnology(record.key);
+          message.success("Technology deleted successfully!");
+          loadTechnologies();
+        } catch (error) {
+          message.error("Failed to delete technology.");
+        }
       },
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space>
-          <Button
-            icon={<EditOutlined />}
-            style={{ color: "blue", borderColor: "blue" }}
-            onClick={() => showEditModal(record)}
-          />
-          <Button
-            icon={<DeleteOutlined />}
-            style={{ color: "red", borderColor: "red" }}
-            onClick={() => showDeleteModal(record)}
-          />
-        </Space>
-      ),
-    },
-  ];
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
+  };
+
+  const paginatedData = technologies.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   return (
     <div>
-      <Button className="btn" type="primary" onClick={showAddModal}>
-        Add Technology
+      <Button
+        className="btn"
+        type="primary"
+        style={{ marginBottom: 16 }}
+        onClick={showAddPage}
+      >
+        Add New Technology
       </Button>
       <Table
-        columns={columns}
-        dataSource={technologies}
-        rowKey={(record) => record.key}
-      />
-      {isAddModalOpen && (
-        <ModalAddTechnology
-          open={isAddModalOpen}
-          handleClose={handleCloseAddModal}
+        dataSource={paginatedData}
+        rowKey="key"
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          total: technologies.length,
+          onChange: (page, pageSize) =>
+            handleTableChange({ current: page, pageSize }),
+        }}
+      >
+        <Column
+          title="Image"
+          dataIndex="imageUrl"
+          key="imageUrl"
+          render={(imageUrl) => (
+            imageUrl ? <img src={imageUrl} alt="Technology" style={{ width: 50, height: 50 }} /> : <span>No Image</span>
+          )}
         />
-      )}
-      {isEditModalOpen && (
-        <ModalEditTechnology
-          open={isEditModalOpen}
-          handleClose={handleCloseEditModal}
-          dataTechnologyEdit={dataTechnologyEdit}
+        <Column title="Name" dataIndex="name" key="name" />
+        <Column title="Description" dataIndex="description" key="description" />
+        <Column
+          title="Status"
+          dataIndex="status"
+          key="status"
+          render={(text) => {
+            const className = text === "active" ? "status-active" : "status-inactive";
+            return (
+              <span className={className}>
+                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+              </span>
+            );
+          }}
         />
-      )}
-      {isDeleteModalOpen && (
-        <ModalDeleteTechnology
-          open={isDeleteModalOpen}
-          handleClose={handleCloseDeleteModal}
-          technologyIdToDelete={technologyIdToDelete}
+        <Column
+          title="Actions"
+          key="actions"
+          render={(text, record) => (
+            <Space>
+              <Button
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
+                onClick={() => navigate(`/technology-management/edit/${record.key}`)}
+              />
+              <Button
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
+                onClick={() => handleDelete(record)}
+              />
+            </Space>
+          )}
         />
-      )}
+      </Table>
     </div>
   );
 };

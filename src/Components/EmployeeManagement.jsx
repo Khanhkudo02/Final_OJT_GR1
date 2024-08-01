@@ -1,18 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { Button, Table, message, Modal } from "antd";
 import {
-  fetchAllEmployees,
-  deleteEmployeeById,
-} from "../service/EmployeeServices";
+  DeleteOutlined,
+  EditOutlined,
+  ExportOutlined,
+  EyeOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { Button, message, Modal, Space, Table } from "antd";
+import { Document, Packer, Paragraph, TextRun } from "docx";
+import { saveAs } from "file-saver";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Pages/EmployeeManagement.scss";
+import * as XLSX from "xlsx";
 import "../assets/style/Global.scss";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import "../assets/style/Pages/EmployeeManagement.scss";
+import {
+  deleteEmployeeById,
+  fetchAllEmployees,
+} from "../service/EmployeeServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
 
 const EmployeeManagement = () => {
+  const { t } = useTranslation();
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -21,11 +32,12 @@ const EmployeeManagement = () => {
   const loadEmployees = async () => {
     try {
       const data = await fetchAllEmployees();
-      // Filter employees to only include those with role 'employee'
-      const filteredData = data.filter(employee => employee.role === 'employee');
+      const filteredData = data
+        .filter((employee) => employee.role === "employee")
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp theo createdAt
       setEmployees(filteredData);
     } catch (error) {
-      console.error("Failed to fetch employees:", error);
+      console.error(t("errorFetchingEmployees"), error);
     }
   };
 
@@ -34,10 +46,10 @@ const EmployeeManagement = () => {
 
     const employeeAdded = localStorage.getItem("employeeAdded");
     if (employeeAdded === "true") {
-      message.success("Employee added successfully!");
+      message.success(t("employeeAddedSuccessfully"));
       localStorage.removeItem("employeeAdded");
     }
-  }, []);
+  }, [t]);
 
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);
@@ -50,31 +62,88 @@ const EmployeeManagement = () => {
 
   const handleDelete = (record) => {
     if (record.status !== "inactive") {
-      message.error("Only inactive employees can be deleted.");
+      message.error(t("onlyInactiveEmployeesCanBeDeleted"));
       return;
     }
 
     confirm({
-      title: "Are you sure you want to delete this employee?",
+      title: t("confirmDeleteEmployee"),
       onOk: async () => {
         try {
           await deleteEmployeeById(record.key);
-          message.success("Employee deleted successfully!");
+          message.success(t("employeeDeletedSuccessfully"));
           loadEmployees();
         } catch (error) {
-          message.error("Failed to delete employee.");
+          message.error(t("failedToDeleteEmployee"));
         }
       },
       onCancel() {
-        console.log("Cancel");
+        console.log(t("cancel"));
       },
     });
+  };
+
+  const exportToExcel = () => {
+    const filteredEmployees = employees.map(
+      ({ key, createdAt, password, imageUrl, isAdmin, ...rest }) => rest
+    );
+
+    const ws = XLSX.utils.json_to_sheet(filteredEmployees);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, t("employees"));
+    XLSX.writeFile(wb, `${t("employees")}.xlsx`);
   };
 
   const paginatedData = employees.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  const exportToWord = () => {
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: employees.map(
+            (employee) =>
+              new Paragraph({
+                children: [
+                  new TextRun(`Name: ${employee.name}`),
+                  new TextRun({
+                    text: "\n",
+                    break: 1,
+                  }),
+                  new TextRun(`Email: ${employee.email}`),
+                  new TextRun({
+                    text: "\n",
+                    break: 1,
+                  }),
+                  new TextRun(`Phone Number: ${employee.phoneNumber}`),
+                  new TextRun({
+                    text: "\n",
+                    break: 1,
+                  }),
+                  new TextRun(`Skills: ${employee.skills.join(", ")}`),
+                  new TextRun({
+                    text: "\n",
+                    break: 1,
+                  }),
+                  new TextRun(`Status: ${employee.status}`),
+                  new TextRun({
+                    text: "\n\n",
+                    break: 2,
+                  }),
+                ],
+              })
+          ),
+        },
+      ],
+    });
+
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, `${t("employees")}_CVs.docx`);
+    });
+  };
 
   return (
     <div>
@@ -83,8 +152,15 @@ const EmployeeManagement = () => {
         type="primary"
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
+        icon={<PlusOutlined />}
+      ></Button>
+      <Button
+        className="btn"
+        type="primary"
+        style={{ marginBottom: 16, marginLeft: 16 }}
+        onClick={exportToExcel}
       >
-        Add New Employee
+        {t("exportToExcel")}
       </Button>
       <Table
         dataSource={paginatedData}
@@ -97,12 +173,46 @@ const EmployeeManagement = () => {
             handleTableChange({ current: page, pageSize }),
         }}
       >
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Email" dataIndex="email" key="email" />
-        <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
-        <Column title="Skills" dataIndex="skills" key="skills" />
         <Column
-          title="Status"
+          title={t("image")}
+          dataIndex="imageUrl"
+          key="imageUrl"
+          render={(text, record) => (
+            <img
+              src={record.imageUrl}
+              alt={t("employee")}
+              width="50"
+              height="50"
+              style={{ objectFit: "cover" }}
+            />
+          )}
+        />
+        <Column title={t("name")} dataIndex="name" key="name" />
+        <Column title={t("email")} dataIndex="email" key="email" />
+        <Column
+          title={t("phoneNumber")}
+          dataIndex="phoneNumber"
+          key="phoneNumber"
+        />
+        <Column
+  title={t("skills")}
+  dataIndex="skills"
+  key="skills"
+  render={(text) => {
+    if (Array.isArray(text)) {
+      return text
+        .map((skill) =>
+          t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
+            defaultValue: skill.replace(/_/g, " "),
+          })
+        )
+        .join(", ");
+    }
+    return text;
+  }}
+/>
+        <Column
+          title={t("status")}
           dataIndex="status"
           key="status"
           render={(text) => {
@@ -116,29 +226,35 @@ const EmployeeManagement = () => {
           }}
         />
         <Column
-          title="Actions"
+          title={t("actions")}
           key="actions"
           render={(text, record) => (
-            <span>
+            <Space>
               <Button
-                className="edit-button"
-                type="primary"
+                icon={<EyeOutlined />}
+                style={{ color: "green", borderColor: "green" }}
+                onClick={() =>
+                  navigate(`/employee-management/view/${record.key}`)
+                }
+              />
+              <Button
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
                 onClick={() =>
                   navigate(`/employee-management/edit/${record.key}`)
                 }
-                style={{ marginLeft: 8 }}
-              >
-                <EditOutlined />
-              </Button>
+              />
               <Button
-                className="delete-button"
-                type="danger"
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDelete(record)}
-                style={{ marginLeft: 8 }}
-              >
-                <DeleteOutlined />
-              </Button>
-            </span>
+              />
+              <Button
+                icon={<ExportOutlined />}
+                style={{ color: "black", borderColor: "black" }}
+                onClick={() => exportToWord()}
+              />
+            </Space>
           )}
         />
       </Table>
