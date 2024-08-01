@@ -30,9 +30,9 @@ const ProjectEdit = () => {
   const [technologies, setTechnologies] = useState([]);
   const [languages, setLanguages] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [statusOptions, setStatusOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -58,6 +58,8 @@ const ProjectEdit = () => {
               },
             ]);
           }
+
+          updateStatusOptions(projectData.status);
         } else {
           message.error("Project not found");
           navigate("/project-management");
@@ -171,6 +173,28 @@ const ProjectEdit = () => {
     }
   };
 
+  const updateStatusOptions = (currentStatus) => {
+    let options = [];
+    switch (currentStatus) {
+      case "ONGOING":
+        options = ["PENDING", "COMPLETED"];
+        break;
+      case "PENDING":
+        options = ["ONGOING"];
+        break;
+      case "COMPLETED":
+        options = ["ONGOING"];
+        break;
+      case "NOT STARTED":
+        options = ["ONGOING", "PENDING"];
+        break;
+      default:
+        options = ["NOT STARTED", "ONGOING", "COMPLETED", "PENDING"];
+        break;
+    }
+    setStatusOptions(options);
+  };
+
   const onFinish = async (values) => {
     Modal.confirm({
       title: "Confirm Changes",
@@ -204,16 +228,6 @@ const ProjectEdit = () => {
     setFileList(fileList);
   };
 
-  const formatNumber = (value) => {
-    return new Intl.NumberFormat("vi-VN").format(value);
-  };
-
-  const parseNumber = (value) => {
-    return value.replace(/\D/g, "");
-  };
-
-
-  
   if (!project) {
     return <div>Loading...</div>;
   }
@@ -284,10 +298,10 @@ const ProjectEdit = () => {
           name="email"
           rules={[
             { required: true, message: "Please input the client email!" },
-            { type: 'email', message: 'Please enter a valid email!' }
+            { type: "email", message: "Please enter a valid email!" },
           ]}
         >
-          <Input placeholder="input placeholder" />
+          <Input placeholder="emailname@gmail.com" />
         </Form.Item>
 
         <Form.Item
@@ -295,10 +309,10 @@ const ProjectEdit = () => {
           name="phoneNumber"
           rules={[
             { required: true, message: "Please input the phone number!" },
-            { pattern: /^[0-9]+$/, message: 'Please enter a valid phone number!' }
+            { pattern: /^[0-9]+$/, message: "Please enter a valid phone number!" },
           ]}
         >
-          <Input placeholder="input placeholder" />
+          <Input placeholder="0123456789" />
         </Form.Item>
 
         <Form.Item
@@ -349,10 +363,11 @@ const ProjectEdit = () => {
           ]}
         >
           <Select>
-            <Option value="NOT STARTED">Not Started</Option>
-            <Option value="ONGOING">Ongoing</Option>
-            <Option value="COMPLETED">Completed</Option>
-            <Option value="COMPLETED">Pending</Option>
+            {statusOptions.map((status) => (
+              <Option key={status} value={status}>
+                {status}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 
