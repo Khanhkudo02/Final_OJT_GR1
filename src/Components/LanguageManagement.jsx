@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Space, Table } from 'antd';
+import { Button, message, Modal, Space, Table, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
@@ -8,6 +8,7 @@ import { deleteLanguageById, fetchAllLanguages } from "../service/LanguageServic
 
 const { Column } = Table;
 const { confirm } = Modal;
+const { TabPane } = Tabs;
 
 const LanguageManagement = () => {
   const [languages, setLanguages] = useState([]);
@@ -16,6 +17,7 @@ const LanguageManagement = () => {
   const navigate = useNavigate();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [dataLanguageEdit, setDataLanguageEdit] = useState(null);
+  const [filteredStatus, setFilteredStatus] = useState("All Languages");
 
   const loadLanguages = async () => {
     try {
@@ -73,19 +75,38 @@ const LanguageManagement = () => {
     });
   };
 
-  const paginatedData = languages.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handleTabChange = (key) => {
+    setFilteredStatus(key);
+    setCurrentPage(1); // Reset to first page when changing tabs
+  };
+
+  const filteredData = languages.filter((item) => {
+    if (filteredStatus === "All Languages") return true;
+    return item.status.toLowerCase() === filteredStatus.toLowerCase();
+  });
+
+  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div>
       <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage} icon={<PlusOutlined />}>
       </Button>
+      <Tabs
+        defaultActiveKey="All Languages"
+        onChange={handleTabChange}
+        centered
+      >
+        <TabPane tab="All Languages" key="All Languages" />
+        <TabPane tab="Active" key="active" />
+        <TabPane tab="Inactive" key="inactive" />
+      </Tabs>
       <Table
         dataSource={paginatedData}
         rowKey="key"
         pagination={{
           current: currentPage,
           pageSize: pageSize,
-          total: languages.length,
+          total: filteredData.length,
           onChange: (page, pageSize) =>
             handleTableChange({ current: page, pageSize }),
         }}
