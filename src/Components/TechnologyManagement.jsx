@@ -1,13 +1,18 @@
 // import React, { useState, useEffect } from "react";
 // import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
-// import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+// import {
+//   EditOutlined,
+//   DeleteOutlined,
+//   PlusOutlined,
+//   SearchOutlined,
+// } from "@ant-design/icons";
 // import {
 //   postCreateTechnology,
 //   fetchTechnologyById,
 //   fetchAllTechnology,
 //   putUpdateTechnology,
 //   deleteTechnology,
-// } from '../service/TechnologyServices';
+// } from "../service/TechnologyServices";
 // import { useNavigate } from "react-router-dom";
 // import "../assets/style/Pages/TechnologyManagement.scss";
 // import { useTranslation } from "react-i18next";
@@ -21,7 +26,7 @@
 //   const [pageSize, setPageSize] = useState(10);
 //   const [filteredStatus, setFilteredStatus] = useState("All Technology");
 //   const navigate = useNavigate();
-//   const [searchTerm, setSearchTerm] = useState('');
+//   const [searchTerm, setSearchTerm] = useState("");
 //   const { t } = useTranslation();
 
 //   const loadTechnologies = async () => {
@@ -80,8 +85,12 @@
 //   };
 
 //   const filteredData = technologies.filter((item) => {
-//     const matchesStatus = filteredStatus === "All Technology" || item.status.toLowerCase() === filteredStatus.toLowerCase();
-//     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+//     const matchesStatus =
+//       filteredStatus === "All Technology" ||
+//       item.status.toLowerCase() === filteredStatus.toLowerCase();
+//     const matchesSearch = item.name
+//       .toLowerCase()
+//       .includes(searchTerm.toLowerCase());
 //     return matchesStatus && matchesSearch;
 //   });
 
@@ -104,8 +113,7 @@
 //         style={{ marginBottom: 16 }}
 //         onClick={showAddPage}
 //         icon={<PlusOutlined />}
-//       >
-//       </Button>
+//       ></Button>
 //       <Input
 //         placeholder={t("search")}
 //         value={searchTerm}
@@ -118,7 +126,7 @@
 //         onChange={handleTabChange}
 //         items={tabItems}
 //         centered
-//       /> 
+//       />
 //       <Table
 //         dataSource={paginatedData}
 //         rowKey="id"
@@ -134,11 +142,21 @@
 //           title="Image"
 //           dataIndex="imageUrl"
 //           key="imageUrl"
-//           render={(imageUrl) => (
-//             imageUrl 
-//               ? <img src={imageUrl} alt="Technology" style={{ width: 50, height: 50 }} onError={(e) => {e.target.onerror = null; e.target.src="path/to/placeholder.png"}} /> 
-//               : <span>No Image</span>
-//           )}
+//           render={(imageUrl) =>
+//             imageUrl ? (
+//               <img
+//                 src={imageUrl}
+//                 alt="Technology"
+//                 style={{ width: 50, height: 50 }}
+//                 onError={(e) => {
+//                   e.target.onerror = null;
+//                   e.target.src = "path/to/placeholder.png";
+//                 }}
+//               />
+//             ) : (
+//               <span>No Image</span>
+//             )
+//           }
 //         />
 //         <Column title="Name" dataIndex="name" key="name" />
 //         <Column title="Description" dataIndex="description" key="description" />
@@ -147,7 +165,8 @@
 //           dataIndex="status"
 //           key="status"
 //           render={(text) => {
-//             const className = text === "active" ? "status-active" : "status-inactive";
+//             const className =
+//               text === "active" ? "status-active" : "status-inactive";
 //             return (
 //               <span className={className}>
 //                 {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
@@ -163,7 +182,9 @@
 //               <Button
 //                 icon={<EditOutlined />}
 //                 style={{ color: "blue", borderColor: "blue" }}
-//                 onClick={() => navigate(`/technology-management/edit/${record.id}`)}
+//                 onClick={() =>
+//                   navigate(`/technology-management/edit/${record.id}`)
+//                 }
 //               />
 //               <Button
 //                 icon={<DeleteOutlined />}
@@ -179,17 +200,18 @@
 // };
 
 // export default TechnologyManagement;
-
 import React, { useState, useEffect } from "react";
 import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import {
-  postCreateTechnology,
-  fetchTechnologyById,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import {
   fetchAllTechnology,
-  putUpdateTechnology,
   deleteTechnology,
-} from '../service/TechnologyServices';
+} from "../service/TechnologyServices";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/TechnologyManagement.scss";
 import { useTranslation } from "react-i18next";
@@ -202,8 +224,8 @@ const TechnologyManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filteredStatus, setFilteredStatus] = useState("All Technology");
-  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
   // Load technologies from the server
@@ -243,8 +265,8 @@ const TechnologyManagement = () => {
       onOk: async () => {
         try {
           await deleteTechnology(record.id);
-          message.success(t("Technology deleted successfully!"));
-          loadTechnologies();
+          message.success("Technology deleted successfully!");
+          loadTechnologies(); // Reload technologies after deletion
         } catch (error) {
           message.error(t("Failed to delete technology."));
         }
@@ -269,8 +291,12 @@ const TechnologyManagement = () => {
 
   // Filter and paginate data
   const filteredData = technologies.filter((item) => {
-    const matchesStatus = filteredStatus === "All Technology" || item.status.toLowerCase() === filteredStatus.toLowerCase();
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filteredStatus === "All Technology" ||
+      item.status.toLowerCase() === filteredStatus.toLowerCase();
+    const matchesSearch = item.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -295,7 +321,7 @@ const TechnologyManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       >
-        {t("Add Technology")}
+        Add Technology
       </Button>
       <Input
         placeholder={t("search")}
@@ -309,7 +335,7 @@ const TechnologyManagement = () => {
         onChange={handleTabChange}
         items={tabItems}
         centered
-      /> 
+      />
       <Table
         dataSource={paginatedData}
         rowKey="id"
@@ -325,11 +351,21 @@ const TechnologyManagement = () => {
           title={t("Image")}
           dataIndex="imageUrl"
           key="imageUrl"
-          render={(imageUrl) => (
-            imageUrl 
-              ? <img src={imageUrl} alt={t("Technology")} style={{ width: 50, height: 50 }} onError={(e) => {e.target.onerror = null; e.target.src="path/to/placeholder.png"}} /> 
-              : <span>{t("No Image")}</span>
-          )}
+          render={(imageUrl) =>
+            imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="Technology"
+                style={{ width: 50, height: 50 }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "path/to/placeholder.png";
+                }}
+              />
+            ) : (
+              <span>No Image</span>
+            )
+          }
         />
         <Column title={t("Name")} dataIndex="name" key="name" />
         <Column title={t("Description")} dataIndex="description" key="description" />
@@ -338,7 +374,8 @@ const TechnologyManagement = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
-            const className = text.toLowerCase() === "active" ? "status-active" : "status-inactive";
+            const className =
+              text === "active" ? "status-active" : "status-inactive";
             return (
               <span className={className}>
                 {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
@@ -354,7 +391,9 @@ const TechnologyManagement = () => {
               <Button
                 icon={<EditOutlined />}
                 style={{ color: "blue", borderColor: "blue" }}
-                onClick={() => navigate(`/technology-management/edit/${record.id}`)}
+                onClick={() =>
+                  navigate(`/technology-management/edit/${record.id}`)
+                }
               />
               <Button
                 icon={<DeleteOutlined />}
