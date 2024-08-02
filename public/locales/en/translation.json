@@ -170,5 +170,8 @@
   "ExistingPosition": "Existing Positions",
   "EditPosition": "Edit Position",
 
-  "LogOut": "Log Out"
+  "LogOut": "Log Out",
+  "EmployeeAccount": "Employee Account",
+  "AccountInfo": "Account Info",
+  "ListProject": "List Project"
 }

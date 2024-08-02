@@ -170,5 +170,8 @@
   "ExistingPosition": "Chức vụ hiện có",
   "EditPosition": "Chỉnh sửa thông tin của chức vụ",
 
-  "LogOut": "Đăng Xuất"
+  "LogOut": "Đăng Xuất",
+  "EmployeeAccount": "Tài khoản nhân viên",
+  "AccountInfo": "Thông tin tài khoản",
+  "ListProject": "Danh sách Dự Án"
 }

@@ -89,22 +89,22 @@ const Sidebar = ({ role }) => {
     {
       key: "1",
       icon: <UserOutlined />,
-      label: <NavLink to="/employee">Employee Account</NavLink>,
+      label: <NavLink to="/employee">{t("EmployeeAccount")}</NavLink>,
       children: [
         {
           key: "1-1",
-          label: <NavLink to="/account-info">Account Info</NavLink>,
+          label: <NavLink to="/account-info">{t("AccountInfo")}</NavLink>,
         },
         {
           key: "1-2",
-          label: <NavLink to="/change-password">Change Password</NavLink>,
+          label: <NavLink to="/change-password">{t("changePassword")}</NavLink>,
         },
       ],
     },
     {
       key: "3",
       icon: <ProjectOutlined />,
-      label: <NavLink to="/employee-ProjectManagement">List Project</NavLink>,
+      label: <NavLink to="/employee-ProjectManagement">{t("ListProject")}</NavLink>,
     },
     {
       key: "4",
