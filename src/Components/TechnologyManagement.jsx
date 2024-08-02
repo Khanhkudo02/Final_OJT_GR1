@@ -105,7 +105,6 @@ const TechnologyManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       >
-        Add Technology
       </Button>
       <Input
         placeholder={t("search")}

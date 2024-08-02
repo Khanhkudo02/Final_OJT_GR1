@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select, Upload, Table, Modal, Space } from "antd";
 import { storage } from "../firebaseConfig";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";

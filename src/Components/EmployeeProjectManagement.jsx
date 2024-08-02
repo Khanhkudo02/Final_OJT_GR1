@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from "react";
+import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import {
-  Table,
-  Tag,
-  Space,
-  Button,
   Avatar,
-  Pagination,
-  Tabs,
+  Button,
   Input,
+  Pagination,
+  Space,
+  Table,
+  Tabs,
+  Tag,
 } from "antd";
-import { useNavigate } from "react-router-dom";
-import { fetchAllProjects } from "../service/Project";
-import { EyeOutlined, InboxOutlined, SearchOutlined } from "@ant-design/icons";
+import { onValue, ref } from "firebase/database"; // Import ref và onValue từ Firebase Database
 import moment from "moment";
-import "../assets/style/Pages/ProjectManagement.scss";
-import "../assets/style/Global.scss";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import "../assets/style/Global.scss";
+import "../assets/style/Pages/ProjectManagement.scss";
+import { database } from "../firebaseConfig"; // Import cấu hình Firebase
 
 const statusColors = {
   COMPLETED: "green",
@@ -33,13 +34,30 @@ const EmployeeProjectManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
+  // Lấy userId của employee đăng nhập từ localStorage
+  const userId = localStorage.getItem("userId");
+
   useEffect(() => {
     const fetchData = async () => {
-      const projects = await fetchAllProjects();
-      setData(projects.reverse());
+      const projectsRef = ref(database, "projects");
+      onValue(projectsRef, (snapshot) => {
+        const projectsData = snapshot.val();
+        const projects = [];
+        for (const key in projectsData) {
+          projects.push({ key, ...projectsData[key] });
+        }
+        // Kiểm tra xem dự án có mảng teamMembers chứa userId của employee đăng nhập không
+        const employeeProjects = projects.filter((project) => {
+          if (project.teamMembers && Array.isArray(project.teamMembers)) {
+            return project.teamMembers.includes(userId); // So sánh với userId
+          }
+          return false;
+        });
+        setData(employeeProjects.reverse());
+      });
     };
     fetchData();
-  }, []);
+  }, [userId]); // Thay đổi phụ thuộc vào userId
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -123,11 +141,12 @@ const EmployeeProjectManagement = () => {
     },
     {
       title: "Start Date",
+      title: "Start Date",
       dataIndex: "startDate",
       key: "startDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = moment(date);
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
           : "Invalid Date";
@@ -135,11 +154,12 @@ const EmployeeProjectManagement = () => {
     },
     {
       title: "End Date",
+      title: "End Date",
       dataIndex: "endDate",
       key: "endDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = moment(date);
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
           : "Invalid Date";
@@ -163,11 +183,13 @@ const EmployeeProjectManagement = () => {
     },
     {
       title: "Budget",
+      title: "Budget",
       dataIndex: "budget",
       key: "budget",
       render: formatBudget,
     },
     {
+      title: "Status",
       title: "Status",
       dataIndex: "status",
       key: "status",
@@ -203,12 +225,6 @@ const EmployeeProjectManagement = () => {
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <div className="project-management-header">
-        <Button
-          type="default"
-          icon={<InboxOutlined />}
-          onClick={() => navigate("/archived-projects")}
-          style={{ marginLeft: "auto" }}
-        />
         <Input
           placeholder={t("search")}
           value={searchTerm}
