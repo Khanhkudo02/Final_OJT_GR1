@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { UploadOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { Button, Form, Input, Select, Upload, Table, Modal, Space } from "antd";
 import { storage } from "../firebaseConfig";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 import {
   postCreateTechnology,
   fetchTechnologyById,
   fetchAllTechnology,
   putUpdateTechnology,
   deleteTechnology,
-} from '../service/TechnologyServices';
+} from "../service/TechnologyServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -50,12 +59,20 @@ const AddTechnology = () => {
 
     try {
       // Upload image to Firebase Storage
-      const storageReference = storageRef(storage, `technologies/${imageFile.name}`);
+      const storageReference = storageRef(
+        storage,
+        `technologies/${imageFile.name}`
+      );
       await uploadBytes(storageReference, imageFile);
       const imageUrl = await getDownloadURL(storageReference);
 
       // Save technology details to Firebase Database
-      const technologyId = await postCreateTechnology(values.name, values.description, values.status, imageUrl);
+      const technologyId = await postCreateTechnology(
+        values.name,
+        values.description,
+        values.status,
+        imageUrl
+      );
       toast.success("Technology added successfully!");
       loadTechnologies(); // Reload the technologies after adding a new one
       navigate("/technology-management");
@@ -105,7 +122,9 @@ const AddTechnology = () => {
         <Form.Item
           label="Name"
           name="name"
-          rules={[{ required: true, message: "Please input the technology name!" }]}
+          rules={[
+            { required: true, message: "Please input the technology name!" },
+          ]}
         >
           <Input />
         </Form.Item>
@@ -113,7 +132,12 @@ const AddTechnology = () => {
         <Form.Item
           label="Description"
           name="description"
-          rules={[{ required: true, message: "Please input the technology description!" }]}
+          rules={[
+            {
+              required: true,
+              message: "Please input the technology description!",
+            },
+          ]}
         >
           <Input />
         </Form.Item>
@@ -121,7 +145,9 @@ const AddTechnology = () => {
         <Form.Item
           label="Status"
           name="status"
-          rules={[{ required: true, message: "Please select the technology status!" }]}
+          rules={[
+            { required: true, message: "Please select the technology status!" },
+          ]}
         >
           <Select>
             <Option value="active">Active</Option>
@@ -165,7 +191,8 @@ const AddTechnology = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
-            const className = text === "active" ? "status-active" : "status-inactive";
+            const className =
+              text === "active" ? "status-active" : "status-inactive";
             return (
               <span className={className}>
                 {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
@@ -217,7 +244,11 @@ const AddTechnology = () => {
             {selectedTechnology.imageUrl && (
               <p>
                 <strong>Image:</strong>
-                <img src={selectedTechnology.imageUrl} alt="Technology" style={{ width: "100%", height: "auto" }} />
+                <img
+                  src={selectedTechnology.imageUrl}
+                  alt="Technology"
+                  style={{ width: "100%", height: "auto" }}
+                />
               </p>
             )}
           </div>
