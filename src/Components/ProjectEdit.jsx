@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import {
+  Button,
+  DatePicker,
   Form,
   Input,
-  Button,
-  Select,
-  DatePicker,
   message,
-  Upload,
   Modal,
+  Select,
+  Upload,
 } from "antd";
-import dayjs from "dayjs";
-import { useNavigate, useParams } from "react-router-dom";
-import { fetchAllProjects, putUpdateProject } from "../service/Project";
-import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import emailjs from 'emailjs-com';
 import moment from "moment";
-import { fetchAllTechnology } from "../service/TechnologyServices";
-import { fetchAllLanguages } from "../service/LanguageServices";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllEmployees } from "../service/EmployeeServices";
+import { fetchAllLanguages } from "../service/LanguageServices";
+import { fetchAllProjects, putUpdateProject } from "../service/Project";
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -124,6 +124,7 @@ const ProjectEdit = () => {
           .map((emp) => ({
             label: emp.name,
             value: emp.key, // Use key as value for Option
+            email: emp.email,
           }));
         setEmployees(employeeOptions);
       } catch (err) {
@@ -136,6 +137,25 @@ const ProjectEdit = () => {
     loadEmployees();
   }, []);
 
+  const sendNotificationEmail = (memberEmail, projectName, action) => {
+    const templateParams = {
+      user_email: memberEmail,
+      projectName: projectName,
+      action: action, // Thêm hành động (added/removed)
+    };
+  
+    emailjs.send(
+      "service_38z8rf8", // ID dịch vụ
+      "template_bcwpepg", // ID mẫu
+      templateParams,
+      "BLOiZZ22_oSBTDilA" // User ID
+    ).then((response) => {
+      console.log("Email sent successfully:", response.status, response.text);
+    }).catch((err) => {
+      console.error("Failed to send email:", err);
+    });
+  };
+  
   const formatBudget = (value) => {
     let numericValue = value.replace(/[^\d$VND]/g, "");
     const hasDollarSign = numericValue.startsWith("$");
@@ -203,19 +223,49 @@ const ProjectEdit = () => {
       cancelText: "No",
       onOk: async () => {
         try {
+          // Cập nhật dữ liệu dự án
           const projectData = {
             ...values,
             startDate: values.startDate.format("YYYY-MM-DD"),
             endDate: values.endDate.format("YYYY-MM-DD"),
             imageUrl:
-              fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
+              fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Đảm bảo imageUrl không phải là undefined
           };
           await putUpdateProject(
             id,
             projectData,
             fileList.length > 0 ? fileList[0].originFileObj : null
           );
+  
           message.success("Project updated successfully");
+  
+          // Xác định các thành viên mới và cũ
+          const currentTeamMembers = values.teamMembers || [];
+          const previousTeamMembers = project.teamMembers || [];
+  
+          const addedMembers = currentTeamMembers.filter(
+            (member) => !previousTeamMembers.includes(member)
+          );
+          const removedMembers = previousTeamMembers.filter(
+            (member) => !currentTeamMembers.includes(member)
+          );
+  
+          // Gửi email thông báo cho các thành viên mới
+          for (const member of addedMembers) {
+            const memberData = employees.find((emp) => emp.value === member);
+            if (memberData) {
+              sendNotificationEmail(memberData.email, values.name, "added");
+            }
+          }
+  
+          // Gửi email thông báo cho các thành viên bị xóa
+          for (const member of removedMembers) {
+            const memberData = employees.find((emp) => emp.value === member);
+            if (memberData) {
+              sendNotificationEmail(memberData.email, values.name, "removed");
+            }
+          }
+  
           navigate(`/project/${id}`);
         } catch (error) {
           message.error("Failed to update project");
@@ -223,7 +273,7 @@ const ProjectEdit = () => {
       },
     });
   };
-
+  
   const handleImageChange = ({ fileList }) => {
     setFileList(fileList);
   };

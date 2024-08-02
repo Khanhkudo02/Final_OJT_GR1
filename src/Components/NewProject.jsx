@@ -9,13 +9,13 @@ import {
   Select,
   Upload,
 } from "antd";
+import emailjs from "emailjs-com";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
-import { fetchAllEmployees } from "../service/EmployeeServices";
-import dayjs from "dayjs";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -34,23 +34,70 @@ const NewProject = () => {
   const [startDate, setStartDate] = useState(null); // State to store selected start date
   const [endDate, setEndDate] = useState(null); // State to store selected end date
 
+  // const onFinish = async (values) => {
+  //   try {
+  //     const projectData = {
+  //       ...values,
+  //       startDate: values.startDate.format("YYYY-MM-DD"),
+  //       endDate: values.endDate.format("YYYY-MM-DD"),
+  //       technologies: values.technologies,
+  //       languages: values.languages,
+  //     };
+  //     await postCreateProject(projectData, imageFile);
+  //     message.success("Project added successfully");
+  //     navigate("/project-management");
+  //   } catch (error) {
+  //     message.error("Failed to add project");
+  //   }
+  // };
   const onFinish = async (values) => {
     try {
       const projectData = {
         ...values,
         startDate: values.startDate.format("YYYY-MM-DD"),
         endDate: values.endDate.format("YYYY-MM-DD"),
-        technologies: values.technologies,
-        languages: values.languages,
+        imageUrl: fileList.length > 0 ? fileList[0].url : null,
       };
-      await postCreateProject(projectData, imageFile);
-      message.success("Project added successfully");
-      navigate("/project-management");
+      const newProject = await postCreateProject(
+        projectData,
+        fileList.length > 0 ? fileList[0].originFileObj : null
+      );
+  
+      // Gửi email thông báo cho các thành viên mới
+      const teamMembers = values.teamMembers || [];
+      const memberEmails = employees
+        .filter((emp) => teamMembers.includes(emp.value))
+        .map((emp) => emp.email);
+  
+      sendNotificationEmail(memberEmails, values.name, "added");
+  
+      message.success("Project created successfully");
+      navigate(`/project/${newProject.id}`);
     } catch (error) {
-      message.error("Failed to add project");
+      message.error("Failed to create project");
     }
   };
 
+  const sendNotificationEmail = (memberEmails, projectName, action) => {
+    memberEmails.forEach(memberEmail => {
+      const templateParams = {
+        user_email: memberEmail,
+        projectName: projectName,
+        action: action,
+      };
+  
+      emailjs.send(
+        "service_38z8rf8",
+        "template_bcwpepg",
+        templateParams,
+        "BLOiZZ22_oSBTDilA"
+      ).then((response) => {
+        console.log("Email sent successfully:", response.status, response.text);
+      }).catch((err) => {
+        console.error("Failed to send email:", err);
+      });
+    });
+  };
   const handleAgreementChange = (e) => {
     setAgreement(e.target.checked);
   };
@@ -114,6 +161,7 @@ const NewProject = () => {
           .map((emp) => ({
             label: emp.name,
             value: emp.key, // Use key as value for Option
+            email: emp.email,
           }));
         setEmployees(employeeOptions);
       } catch (err) {
