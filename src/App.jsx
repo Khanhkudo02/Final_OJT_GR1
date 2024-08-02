@@ -11,8 +11,8 @@ import PositionManagement from "./Components/PositionManagement";
 import ProjectManagement from "./Components/ProjectManagement";
 import Sidebar from "./Components/Sidebar";
 import TechnologyManagement from "./Components/TechnologyManagement";
-import AddTechnology from './Components/AddTechnology';
-import EditTechnology from './Components/EditTechnology';
+import AddTechnology from "./Components/AddTechnology";
+import EditTechnology from "./Components/EditTechnology";
 // import EditTechnology from './Components/EditTechnology';
 import TechnologyDetails from "./Components/TechnologyDetails";
 import Admin from "./pages/Admin";
@@ -31,6 +31,7 @@ import LanguageDetails from "./Components/LanguageDetails";
 import AddEmployee from "./Components/AddEmployee";
 import EditEmployee from "./Components/EditEmployee";
 import EmployeeDetails from "./Components/EmployeeDetails";
+import EmployeeProjectManagement from "./Components/EmployeeProjectManagement";
 
 const { Content } = Layout;
 
@@ -109,11 +110,14 @@ const App = () => {
                           path="/project/:id"
                           element={<ProjectDetail />}
                         />
-                        <Route 
-                          path="/edit-project/:id" 
-                          element={<ProjectEdit />} 
+                        <Route
+                          path="/edit-project/:id"
+                          element={<ProjectEdit />}
                         />
-                        <Route path="/archived-projects" element={<ArchivedProjects />} />
+                        <Route
+                          path="/archived-projects"
+                          element={<ArchivedProjects />}
+                        />
                         <Route
                           path="/position-management"
                           element={<PositionManagement />}
@@ -134,17 +138,17 @@ const App = () => {
                           path="/technology-management"
                           element={<TechnologyManagement />}
                         />
-                        <Route 
-                          path="/technology-management/add" 
-                          element={<AddTechnology />} 
-                          />
-                        <Route 
-                          path="/technology-management/edit/:id" 
-                          element={<EditTechnology />} 
+                        <Route
+                          path="/technology-management/add"
+                          element={<AddTechnology />}
                         />
-                        <Route 
-                          path="/technology-management/view/:id" 
-                          element={<TechnologyDetails />} 
+                        <Route
+                          path="/technology-management/edit/:id"
+                          element={<EditTechnology />}
+                        />
+                        <Route
+                          path="/technology-management/view/:id"
+                          element={<TechnologyDetails />}
                         />
                         <Route
                           path="/programing-language"
@@ -161,6 +165,10 @@ const App = () => {
                         <Route
                           path="/programing-language/view/:id"
                           element={<LanguageDetails />}
+                        />
+                        <Route
+                          path="/employee-ProjectManagement"
+                          element={<EmployeeProjectManagement />}
                         />
                         <Route path="/new-project" element={<NewProject />} />
                         <Route path="/" element={<Navigate to="/login" />} />
