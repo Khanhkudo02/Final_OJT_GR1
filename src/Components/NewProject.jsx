@@ -479,14 +479,14 @@ import {
   Select,
   Upload,
 } from "antd";
+import emailjs from "emailjs-com";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
-import emailjs from "emailjs-com";
-import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { TextArea } = Input;
