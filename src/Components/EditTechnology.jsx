@@ -299,20 +299,20 @@
 // };
 
 // export default EditTechnology;
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Form, Input, Button, Select, Upload, Modal, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Select, Upload, message } from "antd";
-import {
-  getDownloadURL,
-  ref as storageRef,
-  uploadBytes,
-} from "firebase/storage";
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { storage } from "../firebaseConfig";
 import {
   fetchTechnologyById,
   putUpdateTechnology,
 } from "../service/TechnologyServices";
+import { storage } from "../firebaseConfig";
+import {
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 
 const { Option } = Select;
 
