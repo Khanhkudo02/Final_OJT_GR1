@@ -188,8 +188,13 @@
 //     throw error;
 //   }
 // };
-import { get, push, ref, remove, set, update } from "firebase/database";
-import { database } from "../firebaseConfig";
+import { ref, set, push, update, get, remove } from "firebase/database";
+import {
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { database, storage } from "../firebaseConfig";
 
 // Function to create a technology
 export const postCreateTechnology = async (
@@ -234,14 +239,22 @@ export const fetchTechnologyById = async (id) => {
 export const fetchAllTechnology = async () => {
   try {
     const techRef = ref(database, "technologies");
-    const snapshot = await get(techRef)
+    const snapshot = await get(techRef);
+    if (snapshot.exists()) {
       const data = snapshot.val();
-      return data ? Object.entries(data).map(([key, value]) => ({ key, ...value })) : [];
-    } catch (error) {
-        console.error("Failed to fetch technologies :", error);
-        throw error;
+      return Object.keys(data).map((key) => ({
+        id: key,
+        ...data[key],
+      }));
+    } else {
+      return [];
     }
+  } catch (error) {
+    console.error("Error fetching technologies:", error);
+    throw error;
+  }
 };
+
 // Function to update a technology
 export const putUpdateTechnology = async (
   id,
