@@ -67,7 +67,7 @@ const EditPosition = () => {
     }
   };
 
-  
+
   const beforeUpload = (file) => {
     handleImageChange({ file });
     return false;

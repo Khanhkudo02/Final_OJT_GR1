@@ -2,10 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Select, Upload, Modal, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { getTechnologyById, putUpdateTechnology } from "../service/TechnologyServices";
+import {
+  postCreateTechnology,
+  fetchTechnologyById,
+  fetchAllTechnology,
+  putUpdateTechnology,
+  deleteTechnology,
+} from '../service/TechnologyServices';
 import { storage } from "../firebaseConfig";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-
 
 const { Option } = Select;
 
@@ -19,16 +24,22 @@ const EditTechnology = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTechnology = async () => {
+    const loadTechnology = async () => {
       try {
-        const data = await getTechnologyById(id); // Fetch by ID
-        form.setFieldsValue(data);
-        setInitialImageUrl(data.imageUrl);
+        const data = await fetchTechnologyById(id);
+        form.setFieldsValue({
+          name: data.name,
+          description: data.description,
+          status: data.status,
+        });
+        setInitialImageUrl(data.imageUrl || "");
       } catch (error) {
-        console.error("Failed to fetch technology:", error);
+        message.error("Failed to fetch technology data.");
+        console.error("Failed to fetch technology by ID:", error);
       }
     };
-    fetchTechnology();
+
+    loadTechnology();
   }, [id, form]);
 
   const handleImageChange = ({ fileList }) => {
@@ -58,6 +69,7 @@ const EditTechnology = () => {
       });
     } catch (error) {
       message.error("Failed to update technology.");
+      console.error("Failed to update technology:", error);
     } finally {
       setLoading(false);
     }

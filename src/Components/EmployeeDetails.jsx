@@ -2,11 +2,12 @@ import { Button, Spin, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchEmployeeById } from "../service/EmployeeServices";
+import { fetchEmployeeById, fetchAllPositions } from "../service/EmployeeServices";
 
 const EmployeeDetails = () => {
   const { id } = useParams();
   const [employee, setEmployee] = useState(null);
+  const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -16,15 +17,30 @@ const EmployeeDetails = () => {
       try {
         const data = await fetchEmployeeById(id);
         setEmployee(data);
-        setLoading(false);
       } catch (error) {
         message.error(t("failedToFetchEmployeeDetails"));
+      } finally {
         setLoading(false);
       }
     };
 
+    const loadPositions = async () => {
+      try {
+        const positionsData = await fetchAllPositions();
+        setPositions(positionsData.map((pos) => ({ key: pos.key, name: pos.label }))); // Adjust based on your data structure
+      } catch (error) {
+        message.error(t("failedToFetchPositions"));
+      }
+    };
+
     loadEmployee();
+    loadPositions();
   }, [id, t]);
+
+  const getPositionNameById = (positionId, positions) => {
+    const position = positions.find((pos) => pos.key === positionId);
+    return position ? position.name : t("unknownPosition");
+  };
 
   if (loading) return <Spin size="large" />;
 
@@ -38,8 +54,8 @@ const EmployeeDetails = () => {
   const formattedSkills = Array.isArray(employee.skills)
     ? employee.skills.map(formatSkill).join(", ")
     : employee.skills
-    ? formatSkill(employee.skills)
-    : t("noSkills");
+      ? formatSkill(employee.skills)
+      : t("noSkills");
 
   const formatDepartment = (department) => {
     if (typeof department === "string") {
@@ -83,6 +99,9 @@ const EmployeeDetails = () => {
             <strong>{t('department')}:</strong> {formatDepartment(employee.department)}
           </p>
           <p>
+            <strong>{t('position')}:</strong> {getPositionNameById(employee.position, positions)}
+          </p>
+          <p>
             <strong>{t('status')}:</strong>
             <span
               className={
@@ -93,7 +112,7 @@ const EmployeeDetails = () => {
             >
               {employee.status
                 ? employee.status.charAt(0).toUpperCase() +
-                  employee.status.slice(1)
+                employee.status.slice(1)
                 : ""}
             </span>
           </p>

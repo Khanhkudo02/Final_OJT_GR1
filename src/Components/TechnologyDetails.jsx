@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getTechnologyById } from "../service/TechnologyServices";
+import {
+  postCreateTechnology,
+  fetchTechnologyById,
+  fetchAllTechnology,
+  putUpdateTechnology,
+  deleteTechnology,
+} from '../service/TechnologyServices';
 import { Button, Spin, message } from "antd";
 import "../Components/TechnologyDetails.jsx"; // Assuming you have a similar stylesheet
 
