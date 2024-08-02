@@ -9,7 +9,7 @@ import {
   Select,
   Upload,
 } from "antd";
-import emailjs from 'emailjs-com';
+import emailjs from "emailjs-com";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -137,25 +137,6 @@ const ProjectEdit = () => {
     loadEmployees();
   }, []);
 
-  const sendNotificationEmail = (memberEmail, projectName, action) => {
-    const templateParams = {
-      user_email: memberEmail,
-      projectName: projectName,
-      action: action, // Thêm hành động (added/removed)
-    };
-  
-    emailjs.send(
-      "service_38z8rf8", // ID dịch vụ
-      "template_bcwpepg", // ID mẫu
-      templateParams,
-      "BLOiZZ22_oSBTDilA" // User ID
-    ).then((response) => {
-      console.log("Email sent successfully:", response.status, response.text);
-    }).catch((err) => {
-      console.error("Failed to send email:", err);
-    });
-  };
-  
   const formatBudget = (value) => {
     let numericValue = value.replace(/[^\d$VND]/g, "");
     const hasDollarSign = numericValue.startsWith("$");
@@ -215,6 +196,25 @@ const ProjectEdit = () => {
     setStatusOptions(options);
   };
 
+  const sendNotificationEmail = (memberEmail, projectName, action) => {
+    const templateParams = {
+      user_email: memberEmail,
+      projectName: projectName,
+      action: action, // Thêm hành động (added/removed)
+    };
+  
+    emailjs.send(
+      "service_38z8rf8", // ID dịch vụ
+      "template_bcwpepg", // ID mẫu
+      templateParams,
+      "BLOiZZ22_oSBTDilA" // User ID
+    ).then((response) => {
+      console.log("Email sent successfully:", response.status, response.text);
+    }).catch((err) => {
+      console.error("Failed to send email:", err);
+    });
+  };
+
   const onFinish = async (values) => {
     Modal.confirm({
       title: "Confirm Changes",
@@ -223,22 +223,20 @@ const ProjectEdit = () => {
       cancelText: "No",
       onOk: async () => {
         try {
-          // Cập nhật dữ liệu dự án
           const projectData = {
             ...values,
             startDate: values.startDate.format("YYYY-MM-DD"),
             endDate: values.endDate.format("YYYY-MM-DD"),
             imageUrl:
-              fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Đảm bảo imageUrl không phải là undefined
+              fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
           };
           await putUpdateProject(
             id,
             projectData,
             fileList.length > 0 ? fileList[0].originFileObj : null
           );
-  
+          
           message.success("Project updated successfully");
-  
           // Xác định các thành viên mới và cũ
           const currentTeamMembers = values.teamMembers || [];
           const previousTeamMembers = project.teamMembers || [];
@@ -272,8 +270,8 @@ const ProjectEdit = () => {
         }
       },
     });
-  };
-  
+  }
+
   const handleImageChange = ({ fileList }) => {
     setFileList(fileList);
   };

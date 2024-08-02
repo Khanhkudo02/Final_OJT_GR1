@@ -9,13 +9,14 @@ import {
   Select,
   Upload,
 } from "antd";
-import emailjs from "emailjs-com";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
+import emailjs from "emailjs-com";
+
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -34,36 +35,17 @@ const NewProject = () => {
   const [startDate, setStartDate] = useState(null); // State to store selected start date
   const [endDate, setEndDate] = useState(null); // State to store selected end date
 
-  // const onFinish = async (values) => {
-  //   try {
-  //     const projectData = {
-  //       ...values,
-  //       startDate: values.startDate.format("YYYY-MM-DD"),
-  //       endDate: values.endDate.format("YYYY-MM-DD"),
-  //       technologies: values.technologies,
-  //       languages: values.languages,
-  //     };
-  //     await postCreateProject(projectData, imageFile);
-  //     message.success("Project added successfully");
-  //     navigate("/project-management");
-  //   } catch (error) {
-  //     message.error("Failed to add project");
-  //   }
-  // };
   const onFinish = async (values) => {
     try {
       const projectData = {
         ...values,
         startDate: values.startDate.format("YYYY-MM-DD"),
         endDate: values.endDate.format("YYYY-MM-DD"),
-        imageUrl: fileList.length > 0 ? fileList[0].url : null,
+        technologies: values.technologies,
+        languages: values.languages,
       };
-      const newProject = await postCreateProject(
-        projectData,
-        fileList.length > 0 ? fileList[0].originFileObj : null
-      );
-  
-      // Gửi email thông báo cho các thành viên mới
+      await postCreateProject(projectData, imageFile);
+       // Gửi email thông báo cho các thành viên mới
       const teamMembers = values.teamMembers || [];
       const memberEmails = employees
         .filter((emp) => teamMembers.includes(emp.value))
@@ -71,10 +53,10 @@ const NewProject = () => {
   
       sendNotificationEmail(memberEmails, values.name, "added");
   
-      message.success("Project created successfully");
-      navigate(`/project/${newProject.id}`);
+      message.success("Project added successfully");
+      navigate("/project-management");
     } catch (error) {
-      message.error("Failed to create project");
+      message.error("Failed to add project");
     }
   };
 
@@ -98,6 +80,7 @@ const NewProject = () => {
       });
     });
   };
+
   const handleAgreementChange = (e) => {
     setAgreement(e.target.checked);
   };
