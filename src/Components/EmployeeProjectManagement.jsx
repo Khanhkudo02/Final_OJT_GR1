@@ -141,7 +141,6 @@ const EmployeeProjectManagement = () => {
     },
     {
       title: "Start Date",
-      title: "Start Date",
       dataIndex: "startDate",
       key: "startDate",
       render: (date) => {
@@ -153,7 +152,6 @@ const EmployeeProjectManagement = () => {
       },
     },
     {
-      title: "End Date",
       title: "End Date",
       dataIndex: "endDate",
       key: "endDate",
@@ -183,13 +181,11 @@ const EmployeeProjectManagement = () => {
     },
     {
       title: "Budget",
-      title: "Budget",
       dataIndex: "budget",
       key: "budget",
       render: formatBudget,
     },
     {
-      title: "Status",
       title: "Status",
       dataIndex: "status",
       key: "status",
