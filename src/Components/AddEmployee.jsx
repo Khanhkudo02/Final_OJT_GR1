@@ -9,6 +9,7 @@ import {
   deleteEmployeeById,
   fetchAllEmployees,
   postCreateEmployee,
+  fetchAllPositions,
 } from "../service/EmployeeServices";
 
 const { Option } = Select;
@@ -22,6 +23,7 @@ const AddEmployee = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [positions, setPositions] = useState([]);
 
   const navigate = useNavigate();
 
@@ -61,6 +63,17 @@ const AddEmployee = () => {
 
   useEffect(() => {
     loadEmployees();
+
+    const fetchPositions = async () => {
+      try {
+        const positionsData = await fetchAllPositions();
+        setPositions(positionsData.map((pos) => ({ value: pos.key, label: pos.label })));
+      } catch (error) {
+        console.error("Failed to fetch positions:", error);
+      }
+    };
+
+    fetchPositions();
   }, []);
 
   const handleAddEmployee = async (values) => {
@@ -74,6 +87,7 @@ const AddEmployee = () => {
       skills,
       status,
       department,
+      position,
     } = values;
 
     // Kiểm tra email đã tồn tại chưa
@@ -98,6 +112,7 @@ const AddEmployee = () => {
         skills,
         status,
         department,
+        position,
         "employee",
         imageFiles[0]
       );
@@ -308,6 +323,18 @@ const AddEmployee = () => {
             ))}
           </Select>
         </Form.Item>
+        <Form.Item label="Position" name="position">
+          <Select
+            placeholder="Select position"
+            onBlur={() => handleFieldBlur("position")}
+          >
+            {positions.map((pos) => (
+              <Option key={pos.value} value={pos.value}>
+                {pos.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
         <Form.Item label={t("images")}>
           <Upload
             accept=".jpg,.jpeg,.png"
@@ -338,118 +365,6 @@ const AddEmployee = () => {
           </Button>
         </Form.Item>
       </Form>
-      <Table dataSource={employees} rowKey="id" style={{ marginTop: "20px" }}>
-        <Column title={t("name")} dataIndex="name" key="name" />
-        <Column title={t("email")} dataIndex="email" key="email" />
-        <Column
-          title={t("phoneNumber")}
-          dataIndex="phoneNumber"
-          key="phoneNumber"
-        />
-        <Column
-          title={t("skills")}
-          dataIndex="skills"
-          key="skills"
-          render={(skills) =>
-            skills ? skills.map(getSkillLabel).join(", ") : ""
-          }
-        />
-        <Column
-          title={t("department")}
-          dataIndex="department"
-          key="department"
-          render={(dept) => {
-            if (typeof dept === "string") {
-              return t(
-                `department${dept.charAt(0).toUpperCase() + dept.slice(1)}`
-              );
-            }
-            return "";
-          }}
-        />
-        <Column
-          title={t("action")}
-          key="action"
-          render={(text, record) => (
-            <Space size="middle">
-              <Button
-                icon={<EyeOutlined />}
-                onClick={() => handleViewEmployee(record)}
-              >
-                {t("view")}
-              </Button>
-              <Button
-                icon={<DeleteOutlined />}
-                onClick={() => handleDeleteEmployee(record.id)}
-                danger
-              >
-                {t("delete")}
-              </Button>
-            </Space>
-          )}
-        />
-      </Table>
-      <Modal
-        title={t("employeeDetails")}
-        visible={viewModalVisible}
-        onCancel={() => setViewModalVisible(false)}
-        footer={null}
-      >
-        {selectedEmployee ? (
-          <div>
-            <p>
-              <strong>{t("name")}:</strong> {selectedEmployee.name}
-            </p>
-            <p>
-              <strong>{t("email")}:</strong> {selectedEmployee.email}
-            </p>
-            <p>
-              <strong>{t("phoneNumber")}:</strong>{" "}
-              {selectedEmployee.phoneNumber}
-            </p>
-            <p>
-              <strong>{t("skills")}:</strong>{" "}
-              {selectedEmployee.skills
-                ? selectedEmployee.skills.map(getSkillLabel).join(", ")
-                : ""}
-            </p>
-            <p>
-              <strong>{t("department")}:</strong>{" "}
-              {t(
-                `department${selectedEmployee.department.charAt(0).toUpperCase() +
-                selectedEmployee.department.slice(1)
-                }`
-              )}
-            </p>
-            <p>
-              <strong>{t("status")}:</strong>{" "}
-              {selectedEmployee.status === "active"
-                ? t("active")
-                : t("inactive")}
-            </p>
-            <p>
-              <strong>{t("address")}:</strong> {selectedEmployee.address}
-            </p>
-            <p>
-              <strong>{t("dateOfBirth")}:</strong>{" "}
-              {selectedEmployee.dateOfBirth}
-            </p>
-            <div className="image-previews">
-              {selectedEmployee.images &&
-                selectedEmployee.images.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`employee-${index}`}
-                    style={{ width: "100px", height: "100px", margin: "5px" }}
-                  />
-                ))}
-            </div>
-          </div>
-        ) : (
-          <p>{t("employeeNotFound")}</p>
-        )}
-      </Modal>
     </div>
   );
 };

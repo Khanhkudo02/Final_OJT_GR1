@@ -34,6 +34,7 @@ const postCreateEmployee = async (
     skills,
     status,
     department,
+    position,
     role,
     imageFile
 ) => {
@@ -69,6 +70,7 @@ const postCreateEmployee = async (
             skills,
             status,
             department, // Added department
+            position,
             imageUrl,
             isAdmin: false,
             role: role || "employee", // Default to "employee" if role is not provided
@@ -81,6 +83,21 @@ const postCreateEmployee = async (
         throw error;
     }
 };
+
+const fetchAllPositions = async () => {
+    try {
+        const positionsRef = ref(db, "positions");
+        const snapshot = await get(positionsRef);
+        const data = snapshot.val();
+        return data
+            ? Object.entries(data).map(([key, value]) => ({ key, label: value.name })) // Adjust based on your data structure
+            : [];
+    } catch (error) {
+        console.error("Failed to fetch positions:", error);
+        throw error;
+    }
+};
+
 
 // Fetch all employees
 const fetchAllEmployees = async () => {
@@ -219,4 +236,5 @@ export {
     fetchEmployeeById,
     postCreateEmployee,
     putUpdateEmployee,
+    fetchAllPositions
 };
