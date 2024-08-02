@@ -122,7 +122,7 @@ const EditPosition = () => {
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/position-management")}
       >
-        Back to Position Management
+        Back 
       </Button>
     </div>
   );

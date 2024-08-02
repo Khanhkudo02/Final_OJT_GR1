@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { UploadOutlined, PlusOutlined, EyeOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Select, Upload, Table, Modal, Space } from "antd";
-import { v4 as uuidv4 } from 'uuid';
-import { storage } from "../firebaseConfig"; // Ensure correct import
+import { UploadOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Select, Upload, Table, Modal, Space } from "antd";
+import { storage } from "../firebaseConfig";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { postCreateTechnology, fetchAllTechnology, deleteTechnology } from "../service/TechnologyServices";
+import {
+  postCreateTechnology,
+  fetchTechnologyById,
+  fetchAllTechnology,
+  putUpdateTechnology,
+  deleteTechnology,
+} from '../service/TechnologyServices';
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Global.scss";
 
 const { Option } = Select;
 const { Column } = Table;
@@ -45,15 +49,13 @@ const AddTechnology = () => {
     }
 
     try {
-      const technologyId = uuidv4();
-
       // Upload image to Firebase Storage
-      const storageReference = storageRef(storage, `technologies/${technologyId}/${imageFile.name}`);
+      const storageReference = storageRef(storage, `technologies/${imageFile.name}`);
       await uploadBytes(storageReference, imageFile);
       const imageUrl = await getDownloadURL(storageReference);
 
       // Save technology details to Firebase Database
-      await postCreateTechnology(technologyId, values.name, values.description, values.status, imageUrl);
+      const technologyId = await postCreateTechnology(values.name, values.description, values.status, imageUrl);
       toast.success("Technology added successfully!");
       loadTechnologies(); // Reload the technologies after adding a new one
       navigate("/technology-management");
@@ -177,7 +179,7 @@ const AddTechnology = () => {
           render={(text, record) => (
             <Space>
               <Button
-                icon={<EyeOutlined />}
+                icon={<UploadOutlined />}
                 style={{ color: "green", borderColor: "green" }}
                 onClick={() => handleViewTechnology(record)}
               />
@@ -193,7 +195,7 @@ const AddTechnology = () => {
 
       <Modal
         title="View Technology"
-        open={viewModalVisible}
+        visible={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>

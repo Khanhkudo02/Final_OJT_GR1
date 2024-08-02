@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { fetchAllTechnology, deleteTechnology } from "../service/TechnologyServices";
+import {
+  postCreateTechnology,
+  fetchTechnologyById,
+  fetchAllTechnology,
+  putUpdateTechnology,
+  deleteTechnology,
+} from '../service/TechnologyServices';
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/TechnologyManagement.scss";
-import "../assets/style/Global.scss";
 import { useTranslation } from "react-i18next";
 
 const { Column } = Table;
@@ -22,12 +27,7 @@ const TechnologyManagement = () => {
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
-      console.log("Fetched technologies:", data); // Debug log
-      const techArray = Object.keys(data).map((key) => ({
-        key,  // Add the key as the ID
-        ...data[key],  // Spread the data
-      }));
-      setTechnologies(techArray);
+      setTechnologies(data);
     } catch (error) {
       console.error("Failed to fetch technologies:", error);
     }
@@ -35,12 +35,6 @@ const TechnologyManagement = () => {
 
   useEffect(() => {
     loadTechnologies();
-
-    const technologyAdded = localStorage.getItem("technologyAdded");
-    if (technologyAdded === "true") {
-      message.success("Technology added successfully!");
-      localStorage.removeItem("technologyAdded"); // Clear notification after displaying
-    }
   }, []);
 
   const handleTableChange = (pagination) => {
@@ -62,7 +56,7 @@ const TechnologyManagement = () => {
       title: "Are you sure you want to delete this technology?",
       onOk: async () => {
         try {
-          await deleteTechnology(record.key);
+          await deleteTechnology(record.id);
           message.success("Technology deleted successfully!");
           loadTechnologies();
         } catch (error) {
@@ -111,6 +105,7 @@ const TechnologyManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       >
+        Add Technology
       </Button>
       <Input
         placeholder={t("search")}
@@ -127,7 +122,7 @@ const TechnologyManagement = () => {
       /> 
       <Table
         dataSource={paginatedData}
-        rowKey="key"
+        rowKey="id"
         pagination={{
           current: currentPage,
           pageSize: pageSize,
@@ -161,24 +156,24 @@ const TechnologyManagement = () => {
             );
           }}
         />
-       <Column
-  title="Actions"
-  key="actions"
-  render={(text, record) => (
-    <Space>
-      <Button
-        icon={<EditOutlined />}
-        style={{ color: "blue", borderColor: "blue" }}
-        onClick={() => navigate(`/technology-management/edit/${record.key}`)} // Use record.key to navigate
-      />
-      <Button
-        icon={<DeleteOutlined />}
-        style={{ color: "red", borderColor: "red" }}
-        onClick={() => handleDelete(record)}
-      />
-    </Space>
-  )}
-/>
+        <Column
+          title="Actions"
+          key="actions"
+          render={(text, record) => (
+            <Space>
+              <Button
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
+                onClick={() => navigate(`/technology-management/edit/${record.id}`)}
+              />
+              <Button
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
+                onClick={() => handleDelete(record)}
+              />
+            </Space>
+          )}
+        />
       </Table>
     </div>
   );
