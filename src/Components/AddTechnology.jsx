@@ -9,7 +9,7 @@ import {
   fetchAllTechnology,
   deleteTechnology,
 } from "../service/TechnologyServices";
-import { EyeOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EyeOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
@@ -206,10 +206,10 @@ const AddTechnology = () => {
             <p>
               <strong>Status:</strong> {selectedTechnology.status}
             </p>
-            {selectedTechnology.imageURL && (
+            {selectedTechnology.imageUrl && (
               <p>
                 <strong>Image:</strong>
-                <img src={selectedTechnology.imageURL} alt="Technology" style={{ width: "100%", height: "auto" }} />
+                <img src={selectedTechnology.imageUrl} alt="Technology" style={{ width: "100%", height: "auto" }} />
               </p>
             )}
           </div>
