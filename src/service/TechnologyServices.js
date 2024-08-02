@@ -1,4 +1,3 @@
-// service/TechnologyServices.js
 import { ref, set, push, update, get, remove } from "firebase/database";
 import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
 import { database, storage } from "../firebaseConfig";
@@ -30,20 +29,26 @@ export const postCreateTechnology = async (name, description, category, status, 
     throw error;
   }
 };
+
 export const fetchTechnologyById = async (id) => {
   try {
+    console.log(`Attempting to fetch technology with ID: ${id}`); // Debug log
     const technologyRef = ref(database, `technologies/${id}`);
     const snapshot = await get(technologyRef);
+    
     if (!snapshot.exists()) {
+      console.error(`No technology found with ID: ${id}`); // Debug log
       throw new Error("Technology not found.");
     }
+    
+    console.log('Fetched Technology data:', snapshot.val()); // Debug log
     return snapshot.val();
   } catch (error) {
     console.error("Error fetching technology:", error);
     throw error;
   }
 };
-
+// Function to fetch all technologies
 export const fetchAllTechnology = async () => {
   try {
     const technologiesRef = ref(db, "technologies");
@@ -62,7 +67,6 @@ export const fetchAllTechnology = async () => {
     throw error;
   }
 };
-
 // Function to update a technology
 export const putUpdateTechnology = async (id, name, description, status, imageFile) => {
   try {
@@ -85,7 +89,6 @@ export const putUpdateTechnology = async (id, name, description, status, imageFi
     throw error;
   }
 };
-
 
 // Function to delete a technology
 export const deleteTechnology = async (id) => {
@@ -117,8 +120,16 @@ export const getTechnologyById = async (id) => {
   }
 };
 
-
-
-
-
-
+const loadTechnologies = async () => {
+  try {
+    const data = await fetchAllTechnology();
+    console.log("Fetched technologies:", data); // Debug log
+    const techArray = data.map((item, index) => ({
+      key: item.id, // Correctly assign the ID from Firebase as the key
+      ...item,
+    }));
+    setTechnologies(techArray);
+  } catch (error) {
+    console.error("Failed to fetch technologies:", error);
+  }
+};

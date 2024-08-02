@@ -11,11 +11,11 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
-import { fetchAllEmployees } from "../service/EmployeeServices";
-import dayjs from "dayjs";
+import emailjs from "emailjs-com";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -44,11 +44,47 @@ const NewProject = () => {
         languages: values.languages,
       };
       await postCreateProject(projectData, imageFile);
+      // Gửi email thông báo cho các thành viên mới
+      const teamMembers = values.teamMembers || [];
+      const memberEmails = employees
+        .filter((emp) => teamMembers.includes(emp.value))
+        .map((emp) => emp.email);
+
+      sendNotificationEmail(memberEmails, values.name, "added");
+
       message.success("Project added successfully");
       navigate("/project-management");
     } catch (error) {
       message.error("Failed to add project");
     }
+  };
+
+  const sendNotificationEmail = (memberEmails, projectName, action) => {
+    memberEmails.forEach((memberEmail) => {
+      const templateParams = {
+        user_email: memberEmail,
+        projectName: projectName,
+        action: action,
+      };
+
+      emailjs
+        .send(
+          "service_38z8rf8",
+          "template_bcwpepg",
+          templateParams,
+          "BLOiZZ22_oSBTDilA"
+        )
+        .then((response) => {
+          console.log(
+            "Email sent successfully:",
+            response.status,
+            response.text
+          );
+        })
+        .catch((err) => {
+          console.error("Failed to send email:", err);
+        });
+    });
   };
 
   const handleAgreementChange = (e) => {
@@ -114,6 +150,7 @@ const NewProject = () => {
           .map((emp) => ({
             label: emp.name,
             value: emp.key, // Use key as value for Option
+            email: emp.email,
           }));
         setEmployees(employeeOptions);
       } catch (err) {
@@ -269,7 +306,10 @@ const NewProject = () => {
           name="phoneNumber"
           rules={[
             { required: true, message: "Please input the phone number!" },
-            { pattern: /^[0-9]{10}$/, message: 'Please enter a valid 10-digit phone number!' }
+            {
+              pattern: /^[0-9]{10}$/,
+              message: "Please enter a valid 10-digit phone number!",
+            },
           ]}
         >
           <Input placeholder="0123456789" />

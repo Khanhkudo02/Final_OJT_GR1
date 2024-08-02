@@ -14,6 +14,7 @@ import {
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { Column } = Table;
@@ -25,6 +26,7 @@ const AddLanguage = () => {
   const [languages, setLanguages] = useState([]);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const { t } = useTranslation();
 
   const navigate = useNavigate();
 
@@ -71,11 +73,21 @@ const AddLanguage = () => {
     }
   };
 
+  const formatDescription = (description) => {
+    const translatedDescription = t(description);
+    return translatedDescription ? translatedDescription.charAt(0).toUpperCase() + translatedDescription.slice(1) : null;
+  };
+
+  const formatStatus = (status) => {
+    const translatedStatus = t(status);
+    return translatedStatus ? translatedStatus.charAt(0).toUpperCase() + translatedStatus.slice(1) : "";
+  };
+
   return (
     <div className="add-language">
-      <h2>Add New Language</h2>
+      <h2>{t("AddNewLanguage")}</h2>
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
           type="text"
           value={name}
@@ -83,7 +95,7 @@ const AddLanguage = () => {
         />
       </div>
       <div className="form-group">
-        <label>Description</label>
+        <label>{t("Description")}</label>
         <Input
           type="text"
           value={description}
@@ -91,62 +103,64 @@ const AddLanguage = () => {
         />
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("status")}</label>
         <Select
           value={status}
           onChange={(value) => setStatus(value)}
           placeholder="Select Status"
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
+          <Option value="active">{t("active")}</Option>
+          <Option value="inactive">{t("inactive")}</Option>
         </Select>
       </div>
       <Button
+        className="btn"
         type="primary"
         onClick={handleAddLanguage}
         disabled={!name || !description || !status}
       >
-        Save
+        {t("Save")}
       </Button>
       <Button
+        className="btn-length"
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/programing-language")}
       >
-        Back to Language Management
+        {t("BacktoLanguageManagement")}
       </Button>
 
-      <h2>Existing Languages</h2>
+      <h2>{t("ExistingLanguage")}</h2>
       <Table dataSource={languages} rowKey="key" pagination={false}>
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Description" dataIndex="description" key="description" />
+        <Column title={t("name")} dataIndex="name" key="name" />
+        <Column title={t("Description")} dataIndex="description" key="description" />
         <Column
-          title="Status"
+          title={t("Status")}
           dataIndex="status"
           key="status"
           render={(text) => {
+            // Dịch giá trị của text
+            const translatedText = t(text);
+
+            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
-              text === "active" ? "status-active" : "status-inactive";
+              translatedText === t("active")
+                ? "status-active"
+                : "status-inactive";
+
             return (
               <span className={className}>
-                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+                {translatedText
+                  ? translatedText.charAt(0).toUpperCase() +
+                    translatedText.slice(1)
+                  : ""}
               </span>
             );
           }}
         />
         <Column
-          title="Actions"
+          title={t("actions")}
           key="actions"
           render={(text, record) => (
-            // <div>
-            //   <Button onClick={() => handleViewLanguage(record)}>View</Button>
-            //   <Button
-            //     onClick={() => handleDeleteLanguage(record.key)}
-            //     disabled={record.status !== "inactive"}
-            //     style={{ marginLeft: 8 }}
-            //   >
-            //     Delete
-            //   </Button>
-            // </div>
             <Space>
                 <Button 
                 icon={<EyeOutlined />} 
@@ -163,25 +177,25 @@ const AddLanguage = () => {
         />
       </Table>
       <Modal
-        title="View Language"
+        title={t("ViewLanguage")}
         open={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>
-            Close
+            {t("close")}
           </Button>,
         ]}
       >
         {selectedLanguage && (
           <div>
             <p>
-              <strong>Name:</strong> {selectedLanguage.name}
+              <strong>{t("name")}:</strong> {selectedLanguage.name}
             </p>
             <p>
-              <strong>Description:</strong> {selectedLanguage.description}
+              <strong>{t("Description")}:</strong> {formatDescription(selectedLanguage.description)}
             </p>
             <p>
-              <strong>Status:</strong> {selectedLanguage.status}
+              <strong>{t("Status")}:</strong> {formatStatus(selectedLanguage.status)}
             </p>
           </div>
         )}

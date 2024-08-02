@@ -6,13 +6,14 @@ import {
   putUpdateLanguage,
   fetchLanguageById,
 } from "../service/LanguageServices";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
 const EditLanguage = () => {
   const { id } = useParams(); // Get ID from URL
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
@@ -56,10 +57,10 @@ const EditLanguage = () => {
 
   return (
     <div>
-      <h2>Edit Language</h2>
+      <h2>{t("EditLanguage")}</h2>
 
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
           placeholder="Name"
           value={name}
@@ -67,7 +68,7 @@ const EditLanguage = () => {
         />
       </div>
       <div className="form-group">
-        <label>Description</label>
+        <label>{t("Description")}</label>
         <Input.TextArea
           placeholder="Description"
           value={description}
@@ -75,28 +76,30 @@ const EditLanguage = () => {
         />
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("Status")}</label>
         <Select
           placeholder="Select Status"
           value={status}
           onChange={(value) => setStatus(value)}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
+          <Option value="active">{t("active")}</Option>
+          <Option value="inactive">{t("inactive")}</Option>
         </Select>
       </div>
       <Button
+        className="btn"
         type="primary"
         onClick={handleUpdateLanguage}
         disabled={!name || !description || !status}
       >
-        Save
+        {t("save")}
       </Button>
       <Button
+        className="btn-length"
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/programing-language")}
       >
-        Back to Language Management
+        {t("BacktoLanguageManagement")}
       </Button>
     </div>
   );

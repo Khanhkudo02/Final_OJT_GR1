@@ -16,8 +16,6 @@ const TechnologyManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [filteredStatus, setFilteredStatus] = useState("All Technology");
   const navigate = useNavigate();
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [dataPositionEdit, setDataPositionEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { t } = useTranslation();
 
@@ -121,7 +119,7 @@ const TechnologyManagement = () => {
         onChange={handleTabChange}
         items={tabItems}
         centered
-      />
+      /> 
       <Table
         dataSource={paginatedData}
         rowKey="key"
@@ -138,7 +136,9 @@ const TechnologyManagement = () => {
           dataIndex="imageUrl"
           key="imageUrl"
           render={(imageUrl) => (
-            imageUrl ? <img src={imageUrl} alt="Technology" style={{ width: 50, height: 50 }} /> : <span>No Image</span>
+            imageUrl 
+              ? <img src={imageUrl} alt="Technology" style={{ width: 50, height: 50 }} onError={(e) => {e.target.onerror = null; e.target.src="path/to/placeholder.png"}} /> 
+              : <span>No Image</span>
           )}
         />
         <Column title="Name" dataIndex="name" key="name" />
@@ -156,24 +156,24 @@ const TechnologyManagement = () => {
             );
           }}
         />
-        <Column
-          title="Actions"
-          key="actions"
-          render={(text, record) => (
-            <Space>
-              <Button
-                icon={<EditOutlined />}
-                style={{ color: "blue", borderColor: "blue" }}
-                onClick={() => navigate(`/technology-management/edit/${record.key}`)}
-              />
-              <Button
-                icon={<DeleteOutlined />}
-                style={{ color: "red", borderColor: "red" }}
-                onClick={() => handleDelete(record)}
-              />
-            </Space>
-          )}
-        />
+       <Column
+  title="Actions"
+  key="actions"
+  render={(text, record) => (
+    <Space>
+      <Button
+        icon={<EditOutlined />}
+        style={{ color: "blue", borderColor: "blue" }}
+        onClick={() => navigate(`/technology-management/edit/${record.key}`)} // Use record.key to navigate
+      />
+      <Button
+        icon={<DeleteOutlined />}
+        style={{ color: "red", borderColor: "red" }}
+        onClick={() => handleDelete(record)}
+      />
+    </Space>
+  )}
+/>
       </Table>
     </div>
   );
