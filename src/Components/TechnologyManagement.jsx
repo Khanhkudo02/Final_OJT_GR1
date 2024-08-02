@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { fetchAllTechnology, deleteTechnology } from "../service/TechnologyServices";
-import { useNavigate } from "react-router-dom";
-import "../assets/style/Pages/TechnologyManagement.scss";
-import "../assets/style/Global.scss";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import "../assets/style/Global.scss";
+import "../assets/style/Pages/TechnologyManagement.scss";
+import { deleteTechnology, fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
