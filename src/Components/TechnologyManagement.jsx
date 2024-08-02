@@ -124,7 +124,7 @@ const TechnologyManagement = () => {
         onChange={handleTabChange}
         items={tabItems}
         centered
-      />
+      /> 
       <Table
         dataSource={paginatedData}
         rowKey="key"
@@ -141,7 +141,9 @@ const TechnologyManagement = () => {
           dataIndex="imageUrl"
           key="imageUrl"
           render={(imageUrl) => (
-            imageUrl ? <img src={imageUrl} alt="Technology" style={{ width: 50, height: 50 }} /> : <span>No Image</span>
+            imageUrl 
+              ? <img src={imageUrl} alt="Technology" style={{ width: 50, height: 50 }} onError={(e) => {e.target.onerror = null; e.target.src="path/to/placeholder.png"}} /> 
+              : <span>No Image</span>
           )}
         />
         <Column title="Name" dataIndex="name" key="name" />

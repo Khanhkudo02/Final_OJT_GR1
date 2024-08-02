@@ -3,8 +3,19 @@ import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadUR
 import { database, storage } from "../firebaseConfig";
 
 // Function to create a technology
-export const postCreateTechnology = async (name, description, status, imageFile) => {
-  // function implementation
+export const postCreateTechnology = async (id, name, description, status, imageUrl) => {
+  try {
+    const techRef = ref(database, `technologies/${id}`);
+    await set(techRef, {
+      name,
+      description,
+      status,
+      imageUrl
+    });
+  } catch (error) {
+    console.error("Error creating technology:", error);
+    throw error;
+  }
 };
 
 // Function to fetch technology by ID
@@ -94,3 +105,4 @@ export const getTechnologyById = async (id) => {
     throw error;
   }
 };
+

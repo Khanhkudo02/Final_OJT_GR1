@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Table, Modal, Space, Upload } from "antd";
+import { UploadOutlined, PlusOutlined, EyeOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Form, Input, message, Select, Upload, Table, Modal, Space } from "antd";
 import { v4 as uuidv4 } from 'uuid';
-import { storage, database } from "../firebaseConfig"; // Import Firebase config
+import { storage } from "../firebaseConfig"; // Ensure correct import
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { ref as databaseRef, set } from "firebase/database";
-import {
-  postCreateTechnology,
-  fetchAllTechnology,
-  deleteTechnology,
-} from "../service/TechnologyServices";
-import { EyeOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { postCreateTechnology, fetchAllTechnology, deleteTechnology } from "../service/TechnologyServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
@@ -18,13 +13,13 @@ const { Option } = Select;
 const { Column } = Table;
 
 const AddTechnology = () => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("active");
+  const [form] = Form.useForm();
   const [imageFile, setImageFile] = useState(null);
+  const [fileList, setFileList] = useState([]);
   const [technologies, setTechnologies] = useState([]);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedTechnology, setSelectedTechnology] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -41,9 +36,11 @@ const AddTechnology = () => {
     loadTechnologies();
   }, []);
 
-  const handleAddTechnology = async () => {
-    if (!name || !description || !status || !imageFile) {
-      toast.error("Please fill in all fields.");
+  const onFinish = async (values) => {
+    setLoading(true);
+    if (!imageFile) {
+      toast.error("Please upload an image.");
+      setLoading(false);
       return;
     }
 
@@ -56,12 +53,15 @@ const AddTechnology = () => {
       const imageUrl = await getDownloadURL(storageReference);
 
       // Save technology details to Firebase Database
-      await postCreateTechnology(technologyId, name, description, status, imageUrl);
-      localStorage.setItem("technologyAdded", "true");
+      await postCreateTechnology(technologyId, values.name, values.description, values.status, imageUrl);
       toast.success("Technology added successfully!");
+      loadTechnologies(); // Reload the technologies after adding a new one
       navigate("/technology-management");
     } catch (error) {
       toast.error("Failed to add technology.");
+      console.error("Error details:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,72 +80,79 @@ const AddTechnology = () => {
     }
   };
 
-  const handleImageChange = (info) => {
-    const file = info.file.originFileObj;
-    if (file && (file.type === "image/png" || file.type === "image/svg+xml")) {
-      setImageFile(file);
+  const handleImageChange = ({ fileList }) => {
+    setFileList(fileList);
+    if (fileList.length > 0) {
+      setImageFile(fileList[fileList.length - 1].originFileObj);
     } else {
-      toast.error("Only PNG and SVG images are allowed.");}
-  };
-
-  const beforeUpload = (file) => {
-    handleImageChange({ file });
-    return false; // Prevent automatic upload
+      setImageFile(null);
+    }
   };
 
   return (
-    <div className="add-technology">
+    <div
+      style={{
+        padding: "24px 0",
+        background: "#fff",
+        maxWidth: "1000px",
+        margin: "auto",
+      }}
+    >
       <h2>Add New Technology</h2>
-      <div className="form-group">
-        <label>Name</label>
-        <Input
-          type="text"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-      </div>
-      <div className="form-group">
-        <label>Description</label>
-        <Input
-          type="text"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-        />
-      </div>
-      <div className="form-group">
-        <label>Status</label>
-        <Select
-          value={status}
-          onChange={(value) => setStatus(value)}
-          placeholder="Select Status"
+      <Form form={form} onFinish={onFinish}>
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: "Please input the technology name!" }]}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
-        </Select>
-      </div>
-      <div className="form-group">
-        <label>Image</label>
-        <Upload
-          beforeUpload={beforeUpload}
-          showUploadList={false}
-          customRequest={() => {}}
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Description"
+          name="description"
+          rules={[{ required: true, message: "Please input the technology description!" }]}
         >
-          <Button icon={<PlusOutlined />}>Upload Image</Button>
-        </Upload>
-      </div>
-      <Button
-        type="primary"
-        onClick={handleAddTechnology}
-        disabled={!name || !description || !status || !imageFile}
-      >
-        Save
-      </Button>
-      <Button
-        style={{ marginLeft: 8 }}
-        onClick={() => navigate("/technology-management")}
-      >
-        Back to Technology Management
-      </Button>
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Status"
+          name="status"
+          rules={[{ required: true, message: "Please select the technology status!" }]}
+        >
+          <Select>
+            <Option value="active">Active</Option>
+            <Option value="inactive">Inactive</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          label="Image"
+          name="image"
+          rules={[{ required: true, message: "Please upload an image!" }]}
+        >
+          <Upload
+            fileList={fileList}
+            beforeUpload={() => false}
+            onChange={handleImageChange}
+          >
+            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            Save
+          </Button>
+          <Button
+            style={{ marginLeft: 8 }}
+            onClick={() => navigate("/technology-management")}
+          >
+            Back to Technology Management
+          </Button>
+        </Form.Item>
+      </Form>
 
       <h2>Existing Technologies</h2>
       <Table dataSource={technologies} rowKey="id" pagination={false}>
@@ -156,8 +163,7 @@ const AddTechnology = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
-            const className =
-              text === "active" ? "status-active" : "status-inactive";
+            const className = text === "active" ? "status-active" : "status-inactive";
             return (
               <span className={className}>
                 {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
@@ -178,15 +184,17 @@ const AddTechnology = () => {
               <Button
                 icon={<DeleteOutlined />}
                 style={{ color: "red", borderColor: "red" }}
-                onClick={() => handleDeleteTechnology(record.key)}
+                onClick={() => handleDeleteTechnology(record.id)}
               />
             </Space>
           )}
         />
       </Table>
+
       <Modal
         title="View Technology"
-        open={viewModalVisible}onCancel={() => setViewModalVisible(false)}
+        open={viewModalVisible}
+        onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>
             Close
