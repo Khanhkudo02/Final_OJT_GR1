@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from "react";
 import {
-  Table,
-  Tag,
-  Space,
-  Button,
-  Avatar,
-  Pagination,
-  Tabs,
-  Modal,
-  message,
-  Input,
-} from "antd";
-import { useNavigate } from "react-router-dom";
-import { fetchAllProjects, moveToArchive } from "../service/Project";
-import {
-  EyeOutlined,
-  EditOutlined,
   DeleteOutlined,
-  PlusOutlined,
+  EditOutlined,
+  EyeOutlined,
   InboxOutlined,
+  PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
+import {
+  Avatar,
+  Button,
+  Input,
+  Modal,
+  Pagination,
+  Space,
+  Table,
+  Tabs,
+  Tag,
+  message,
+} from "antd";
 import moment from "moment"; // Thêm moment.js để xử lý định dạng ngày tháng
-import "../assets/style/Pages/ProjectManagement.scss";
-import "../assets/style/Global.scss";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import "../assets/style/Global.scss";
+import "../assets/style/Pages/ProjectManagement.scss";
+import { fetchAllProjects, moveToArchive } from "../service/Project";
 
 const statusColors = {
   COMPLETED: "green",

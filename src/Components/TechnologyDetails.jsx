@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  postCreateTechnology,
   fetchTechnologyById,
-  fetchAllTechnology,
-  putUpdateTechnology,
-  deleteTechnology,
 } from '../service/TechnologyServices';
 import { Button, Spin, message } from "antd";
 import "../Components/TechnologyDetails.jsx"; // Assuming you have a similar stylesheet
@@ -19,7 +15,7 @@ const TechnologyDetails = () => {
   useEffect(() => {
     const loadTechnology = async () => {
       try {
-        const data = await getTechnologyById(id);
+        const data = await fetchTechnologyById(id);
         setTechnology(data);
         setLoading(false);
       } catch (error) {
