@@ -97,20 +97,6 @@ const fetchAllEmployees = async () => {
     }
 };
 
-const fetchAllPositions = async () => {
-    try {
-        const positionsRef = ref(db, "positions");
-        const snapshot = await get(positionsRef);
-        const data = snapshot.val();
-        return data
-            ? Object.entries(data).map(([key, value]) => ({ key, ...value }))
-            : [];
-    } catch (error) {
-        console.error("Failed to fetch positions:", error);
-        throw error;
-    }
-};
-
 // Update existing employee
 const putUpdateEmployee = async (
     id,
@@ -233,5 +219,4 @@ export {
     fetchEmployeeById,
     postCreateEmployee,
     putUpdateEmployee,
-    fetchAllPositions, // Add this line
 };

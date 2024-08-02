@@ -232,8 +232,8 @@ const EmployeeManagement = () => {
                     text: Array.isArray(employee.skills)
                       ? employee.skills.map(formatSkill).join(", ")
                       : employee.skills
-                      ? formatSkill(employee.skills)
-                      : "Not provided",
+                        ? formatSkill(employee.skills)
+                        : "Not provided",
                     size: 24,
                   }),
                 ],
@@ -253,107 +253,107 @@ const EmployeeManagement = () => {
                 ],
               }),
               ...(Array.isArray(employee.projects) &&
-              employee.projects.length > 0
+                employee.projects.length > 0
                 ? employee.projects.map((project, index) => [
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Project name: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.name || "No name provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Role: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.role || "No role provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Description: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text:
-                            project.description || "No description provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Specification: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text:
-                            project.specification ||
-                            "No specification provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Languages and frameworks: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: Array.isArray(project.languagesAndFrameworks)
-                            ? project.languagesAndFrameworks.join(", ")
-                            : "Not provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Technologies: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: Array.isArray(project.technologies)
-                            ? project.technologies.join(", ")
-                            : "Not provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    // Add a blank paragraph to create space between projects
-                    new Paragraph({}),
-                  ])
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Project name: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: project.name || "No name provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Role: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: project.role || "No role provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Description: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text:
+                          project.description || "No description provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Specification: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text:
+                          project.specification ||
+                          "No specification provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Languages and frameworks: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: Array.isArray(project.languagesAndFrameworks)
+                          ? project.languagesAndFrameworks.join(", ")
+                          : "Not provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Technologies: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: Array.isArray(project.technologies)
+                          ? project.technologies.join(", ")
+                          : "Not provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  // Add a blank paragraph to create space between projects
+                  new Paragraph({}),
+                ])
                 : [
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Not yet joined the project",
-                          size: 24,
-                          italics: true,
-                        }),
-                      ],
-                    }),
-                  ]),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Not yet joined the project",
+                        size: 24,
+                        italics: true,
+                      }),
+                    ],
+                  }),
+                ]),
             ],
           },
         ],
