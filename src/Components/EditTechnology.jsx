@@ -1,134 +1,125 @@
 import React, { useState, useEffect } from "react";
-import { Upload, Button, Input, Select, Layout } from "antd";
-import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
-import { putUpdateTechnology, fetchTechnologyById } from "../service/TechnologyServices";
-import { PlusOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Select, Upload, Modal, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { getTechnologyById, putUpdateTechnology } from "../service/TechnologyServices";
+import { storage } from "../firebaseConfig";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+
 
 const { Option } = Select;
-const { Header } = Layout;
 
-const EditTechnology = () => {  
-  const { id } = useParams(); // Get ID from URL
+const EditTechnology = () => {
+  const { id } = useParams();
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [fileList, setFileList] = useState([]);
+  const [initialImageUrl, setInitialImageUrl] = useState("");
   const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-
   useEffect(() => {
-    const loadTechnology = async () => {
+    const fetchTechnology = async () => {
       try {
-        console.log(`Fetching technology with ID: ${id}`);
-        const technology = await fetchTechnologyById(id);
-        if (technology) {
-          console.log("Loaded technology:", technology);
-          setName(technology.name || "");
-          setDescription(technology.description || "");
-          setStatus(technology.status || "");
-          // If you want to display the existing image URL, you can handle it here.
-        } else {
-          toast.error("Technology not found.");
-        }
+        const data = await getTechnologyById(id); // Fetch by ID
+        form.setFieldsValue(data);
+        setInitialImageUrl(data.imageUrl);
       } catch (error) {
-        toast.error("Failed to fetch technology data.");
+        console.error("Failed to fetch technology:", error);
       }
     };
+    fetchTechnology();
+  }, [id, form]);
 
-    loadTechnology();
-  }, [id]);
-
-  const handleUpdateTechnology = async () => {
-    if (!name || !description || !status) {
-      toast.error("Please fill in all fields.");
-      return;
-    }
-
-    try {
-      await putUpdateTechnology(
-        id,
-        name,
-        description,
-        status,
-        imageFile
-      );
-      toast.success("Technology updated successfully!");
-      navigate("/technology-management");
-    } catch (error) {
-      toast.error("Failed to update technology.");
-      console.error("Error details:", error);
-    }
-  };
-
-  const handleImageChange = (info) => {
-    const file = info.file.originFileObj;
-    if (file && (file.type === "image/png" || file.type === "image/svg+xml")) {
-      setImageFile(file);
+  const handleImageChange = ({ fileList }) => {
+    setFileList(fileList);
+    if (fileList.length > 0) {
+      setImageFile(fileList[fileList.length - 1].originFileObj);
     } else {
-      toast.error("Only PNG and SVG images are allowed.");
+      setImageFile(null);
     }
   };
 
-  const beforeUpload = (file) => {
-    handleImageChange({ file });
-    return false; // Prevent automatic upload
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      let imageUrl = initialImageUrl;
+      if (imageFile) {
+        const storageReference = storageRef(storage, `technologies/${Date.now()}_${imageFile.name}`);
+        await uploadBytes(storageReference, imageFile);
+        imageUrl = await getDownloadURL(storageReference);
+      }
+
+      await putUpdateTechnology(id, values.name, values.description, values.status, imageUrl);
+
+      Modal.success({
+        content: 'Technology updated successfully!',
+        onOk: () => navigate("/technology-management"),
+      });
+    } catch (error) {
+      message.error("Failed to update technology.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div>
+    <div className="edit-technology">
       <h2>Edit Technology</h2>
+      <Form form={form} onFinish={onFinish}>
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: "Please input the technology name!" }]}
+        >
+          <Input />
+        </Form.Item>
 
-      <div className="form-group">
-        <label>Name</label>
-        <Input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
-      <div className="form-group">
-        <label>Description</label>
-        <Input.TextArea
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
-      <div className="form-group">
-        <label>Status</label>
-        <Select
-          placeholder="Select Status"
-          value={status}
-          onChange={(value) => setStatus(value)}
+        <Form.Item
+          label="Description"
+          name="description"
+          rules={[{ required: true, message: "Please input the technology description!" }]}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
-        </Select>
-      </div>
-      <div className="form-group">
-        <label>Image</label>
-        <Upload
-          beforeUpload={beforeUpload}
-          showUploadList={false}
-          customRequest={() => {}}
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Status"
+          name="status"
+          rules={[{ required: true, message: "Please select the technology status!" }]}
         >
-          <Button icon={<PlusOutlined />}>Upload Image</Button>
-        </Upload>
-      </div>
-      <Button
-        type="primary"
-        onClick={handleUpdateTechnology}
-        disabled={!name || !description || !status}
-      >
-        Save
-      </Button>
-      <Button
-        style={{ marginLeft: 8 }}
-        onClick={() => navigate("/technology-management")}
-      >
-        Back to Technology Management
-      </Button>
+          <Select>
+            <Option value="active">Active</Option>
+            <Option value="inactive">Inactive</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          label="Image"
+          name="image"
+          rules={[{ required: true, message: "Please upload an image!" }]}
+        >
+          <Upload
+            fileList={fileList}
+            beforeUpload={() => false}
+            onChange={handleImageChange}
+          >
+            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+          </Upload>
+          {initialImageUrl && !fileList.length && (
+            <img src={initialImageUrl} alt="Technology" style={{ width: "100px", marginTop: "10px" }} />
+          )}
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            Save
+          </Button>
+          <Button style={{ marginLeft: 8 }} onClick={() => navigate("/technology-management")}>
+            Back
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 };
