@@ -4,6 +4,7 @@
   "delete": "Xóa",
   "update": "Cập nhật",
   "updateUser": "Cập nhật người dùng",
+  "changePassword": "Đổi mật khẩu",
   "errorFetchingUsers": "Lỗi khi lấy danh sách người dùng.",
   "pleaseFillAllFields": "Vui lòng điền tất cả các trường.",
   "invalidEmailFormat": "Định dạng email không hợp lệ.",
@@ -18,7 +19,7 @@
   "pleaseInputEmail": "Vui lòng nhập email.",
   "pleaseInputName": "Vui lòng nhập tên.",
   "pleaseInputPassword": "Vui lòng nhập mật khẩu.",
-  "adminPage": "Trang Admin",
+  "adminPage": "Trang Quản Trị Viên",
   "addUser": "Thêm người dùng",
   "editUser": "Chỉnh sửa người dùng",
   "name": "Tên",
@@ -155,10 +156,19 @@
   "avatar": "Ảnh đại diện",
   "AllLanguages": "Tất cả ngôn ngữ",
   "AddNewLanguage": "Thêm mới ngôn ngữ lập trình",
-  "EditLanguage": "Chỉnh sửa thông tin của ngôn ngữ lập trìn",
+  "EditLanguage": "Chỉnh sửa thông tin của ngôn ngữ lập trình",
+  "DetailLanguage": "Chi tiết ngôn ngữ lập trình",
   "ExistingLanguage": "Ngôn ngữ lập trình hiện có",
   "BacktoLanguageManagement": "Quay về trang quản lý ngôn ngữ",
   "ViewLanguage": "Xem chi tiết ngôn ngữ lập trình",
   "null": "Chưa có thông tin",
-  "AllPosition": "Tất cả vị trí"
+
+  "AllPosition": "Tất cả vị trí",
+  "AddNewPosition": "Thêm mới chức vụ",
+  "BacktoPositionManagement": "Quay về trang quản lý chức vụ",
+  "ViewPosition": "Xem chi tiết chức vụ",
+  "ExistingPosition": "Chức vụ hiện có",
+  "EditPosition": "Chỉnh sửa thông tin của chức vụ",
+
+  "LogOut": "Đăng Xuất"
 }

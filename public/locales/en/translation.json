@@ -4,6 +4,7 @@
   "delete": "Delete",
   "update": "Update",
   "updateUser": "Update User",
+  "changePassword": "Change Password",
   "errorFetchingUsers": "Error fetching users.",
   "pleaseFillAllFields": "Please fill all fields.",
   "invalidEmailFormat": "Invalid email format.",
@@ -156,9 +157,18 @@
   "AllLanguages": "All Languages",
   "AddNewLanguage": "Add New Programming Language",
   "EditLanguage": "Edit Programming Language",
+  "DetailLanguage": "Detail Language",
   "ExistingLanguage": "Existing Programming Languages",
   "BacktoLanguageManagement": "Back to Language Management",
   "ViewLanguage": "View Programming Language",
   "null": "No description",
-  "AllPosition": "All Position"
+
+  "AllPosition": "All Position",
+  "AddNewPosition": "Add New Position",
+  "BacktoPositionManagement": "Back to Position Management",
+  "ViewPosition": "View Position",
+  "ExistingPosition": "Existing Positions",
+  "EditPosition": "Edit Position",
+
+  "LogOut": "Log Out"
 }
