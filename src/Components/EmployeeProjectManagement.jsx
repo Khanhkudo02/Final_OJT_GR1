@@ -132,6 +132,7 @@ const EmployeeProjectManagement = () => {
     },
     {
       title: "Start Date",
+      title: "Start Date",
       dataIndex: "startDate",
       key: "startDate",
       render: (date) => {
@@ -143,6 +144,7 @@ const EmployeeProjectManagement = () => {
       },
     },
     {
+      title: "End Date",
       title: "End Date",
       dataIndex: "endDate",
       key: "endDate",
@@ -172,11 +174,13 @@ const EmployeeProjectManagement = () => {
     },
     {
       title: "Budget",
+      title: "Budget",
       dataIndex: "budget",
       key: "budget",
       render: formatBudget,
     },
     {
+      title: "Status",
       title: "Status",
       dataIndex: "status",
       key: "status",
@@ -187,6 +191,7 @@ const EmployeeProjectManagement = () => {
       ),
     },
     {
+      title: "Actions",
       title: "Actions",
       key: "actions",
       render: (text, record) => (
@@ -202,6 +207,11 @@ const EmployeeProjectManagement = () => {
   ];
 
   const tabItems = [
+    { key: "All Projects", label: "All Projects" },
+    { key: "Ongoing", label: "Ongoing" },
+    { key: "Not Started", label: "Not Started" },
+    { key: "Completed", label: "Completed" },
+    { key: "Pending", label: "Pending" },
     { key: "All Projects", label: "All Projects" },
     { key: "Ongoing", label: "Ongoing" },
     { key: "Not Started", label: "Not Started" },
