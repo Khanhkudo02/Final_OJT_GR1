@@ -18,21 +18,24 @@ export const postCreateTechnology = async (id, name, description, status, imageU
   }
 };
 
-// Function to fetch technology by ID
 export const fetchTechnologyById = async (id) => {
   try {
+    console.log(`Attempting to fetch technology with ID: ${id}`); // Debug log
     const technologyRef = ref(database, `technologies/${id}`);
     const snapshot = await get(technologyRef);
+    
     if (!snapshot.exists()) {
+      console.error(`No technology found with ID: ${id}`); // Debug log
       throw new Error("Technology not found.");
     }
+    
+    console.log('Fetched Technology data:', snapshot.val()); // Debug log
     return snapshot.val();
   } catch (error) {
     console.error("Error fetching technology:", error);
     throw error;
   }
 };
-
 // Function to fetch all technologies
 export const fetchAllTechnology = async () => {
   try {
@@ -41,7 +44,7 @@ export const fetchAllTechnology = async () => {
     if (snapshot.exists()) {
       const data = snapshot.val();
       return Object.keys(data).map((key) => ({
-        id: key,
+        id: key, // Correctly assign the key as the ID
         ...data[key],
       }));
     } else {
@@ -52,7 +55,6 @@ export const fetchAllTechnology = async () => {
     throw error;
   }
 };
-
 // Function to update a technology
 export const putUpdateTechnology = async (id, name, description, status, imageFile) => {
   try {
@@ -106,3 +108,16 @@ export const getTechnologyById = async (id) => {
   }
 };
 
+const loadTechnologies = async () => {
+  try {
+    const data = await fetchAllTechnology();
+    console.log("Fetched technologies:", data); // Debug log
+    const techArray = data.map((item, index) => ({
+      key: item.id, // Correctly assign the ID from Firebase as the key
+      ...item,
+    }));
+    setTechnologies(techArray);
+  } catch (error) {
+    console.error("Failed to fetch technologies:", error);
+  }
+};

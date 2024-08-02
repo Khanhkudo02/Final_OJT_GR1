@@ -103,21 +103,11 @@ const Sidebar = ({ role }) => {
     },
     {
       key: "3",
-      icon: <TeamOutlined />,
-      label: <NavLink to="/employee-management"> Employee List </NavLink>,
+      icon: <ProjectOutlined />,
+      label: <NavLink to="/employee-ProjectManagement">List Project</NavLink>,
     },
     {
       key: "4",
-      icon: <ProjectOutlined />,
-      label: <NavLink to="/project-management">Project Management</NavLink>,
-    },
-    {
-      key: "5",
-      icon: <FileTextOutlined />,
-      label: <NavLink to="/cv">CV</NavLink>,
-    },
-    {
-      key: "6",
       label: <LogoutButton collapsed={collapsed} />,
     },
   ];

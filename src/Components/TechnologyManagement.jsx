@@ -161,24 +161,24 @@ const TechnologyManagement = () => {
             );
           }}
         />
-        <Column
-          title="Actions"
-          key="actions"
-          render={(text, record) => (
-            <Space>
-              <Button
-                icon={<EditOutlined />}
-                style={{ color: "blue", borderColor: "blue" }}
-                onClick={() => navigate(`/technology-management/edit/${record.key}`)}
-              />
-              <Button
-                icon={<DeleteOutlined />}
-                style={{ color: "red", borderColor: "red" }}
-                onClick={() => handleDelete(record)}
-              />
-            </Space>
-          )}
-        />
+       <Column
+  title="Actions"
+  key="actions"
+  render={(text, record) => (
+    <Space>
+      <Button
+        icon={<EditOutlined />}
+        style={{ color: "blue", borderColor: "blue" }}
+        onClick={() => navigate(`/technology-management/edit/${record.key}`)} // Use record.key to navigate
+      />
+      <Button
+        icon={<DeleteOutlined />}
+        style={{ color: "red", borderColor: "red" }}
+        onClick={() => handleDelete(record)}
+      />
+    </Space>
+  )}
+/>
       </Table>
     </div>
   );
