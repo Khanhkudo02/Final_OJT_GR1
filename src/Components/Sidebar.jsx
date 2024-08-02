@@ -108,6 +108,10 @@ const Sidebar = ({ role }) => {
     },
     {
       key: "4",
+      label: <LanguageSwitcher collapsed={collapsed} />,
+    },
+    {
+      key: "5",
       label: <LogoutButton collapsed={collapsed} />,
     },
   ];

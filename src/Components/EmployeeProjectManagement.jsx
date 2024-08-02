@@ -123,12 +123,12 @@ const EmployeeProjectManagement = ({ employeeId }) => {
 
   const columns = [
     {
-      title: "Tên dự án",
+      title: "Name",
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "Ngày bắt đầu",
+      title: "Start Date",
       dataIndex: "startDate",
       key: "startDate",
       render: (date) => {
@@ -140,7 +140,7 @@ const EmployeeProjectManagement = ({ employeeId }) => {
       },
     },
     {
-      title: "Ngày kết thúc",
+      title: "End Date",
       dataIndex: "endDate",
       key: "endDate",
       render: (date) => {
@@ -152,7 +152,7 @@ const EmployeeProjectManagement = ({ employeeId }) => {
       },
     },
     {
-      title: "Quản lý dự án",
+      title: "Project Management",
       dataIndex: "projectManager",
       key: "projectManager",
       className: "text-align-start",
@@ -168,13 +168,13 @@ const EmployeeProjectManagement = ({ employeeId }) => {
       ),
     },
     {
-      title: "Ngân sách",
+      title: "Budget",
       dataIndex: "budget",
       key: "budget",
       render: formatBudget,
     },
     {
-      title: "Trạng thái",
+      title: "Status",
       dataIndex: "status",
       key: "status",
       render: (status) => (
@@ -184,7 +184,7 @@ const EmployeeProjectManagement = ({ employeeId }) => {
       ),
     },
     {
-      title: "Hành động",
+      title: "Actions",
       key: "actions",
       render: (text, record) => (
         <Space size="middle">
@@ -199,11 +199,11 @@ const EmployeeProjectManagement = ({ employeeId }) => {
   ];
 
   const tabItems = [
-    { key: "All Projects", label: "Tất cả dự án" },
-    { key: "Ongoing", label: "Đang diễn ra" },
-    { key: "Not Started", label: "Chưa bắt đầu" },
-    { key: "Completed", label: "Hoàn thành" },
-    { key: "Pending", label: "Đang chờ" },
+    { key: "All Projects", label: "All Projects" },
+    { key: "Ongoing", label: "Ongoing" },
+    { key: "Not Started", label: "Not Started" },
+    { key: "Completed", label: "Completed" },
+    { key: "Pending", label: "Pending" },
   ];
 
   return (
