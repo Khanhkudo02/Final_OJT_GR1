@@ -26,54 +26,54 @@ const Sidebar = ({ role }) => {
     {
       key: "1",
       icon: <UserOutlined />,
-      label: <NavLink to="/account-management">Manage Accounts</NavLink>,
+      label: <NavLink to="/account-management">{t("ManageAccounts")}</NavLink>,
       children: [
         {
           key: "1-1",
-          label: <NavLink to="/account-info">Account Info</NavLink>,
+          label: <NavLink to="/account-info">{t("AccountInfo")}</NavLink>,
         },
         {
           key: "1-2",
-          label: <NavLink to="/change-password">Change Password</NavLink>,
+          label: <NavLink to="/change-password">{t("changePassword")}</NavLink>,
         },
       ],
     },
     {
       key: "2",
       icon: <TeamOutlined />,
-      label: <NavLink to="/employee-management">Employee</NavLink>,
+      label: <NavLink to="/employee-management">{t("employee")}</NavLink>,
     },
     {
       key: "3",
       icon: <ProjectOutlined />,
-      label: <NavLink to="/project-management">Project Management</NavLink>,
+      label: <NavLink to="/project-management">{t("ProjectManagement")}</NavLink>,
       children: [
         {
           key: "3-1",
-          label: <NavLink to="/new-project">New Project</NavLink>,
+          label: <NavLink to="/new-project">{t("NewProject")}</NavLink>,
         },
         {
           key: "3-2",
-          label: <NavLink to="/project-tracking">Project Tracking</NavLink>,
+          label: <NavLink to="/project-tracking">{t("ProjectTracking")}</NavLink>,
         },
       ],
     },
     {
       key: "4",
       icon: <TeamOutlined />,
-      label: <NavLink to="/position-management">Position Management</NavLink>,
+      label: <NavLink to="/position-management">{t("PositionManagement")}</NavLink>,
     },
     {
       key: "5",
       icon: <ToolOutlined />,
       label: (
-        <NavLink to="/technology-management">Technology Management</NavLink>
+        <NavLink to="/technology-management">{t("TechnologyManagement")}</NavLink>
       ),
     },
     {
       key: "6",
       icon: <CodeOutlined />,
-      label: <NavLink to="/programing-language">Programming Languages</NavLink>,
+      label: <NavLink to="/programing-language">{t("ProgrammingLanguageManagement")}</NavLink>,
     },
     {
       key: "7",
@@ -89,22 +89,22 @@ const Sidebar = ({ role }) => {
     {
       key: "1",
       icon: <UserOutlined />,
-      label: <NavLink to="/employee">Employee Account</NavLink>,
+      label: <NavLink to="/employee">{t("EmployeeAccount")}</NavLink>,
       children: [
         {
           key: "1-1",
-          label: <NavLink to="/account-info">Account Info</NavLink>,
+          label: <NavLink to="/account-info">{t("AccountInfo")}</NavLink>,
         },
         {
           key: "1-2",
-          label: <NavLink to="/change-password">Change Password</NavLink>,
+          label: <NavLink to="/change-password">{t("changePassword")}</NavLink>,
         },
       ],
     },
     {
       key: "3",
       icon: <ProjectOutlined />,
-      label: <NavLink to="/employee-ProjectManagement">List Project</NavLink>,
+      label: <NavLink to="/employee-ProjectManagement">{t("ListProject")}</NavLink>,
     },
     {
       key: "4",
