@@ -202,17 +202,20 @@ const ProjectEdit = () => {
       projectName: projectName,
       action: action, // Thêm hành động (added/removed)
     };
-  
-    emailjs.send(
-      "service_38z8rf8", // ID dịch vụ
-      "template_bcwpepg", // ID mẫu
-      templateParams,
-      "BLOiZZ22_oSBTDilA" // User ID
-    ).then((response) => {
-      console.log("Email sent successfully:", response.status, response.text);
-    }).catch((err) => {
-      console.error("Failed to send email:", err);
-    });
+
+    emailjs
+      .send(
+        "service_38z8rf8", // ID dịch vụ
+        "template_bcwpepg", // ID mẫu
+        templateParams,
+        "BLOiZZ22_oSBTDilA" // User ID
+      )
+      .then((response) => {
+        console.log("Email sent successfully:", response.status, response.text);
+      })
+      .catch((err) => {
+        console.error("Failed to send email:", err);
+      });
   };
 
   const onFinish = async (values) => {
@@ -235,19 +238,19 @@ const ProjectEdit = () => {
             projectData,
             fileList.length > 0 ? fileList[0].originFileObj : null
           );
-          
+
           message.success("Project updated successfully");
           // Xác định các thành viên mới và cũ
           const currentTeamMembers = values.teamMembers || [];
           const previousTeamMembers = project.teamMembers || [];
-  
+
           const addedMembers = currentTeamMembers.filter(
             (member) => !previousTeamMembers.includes(member)
           );
           const removedMembers = previousTeamMembers.filter(
             (member) => !currentTeamMembers.includes(member)
           );
-  
+
           // Gửi email thông báo cho các thành viên mới
           for (const member of addedMembers) {
             const memberData = employees.find((emp) => emp.value === member);
@@ -255,7 +258,7 @@ const ProjectEdit = () => {
               sendNotificationEmail(memberData.email, values.name, "added");
             }
           }
-  
+
           // Gửi email thông báo cho các thành viên bị xóa
           for (const member of removedMembers) {
             const memberData = employees.find((emp) => emp.value === member);
@@ -263,14 +266,14 @@ const ProjectEdit = () => {
               sendNotificationEmail(memberData.email, values.name, "removed");
             }
           }
-  
+
           navigate(`/project/${id}`);
         } catch (error) {
           message.error("Failed to update project");
         }
       },
     });
-  }
+  };
 
   const handleImageChange = ({ fileList }) => {
     setFileList(fileList);
@@ -289,7 +292,11 @@ const ProjectEdit = () => {
         margin: "auto",
       }}
     >
-      <Button type="default" icon={<ArrowLeftOutlined />} onClick={() => navigate(`/project/${id}`)}>
+      <Button
+        type="default"
+        icon={<ArrowLeftOutlined />}
+        onClick={() => navigate(`/project/${id}`)}
+      >
         Back
       </Button>
       <h2>Edit Project</h2>
@@ -357,7 +364,10 @@ const ProjectEdit = () => {
           name="phoneNumber"
           rules={[
             { required: true, message: "Please input the phone number!" },
-            { pattern: /^[0-9]{10}$/, message: 'Please enter a valid 10-digit phone number!' }
+            {
+              pattern: /^[0-9]{10}$/,
+              message: "Please enter a valid 10-digit phone number!",
+            },
           ]}
         >
           <Input placeholder="0123456789" />
