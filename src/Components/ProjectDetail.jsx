@@ -6,6 +6,7 @@ import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { deleteProjectPermanently, fetchAllProjects } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
+import { useTranslation } from "react-i18next";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const ProjectDetail = () => {
   const [languages, setLanguages] = useState([]);
   const [employees, setEmployees] = useState([]);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const formatDate = (date) => {
     if (!date) return "";
@@ -148,9 +150,9 @@ const ProjectDetail = () => {
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <Button type="default" onClick={handleBack}>
-        Back
+        {t("Back")}
       </Button>
-      <h2>Project Detail</h2>
+      <h2>{t("ProjectDetail")}</h2>
       {project.imageUrl && (
         <div style={{ marginBottom: "20px", textAlign: "center" }}>
           <img
@@ -165,49 +167,49 @@ const ProjectDetail = () => {
         </div>
       )}
       <p>
-        <strong>Project Name:</strong> {project.name}
+        <strong>{t("ProjectName")}:</strong> {project.name}
       </p>
       <p>
-        <strong>Description:</strong> {project.description}
+        <strong>{t("Description")}:</strong> {project.description}
       </p>
       <p>
-        <strong>Client:</strong> {project.clientName}
+        <strong>{t("Client")}:</strong> {project.clientName}
       </p>
       <p>
-        <strong>Project Manager:</strong> {project.projectManager}
+        <strong>{t("ProjectManager")}:</strong> {project.projectManager}
       </p>
       <p>
-        <strong>Email:</strong> {project.email}
+        <strong>{t("Email")}:</strong> {project.email}
       </p>
       <p>
-        <strong>Phone Number:</strong> {project.phoneNumber}
+        <strong>{t("phoneNumber")}:</strong> {project.phoneNumber}
       </p>
       <p>
-        <strong>Team Members:</strong> {displayedTeamMembers}
+        <strong>{t("TeamMember")}:</strong> {displayedTeamMembers}
       </p>
       <p>
-        <strong>Budget:</strong> {project.budget}
+        <strong>{t("Budget")}:</strong> {project.budget}
       </p>
       <p>
-        <strong>Status:</strong> {project.status}
+        <strong>{t("Status")}:</strong> {project.status}
       </p>
       <p>
-        <strong>Priority:</strong> {project.priority}
+        <strong>{t("Priority")}:</strong> {project.priority}
       </p>
       <p>
-        <strong>Category:</strong> {formattedCategories}
+        <strong>{t("Category")}:</strong> {formattedCategories}
       </p>
       <p>
-        <strong>Start Date:</strong> {formatDate(project.startDate)}
+        <strong>{t("StartDate")}:</strong> {formatDate(project.startDate)}
       </p>
       <p>
-        <strong>End Date:</strong> {formatDate(project.endDate)}
+        <strong>{t("EndDate")}:</strong> {formatDate(project.endDate)}
       </p>
       <p>
-        <strong>Technologies Used:</strong> {displayedTechnologies}
+        <strong>{t("TechnologiesUsed")}:</strong> {displayedTechnologies}
       </p>
       <p>
-        <strong>Languages Used:</strong> {displayedLanguages}
+        <strong>{t("ProgrammingLanguageUsed")}:</strong> {displayedLanguages}
       </p>
     </div>
   );
