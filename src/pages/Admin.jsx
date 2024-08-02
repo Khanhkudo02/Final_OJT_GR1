@@ -294,13 +294,22 @@ function AdminPage() {
       dataIndex: "status",
       key: "status",
       render: (text) => {
-        const className =
-          text === "active" ? "status-active" : "status-inactive";
-        return (
-          <span className={className}>
-            {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
-          </span>
-        );
+        const translatedText = t(text);
+
+            // Xác định lớp CSS dựa trên giá trị đã dịch
+            const className =
+              translatedText === t("active")
+                ? "status-active"
+                : "status-inactive";
+
+            return (
+              <span className={className}>
+                {translatedText
+                  ? translatedText.charAt(0).toUpperCase() +
+                    translatedText.slice(1)
+                  : ""}
+              </span>
+            );
       },
     },
     {
