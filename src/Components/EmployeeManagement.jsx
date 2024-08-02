@@ -461,11 +461,21 @@ const EmployeeManagement = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
+            // Dịch giá trị của text
+            const translatedText = t(text);
+
+            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
-              text === "active" ? "status-active" : "status-inactive";
+              translatedText === t("active")
+                ? "status-active"
+                : "status-inactive";
+
             return (
               <span className={className}>
-                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+                {translatedText
+                  ? translatedText.charAt(0).toUpperCase() +
+                    translatedText.slice(1)
+                  : ""}
               </span>
             );
           }}

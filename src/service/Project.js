@@ -7,7 +7,6 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { database, storage } from "../firebaseConfig";
-import { auth } from "../firebaseConfig"; // Giả sử bạn có cấu hình xác thực Firebase
 
 const db = database;
 const storageInstance = storage;
@@ -77,22 +76,20 @@ const fetchAllProjects = async () => {
   }
 };
 
-const fetchEmployeeProjects = async () => {
+const fetchEmployeeProjects = async (employeeId) => {
   try {
-    const userId = auth.currentUser.uid; // Giả sử bạn có cách xác định user hiện tại
     const projectsRef = ref(db, "projects");
     const snapshot = await get(projectsRef);
     const data = snapshot.val();
-    return data
-      ? Object.entries(data)
-        .map(([key, value]) => ({ key, ...value }))
-        .filter(
-          (project) =>
-            project.teamMembers && project.teamMembers.includes(userId)
-        )
-      : [];
+    if (!data) return [];
+
+    const employeeProjects = Object.entries(data)
+      .map(([key, value]) => ({ key, ...value }))
+      .filter((project) => project.teamMembers.includes(employeeId));
+
+    return employeeProjects;
   } catch (error) {
-    console.error("Failed to fetch employee projects:", error);
+    console.error("Failed to fetch employee projects", error);
     throw error;
   }
 };
@@ -215,5 +212,5 @@ export {
   fetchArchivedProjects,
   deleteProjectPermanently,
   restoreProject,
-  fetchEmployeeProjects, // Xuất hàm mới để lấy dự án của nhân viên
+  fetchEmployeeProjects,
 };

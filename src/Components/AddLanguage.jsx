@@ -107,7 +107,7 @@ const AddLanguage = () => {
         <Select
           value={status}
           onChange={(value) => setStatus(value)}
-          placeholder="Select Status"
+          placeholder={t("selectStatus")}
         >
           <Option value="active">{t("active")}</Option>
           <Option value="inactive">{t("inactive")}</Option>

@@ -125,6 +125,7 @@ const putUpdateEmployee = async (
     skills,
     status,
     department,
+    position, // Add position parameter
     imageFile,
     oldImageUrl
 ) => {
@@ -166,6 +167,7 @@ const putUpdateEmployee = async (
             skills,
             status,
             department,
+            position, // Add position to updates
             imageUrl: imageUrl || currentData.imageUrl,
         };
 

@@ -1,11 +1,11 @@
 import { Button, Modal, message } from "antd";
+import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { deleteProjectPermanently, fetchAllProjects } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
-import { fetchAllEmployees } from "../service/EmployeeServices";
-import dayjs from "dayjs";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -46,7 +46,9 @@ const ProjectDetail = () => {
           setProject(projectData);
         } else {
           message.error("Project not found");
-          navigate("/project-management");
+          const userRole = JSON.parse(localStorage.getItem("user"))?.role;
+          const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
+          navigate(redirectPath);
         }
 
         setTechnologies(
@@ -72,7 +74,9 @@ const ProjectDetail = () => {
       } catch (error) {
         console.error("Error fetching project or related data:", error);
         message.error("Error fetching project data");
-        navigate("/project-management");
+        const userRole = JSON.parse(localStorage.getItem("user"))?.role;
+        const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
+        navigate(redirectPath);
       }
     };
 
@@ -84,7 +88,9 @@ const ProjectDetail = () => {
       if (project && project.key) {
         await deleteProjectPermanently(project.key);
         message.success("Project deleted successfully");
-        navigate("/project-management");
+        const userRole = JSON.parse(localStorage.getItem("user"))?.role;
+        const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
+        navigate(redirectPath);
       } else {
         message.error("Project not found");
       }
@@ -133,9 +139,15 @@ const ProjectDetail = () => {
     ? formatCategory(project.category)
     : "No categories";
 
+  const handleBack = () => {
+    const userRole = JSON.parse(localStorage.getItem("user"))?.role;
+    const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
+    navigate(redirectPath);
+  };
+
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button type="default" onClick={() => navigate("/project-management")}>
+      <Button type="default" onClick={handleBack}>
         Back
       </Button>
       <h2>Project Detail</h2>

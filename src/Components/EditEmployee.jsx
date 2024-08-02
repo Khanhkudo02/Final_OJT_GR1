@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchEmployeeById,
+  fetchAllPositions, // Ensure this function is imported
   putUpdateEmployee,
 } from "../service/EmployeeServices";
 
@@ -18,6 +19,7 @@ const EditEmployee = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [oldImageUrl, setOldImageUrl] = useState("");
+  const [positions, setPositions] = useState([]); // State for positions
 
   // Các tùy chọn được chuyển ngữ
   const departmentOptions = [
@@ -56,6 +58,7 @@ const EditEmployee = () => {
             address: employee.address || "",
             phoneNumber: employee.phoneNumber || "",
             skills: employee.skills || [],
+            position: employee.position || "" // Set position value
           });
 
           setOldImageUrl(employee.imageUrl || "");
@@ -78,7 +81,17 @@ const EditEmployee = () => {
       }
     };
 
+    const loadPositions = async () => {
+      try {
+        const positionsData = await fetchAllPositions();
+        setPositions(positionsData.map((pos) => ({ key: pos.key, name: pos.label }))); // Adjust based on your data structure
+      } catch (error) {
+        message.error(t("failedToFetchPositions"));
+      }
+    };
+
     loadEmployee();
+    loadPositions();
   }, [id, form, t]);
 
   const handlePhoneNumberChange = (e) => {
@@ -106,6 +119,7 @@ const EditEmployee = () => {
         values.skills,
         values.status,
         values.department,
+        values.position, // Pass position value
         fileList.length > 0 ? fileList[0].originFileObj : null,
         oldImageUrl
       );
@@ -117,7 +131,6 @@ const EditEmployee = () => {
       console.error("Error details:", error);
     }
   };
-
 
   const handleImageChange = ({ fileList }) => {
     setFileList(fileList);
@@ -136,6 +149,7 @@ const EditEmployee = () => {
       initialValues={{
         department: [],
         skills: [],
+        position: "" // Initial value for position
       }}
     >
       <h2>{t("editEmployee")}</h2>
@@ -168,6 +182,20 @@ const EditEmployee = () => {
           {departmentOptions.map((dept) => (
             <Option key={dept.value} value={dept.value}>
               {dept.label}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+
+      <Form.Item
+        label={t("position")}
+        name="position"
+        rules={[{ required: true, message: t("positionRequired") }]} // Add validation for position
+      >
+        <Select placeholder={t("position")}>
+          {positions.map((pos) => (
+            <Option key={pos.key} value={pos.key}>
+              {pos.name}
             </Option>
           ))}
         </Select>
