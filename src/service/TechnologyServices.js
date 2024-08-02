@@ -1,12 +1,13 @@
-// service/TechnologyServices.js
 import { ref, set, push, update, get, remove } from "firebase/database";
 import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
 import { database, storage } from "../firebaseConfig";
 
-
+// Function to create a technology
 export const postCreateTechnology = async (name, description, status, imageFile) => {
   // function implementation
 };
+
+// Function to fetch technology by ID
 export const fetchTechnologyById = async (id) => {
   try {
     const technologyRef = ref(database, `technologies/${id}`);
@@ -21,6 +22,7 @@ export const fetchTechnologyById = async (id) => {
   }
 };
 
+// Function to fetch all technologies
 export const fetchAllTechnology = async () => {
   try {
     const techRef = ref(database, 'technologies');
@@ -63,7 +65,6 @@ export const putUpdateTechnology = async (id, name, description, status, imageFi
   }
 };
 
-
 // Function to delete a technology
 export const deleteTechnology = async (id) => {
   try {
@@ -93,9 +94,3 @@ export const getTechnologyById = async (id) => {
     throw error;
   }
 };
-
-
-
-
-
-

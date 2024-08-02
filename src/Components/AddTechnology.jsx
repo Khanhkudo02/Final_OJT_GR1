@@ -9,7 +9,7 @@ import {
   fetchAllTechnology,
   deleteTechnology,
 } from "../service/TechnologyServices";
-import { EyeOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EyeOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
@@ -85,8 +85,7 @@ const AddTechnology = () => {
     if (file && (file.type === "image/png" || file.type === "image/svg+xml")) {
       setImageFile(file);
     } else {
-      toast.error("Only PNG and SVG images are allowed.");
-    }
+      toast.error("Only PNG and SVG images are allowed.");}
   };
 
   const beforeUpload = (file) => {
@@ -187,8 +186,7 @@ const AddTechnology = () => {
       </Table>
       <Modal
         title="View Technology"
-        open={viewModalVisible}
-        onCancel={() => setViewModalVisible(false)}
+        open={viewModalVisible}onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>
             Close
@@ -206,10 +204,10 @@ const AddTechnology = () => {
             <p>
               <strong>Status:</strong> {selectedTechnology.status}
             </p>
-            {selectedTechnology.imageURL && (
+            {selectedTechnology.imageUrl && (
               <p>
                 <strong>Image:</strong>
-                <img src={selectedTechnology.imageURL} alt="Technology" style={{ width: "100%", height: "auto" }} />
+                <img src={selectedTechnology.imageUrl} alt="Technology" style={{ width: "100%", height: "auto" }} />
               </p>
             )}
           </div>

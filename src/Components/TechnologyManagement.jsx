@@ -16,14 +16,13 @@ const TechnologyManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [filteredStatus, setFilteredStatus] = useState("All Technology");
   const navigate = useNavigate();
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [dataPositionEdit, setDataPositionEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { t } = useTranslation();
 
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
+      console.log("Fetched technologies:", data); // Debug log
       const techArray = Object.keys(data).map((key) => ({
         key,  // Add the key as the ID
         ...data[key],  // Spread the data
