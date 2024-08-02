@@ -1,5 +1,14 @@
 import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
-import { Avatar, Button, Input, Pagination, Space, Table, Tabs, Tag } from "antd";
+import {
+  Avatar,
+  Button,
+  Input,
+  Pagination,
+  Space,
+  Table,
+  Tabs,
+  Tag,
+} from "antd";
 import { onValue, ref } from "firebase/database"; // Import ref và onValue từ Firebase Database
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -192,7 +201,6 @@ const EmployeeProjectManagement = () => {
     },
     {
       title: "Actions",
-      title: "Actions",
       key: "actions",
       render: (text, record) => (
         <Space size="middle">
@@ -207,11 +215,6 @@ const EmployeeProjectManagement = () => {
   ];
 
   const tabItems = [
-    { key: "All Projects", label: "All Projects" },
-    { key: "Ongoing", label: "Ongoing" },
-    { key: "Not Started", label: "Not Started" },
-    { key: "Completed", label: "Completed" },
-    { key: "Pending", label: "Pending" },
     { key: "All Projects", label: "All Projects" },
     { key: "Ongoing", label: "Ongoing" },
     { key: "Not Started", label: "Not Started" },
