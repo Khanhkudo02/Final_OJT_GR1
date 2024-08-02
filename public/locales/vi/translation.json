@@ -151,5 +151,14 @@
   "employeeImage": "Hình Ảnh Nhân Viên",
   "noSkills": "Không có kỹ năng",
   "AllEmployees": "Tất cả nhân viên",
-  "search": "Nhập từ khóa tìm kiếm"
+  "search": "Nhập từ khóa tìm kiếm",
+  "avatar": "Ảnh đại diện",
+  "AllLanguages": "Tất cả ngôn ngữ",
+  "AddNewLanguage": "Thêm mới ngôn ngữ lập trình",
+  "EditLanguage": "Chỉnh sửa thông tin của ngôn ngữ lập trìn",
+  "ExistingLanguage": "Ngôn ngữ lập trình hiện có",
+  "BacktoLanguageManagement": "Quay về trang quản lý ngôn ngữ",
+  "ViewLanguage": "Xem chi tiết ngôn ngữ lập trình",
+  "null": "Chưa có thông tin",
+  "AllPosition": "Tất cả vị trí"
 }
