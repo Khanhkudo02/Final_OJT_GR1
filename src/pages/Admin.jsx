@@ -1,4 +1,9 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -34,6 +39,7 @@ function AdminPage() {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
 
   const fetchUsers = async () => {
@@ -69,6 +75,20 @@ function AdminPage() {
       navigate("/employee");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    // Cập nhật `filteredUsers` khi `users` hoặc `searchText` thay đổi
+    const filtered = users.filter(
+      (user) =>
+        user.email.toLowerCase().includes(searchText.toLowerCase()) ||
+        user.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  }, [users, searchText]);
+
+  const handleSearch = (e) => {
+    setSearchText(e.target.value);
+  };
 
   const handleAddOrUpdateUser = async (values) => {
     const { email, password, role, name, status } = values;
@@ -314,6 +334,13 @@ function AdminPage() {
           onClick={() => setModalVisible(true)}
           icon={<PlusOutlined />}
         ></Button>
+        <Input
+          prefix={<SearchOutlined />}
+          placeholder={t("search")}
+          value={searchText}
+          onChange={handleSearch}
+          style={{ width: 250 }}
+        />
       </div>
       <Modal
         title={editMode ? t("editUser") : t("addUser")}
@@ -384,7 +411,7 @@ function AdminPage() {
         </Form>
       </Modal>
       <Table
-        dataSource={users}
+        dataSource={filteredUsers}
         columns={columns}
         rowKey={(record) => record.id}
         className="user-table"

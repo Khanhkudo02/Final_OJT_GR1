@@ -246,7 +246,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Client Name"
+          label="Name"
           name="clientName"
           rules={[{ required: true, message: "Please input the client name!" }]}
         >
@@ -254,16 +254,25 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Client Contact"
-          name="clientContact"
+          label="Email"
+          name="email"
           rules={[
-            {
-              required: true,
-              message: "Please input the client contact information!",
-            },
+            { required: true, message: "Please input the client email!" },
+            { type: "email", message: "Please enter a valid email!" },
           ]}
         >
-          <Input onBlur={() => handleFieldBlur("clientContact")} />
+          <Input placeholder="emailname@gmail.com" />
+        </Form.Item>
+
+        <Form.Item
+          label="Phone Number"
+          name="phoneNumber"
+          rules={[
+            { required: true, message: "Please input the phone number!" },
+            { pattern: /^[0-9]{10}$/, message: 'Please enter a valid 10-digit phone number!' }
+          ]}
+        >
+          <Input placeholder="0123456789" />
         </Form.Item>
 
         <Form.Item
