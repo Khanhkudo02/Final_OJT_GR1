@@ -34,6 +34,7 @@
   "Ongoing": "Đang diễn ra",
   "NotStarted": "Chưa bắt đầu",
   "Completed": "Hoàn thành",
+  "Pending": "Tạm dừng",
   "Active": "Hoạt động",
   "Inactive": "Không hoạt động",
   "Client": "Khách",
@@ -173,5 +174,23 @@
   "LogOut": "Đăng Xuất",
   "EmployeeAccount": "Tài khoản nhân viên",
   "AccountInfo": "Thông tin tài khoản",
-  "ListProject": "Danh sách Dự Án"
+  "ListProject": "Danh sách Dự Án",
+
+  "ProjectName": "Tên dự án",
+  "StartDate": "Ngày bắt đầu",
+  "EndDate": "Ngày kết thúc",
+  "ProjectManager": "Quản lý dự án",
+  "Budget": "Ngân sách",
+  "TeamMember": "Thành viên",
+  "Priority": "Độ ưu tiên",
+  "Category": "Thể loại",
+  "TechnologiesUsed": "Công nghệ sử dụng",
+  "ProgrammingLanguageUsed": "Ngôn ngữ lập trình",
+  "Attachments": "Thêm ảnh",
+  "I have read the agreement": "Tôi đã đọc thỏa thuận",
+  "Click to Upload": "Tải ảnh từ thiết bị",
+  "Should accept agreement": "Nên chấp nhận thỏa thuận",
+  "Resister": "Đăng ký",
+  "EditProject": "Chỉnh sửa dự án",
+  "Back": "Quay về"
 }
