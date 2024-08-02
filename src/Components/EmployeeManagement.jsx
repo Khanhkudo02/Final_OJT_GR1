@@ -4,8 +4,9 @@ import {
   ExportOutlined,
   EyeOutlined,
   PlusOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
-import { Button, message, Modal, Space, Table, Tabs } from "antd";
+import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 import React, { useEffect, useState } from "react";
@@ -22,6 +23,7 @@ import {
 const { Column } = Table;
 const { confirm } = Modal;
 const { TabPane } = Tabs;
+const { Search } = Input;
 
 const EmployeeManagement = () => {
   const { t } = useTranslation();
@@ -31,6 +33,7 @@ const EmployeeManagement = () => {
   const navigate = useNavigate();
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const formatSkill = (skill) =>
     skill
@@ -65,7 +68,6 @@ const EmployeeManagement = () => {
       } else {
         setFilteredEmployees(filteredData); // Tab "All Employees"
       }
-
       setEmployees(filteredData);
     } catch (error) {
       console.error(t("errorFetchingEmployees"), error);
@@ -86,6 +88,23 @@ const EmployeeManagement = () => {
     setCurrentPage(pagination.current);
     setPageSize(pagination.pageSize);
   };
+
+  useEffect(() => {
+    // Filter employees based on search term
+    const searchData = employees.filter((employee) =>
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Apply tab filter
+    if (activeTab === "active") {
+      setFilteredEmployees(searchData.filter((e) => e.status === "active"));
+    } else if (activeTab === "inactive") {
+      setFilteredEmployees(searchData.filter((e) => e.status === "inactive"));
+    } else {
+      setFilteredEmployees(searchData); // Tab "All Employees"
+    }
+  }, [searchTerm, employees, activeTab]);
 
   const showAddPage = () => {
     navigate("/employee-management/add");
@@ -366,7 +385,12 @@ const EmployeeManagement = () => {
       >
         {t("exportToExcel")}
       </Button>
-
+      <Search
+        placeholder={t("search")}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ width: 250 }}
+        prefix={<SearchOutlined />}
+      />
       <Tabs
         centered
         defaultActiveKey="all"
