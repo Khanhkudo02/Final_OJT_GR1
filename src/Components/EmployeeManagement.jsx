@@ -419,7 +419,7 @@ const EmployeeManagement = () => {
         }}
       >
         <Column
-          title={t("image")}
+          title={t("avatar")}
           dataIndex="imageUrl"
           key="imageUrl"
           render={(text, record) => (

@@ -95,11 +95,6 @@ const PositionManagement = () => {
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  // const filteredData = positions.filter((item) => {
-  //   if (filteredStatus === "All Positions") return true;
-  //   return item.status.toLowerCase() === filteredStatus.toLowerCase();
-  // });
-
   const filteredData = positions.filter((item) => {
     const matchesStatus = filteredStatus === "All Positions" || item.status.toLowerCase() === filteredStatus.toLowerCase();
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -112,9 +107,9 @@ const PositionManagement = () => {
   );
   
   const tabItems = [
-    { key: "All Positions", label: "All Positions" },
-    { key: "active", label: "Active" },
-    { key: "inactive", label: "Inactive" },
+    { key: "All Positions", label: t("AllPosition") },
+    { key: "active", label: t("active") },
+    { key: "inactive", label: t("inactive") },
   ];
 
   return (
@@ -151,25 +146,35 @@ const PositionManagement = () => {
             handleTableChange({ current: page, pageSize }),
         }}
       >
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Description" dataIndex="description" key="description" />
-        <Column title="Department" dataIndex="department" key="department" />
+        <Column title={t("name")} dataIndex="name" key="name" />
+        <Column title={t("Description")} dataIndex="description" key="description" />
+        <Column title={t("Department")} dataIndex="department" key="department" />
         <Column
-          title="Status"
+          title={t("Status")}
           dataIndex="status"
           key="status"
           render={(text) => {
+            // Dịch giá trị của text
+            const translatedText = t(text);
+
+            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
-              text === "active" ? "status-active" : "status-inactive";
+              translatedText === t("active")
+                ? "status-active"
+                : "status-inactive";
+
             return (
               <span className={className}>
-                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+                {translatedText
+                  ? translatedText.charAt(0).toUpperCase() +
+                    translatedText.slice(1)
+                  : ""}
               </span>
             );
           }}
         />
         <Column
-          title="Actions"
+          title={t("actions")}
           key="actions"
           render={(text, record) => (
             <Space>

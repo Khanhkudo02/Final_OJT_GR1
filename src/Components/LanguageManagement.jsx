@@ -1,10 +1,19 @@
-import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Input, message, Modal, Space, Table, Tabs } from 'antd';
-import React, { useEffect, useState } from 'react';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/LanguageManagement.scss";
-import { deleteLanguageById, fetchAllLanguages } from "../service/LanguageServices";
+import {
+  deleteLanguageById,
+  fetchAllLanguages,
+} from "../service/LanguageServices";
 import { useTranslation } from "react-i18next";
 
 const { Column } = Table;
@@ -19,7 +28,7 @@ const LanguageManagement = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [dataLanguageEdit, setDataLanguageEdit] = useState(null);
   const [filteredStatus, setFilteredStatus] = useState("All Languages");
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
   const loadLanguages = async () => {
@@ -55,24 +64,24 @@ const LanguageManagement = () => {
   };
 
   const handleDelete = (record) => {
-    if (record.status !== 'inactive') {
-      message.error('Only inactive languages can be deleted.');
+    if (record.status !== "inactive") {
+      message.error("Only inactive languages can be deleted.");
       return;
     }
 
     confirm({
-      title: 'Are you sure you want to delete this language?',
+      title: "Are you sure you want to delete this language?",
       onOk: async () => {
         try {
           await deleteLanguageById(record.key);
-          message.success('Language deleted successfully!');
+          message.success("Language deleted successfully!");
           loadLanguages();
         } catch (error) {
-          message.error('Failed to delete language.');
+          message.error("Failed to delete language.");
         }
       },
       onCancel() {
-        console.log('Cancel');
+        console.log("Cancel");
       },
     });
   };
@@ -88,32 +97,44 @@ const LanguageManagement = () => {
   };
 
   const filteredData = languages.filter((item) => {
-    const matchesStatus = filteredStatus === "All Languages" || item.status.toLowerCase() === filteredStatus.toLowerCase();
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filteredStatus === "All Languages" ||
+      item.status.toLowerCase() === filteredStatus.toLowerCase();
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
-  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   return (
     <div>
-      <Button className="btn" type="primary" style={{ marginBottom: 16 }} onClick={showAddPage} icon={<PlusOutlined />}>
-      </Button>
+      <Button
+        className="btn"
+        type="primary"
+        style={{ marginBottom: 16 }}
+        onClick={showAddPage}
+        icon={<PlusOutlined />}
+      ></Button>
       <Input
         placeholder={t("search")}
         value={searchTerm}
         onChange={handleSearchChange}
-        style={{ width: "250px"}}
+        style={{ width: "250px" }}
         prefix={<SearchOutlined />}
       />
       <Tabs
-        defaultActiveKey="All Languages"
+        defaultActiveKey={t("AllLanguages")}
         onChange={handleTabChange}
         centered
       >
-        <TabPane tab="All Languages" key="All Languages" />
-        <TabPane tab="Active" key="active" />
-        <TabPane tab="Inactive" key="inactive" />
+        <TabPane tab={t("AllLanguages")} key="All Languages" />
+        <TabPane tab={t("active")} key="active" />
+        <TabPane tab={t("inactive")} key="inactive" />
       </Tabs>
       <Table
         dataSource={paginatedData}
@@ -126,36 +147,54 @@ const LanguageManagement = () => {
             handleTableChange({ current: page, pageSize }),
         }}
       >
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Description" dataIndex="description" key="description" />
+        <Column title={t("name")} dataIndex="name" key="name" />
         <Column
-          title="Status"
+          title={t("Description")}
+          dataIndex="description"
+          key="description"
+        />
+        <Column
+          title={t("status")}
           dataIndex="status"
           key="status"
           render={(text) => {
+            // Dịch giá trị của text
+            const translatedText = t(text);
+
+            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
-              text === "active" ? "status-active" : "status-inactive";
+              translatedText === t("active")
+                ? "status-active"
+                : "status-inactive";
+
             return (
               <span className={className}>
-                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+                {translatedText
+                  ? translatedText.charAt(0).toUpperCase() +
+                    translatedText.slice(1)
+                  : ""}
               </span>
             );
           }}
         />
         <Column
-          title="Actions"
+          title={t("actions")}
           key="actions"
           render={(text, record) => (
             <Space>
               <Button
                 icon={<EyeOutlined />}
                 style={{ color: "green", borderColor: "green" }}
-                onClick={() => navigate(`/programing-language/view/${record.key}`)}
+                onClick={() =>
+                  navigate(`/programing-language/view/${record.key}`)
+                }
               />
               <Button
                 icon={<EditOutlined />}
                 style={{ color: "blue", borderColor: "blue" }}
-                onClick={() => navigate(`/programing-language/edit/${record.key}`)}
+                onClick={() =>
+                  navigate(`/programing-language/edit/${record.key}`)
+                }
               />
               <Button
                 icon={<DeleteOutlined />}

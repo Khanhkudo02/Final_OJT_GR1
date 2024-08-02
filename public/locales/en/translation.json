@@ -151,5 +151,14 @@
   "employeeImage": "Employee Image",
   "noSkills": "No skills",
   "AllEmployees": "All Employees",
-  "search": "Search....."
+  "search": "Search.....",
+  "avatar": "Avatar",
+  "AllLanguages": "All Languages",
+  "AddNewLanguage": "Add New Programming Language",
+  "EditLanguage": "Edit Programming Language",
+  "ExistingLanguage": "Existing Programming Languages",
+  "BacktoLanguageManagement": "Back to Language Management",
+  "ViewLanguage": "View Programming Language",
+  "null": "No description",
+  "AllPosition": "All Position"
 }
