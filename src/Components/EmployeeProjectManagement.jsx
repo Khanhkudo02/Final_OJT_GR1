@@ -10,8 +10,8 @@ import {
   Input,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import { fetchAllProjects } from "../service/Project";
-import { EyeOutlined, InboxOutlined, SearchOutlined } from "@ant-design/icons";
+import { fetchEmployeeProjects } from "../service/Project";
+import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import moment from "moment";
 import "../assets/style/Pages/ProjectManagement.scss";
 import "../assets/style/Global.scss";
@@ -24,7 +24,7 @@ const statusColors = {
   PENDING: "yellow",
 };
 
-const EmployeeProjectManagement = () => {
+const EmployeeProjectManagement = ({ employeeId }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredStatus, setFilteredStatus] = useState("All Projects");
   const [data, setData] = useState([]);
@@ -35,11 +35,13 @@ const EmployeeProjectManagement = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const projects = await fetchAllProjects();
-      setData(projects.reverse());
+      if (employeeId) {
+        const projects = await fetchEmployeeProjects(employeeId);
+        setData(projects.reverse());
+      }
     };
     fetchData();
-  }, []);
+  }, [employeeId]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -47,12 +49,12 @@ const EmployeeProjectManagement = () => {
 
   const handleTabChange = (key) => {
     setFilteredStatus(key);
-    setCurrentPage(1); // Reset to the first page when changing tabs
+    setCurrentPage(1);
   };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
 
   const filteredData = data.filter((item) => {
@@ -102,27 +104,31 @@ const EmployeeProjectManagement = () => {
       value = String(value);
     }
     if (!value) return "";
+
     const hasDollarSign = value.startsWith("$");
     const hasVND = value.endsWith("VND");
+
     let numericValue = value.replace(/[^\d]/g, "");
     numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
     if (hasDollarSign) {
       numericValue = `$${numericValue}`;
     }
     if (hasVND) {
       numericValue = `${numericValue}VND`;
     }
+
     return numericValue;
   };
 
   const columns = [
     {
-      title: "Project Name",
+      title: "Tên dự án",
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "Start Date",
+      title: "Ngày bắt đầu",
       dataIndex: "startDate",
       key: "startDate",
       render: (date) => {
@@ -130,11 +136,11 @@ const EmployeeProjectManagement = () => {
         const dateObj = moment(date);
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
-          : "Invalid Date";
+          : "Ngày không hợp lệ";
       },
     },
     {
-      title: "End Date",
+      title: "Ngày kết thúc",
       dataIndex: "endDate",
       key: "endDate",
       render: (date) => {
@@ -142,11 +148,11 @@ const EmployeeProjectManagement = () => {
         const dateObj = moment(date);
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
-          : "Invalid Date";
+          : "Ngày không hợp lệ";
       },
     },
     {
-      title: "Project Manager",
+      title: "Quản lý dự án",
       dataIndex: "projectManager",
       key: "projectManager",
       className: "text-align-start",
@@ -162,13 +168,13 @@ const EmployeeProjectManagement = () => {
       ),
     },
     {
-      title: "Budget",
+      title: "Ngân sách",
       dataIndex: "budget",
       key: "budget",
       render: formatBudget,
     },
     {
-      title: "Status",
+      title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       render: (status) => (
@@ -178,7 +184,7 @@ const EmployeeProjectManagement = () => {
       ),
     },
     {
-      title: "Actions",
+      title: "Hành động",
       key: "actions",
       render: (text, record) => (
         <Space size="middle">
@@ -193,22 +199,16 @@ const EmployeeProjectManagement = () => {
   ];
 
   const tabItems = [
-    { key: "All Projects", label: "All Projects" },
-    { key: "Ongoing", label: "Ongoing" },
-    { key: "Not Started", label: "Not Started" },
-    { key: "Completed", label: "Completed" },
-    { key: "Pending", label: "Pending" },
+    { key: "All Projects", label: "Tất cả dự án" },
+    { key: "Ongoing", label: "Đang diễn ra" },
+    { key: "Not Started", label: "Chưa bắt đầu" },
+    { key: "Completed", label: "Hoàn thành" },
+    { key: "Pending", label: "Đang chờ" },
   ];
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <div className="project-management-header">
-        <Button
-          type="default"
-          icon={<InboxOutlined />}
-          onClick={() => navigate("/archived-projects")}
-          style={{ marginLeft: "auto" }}
-        />
         <Input
           placeholder={t("search")}
           value={searchTerm}
@@ -223,7 +223,12 @@ const EmployeeProjectManagement = () => {
         items={tabItems}
         centered
       />
-      <Table columns={columns} dataSource={paginatedData} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={paginatedData}
+        pagination={false}
+        rowKey="key"
+      />
       <div style={{ marginTop: "16px", textAlign: "right" }}>
         <Pagination
           current={currentPage}
