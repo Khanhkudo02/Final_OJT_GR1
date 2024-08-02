@@ -22,7 +22,12 @@ const TechnologyManagement = () => {
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
-      setTechnologies(data);  // Assuming data is already an array
+      console.log("Fetched technologies:", data); // Debug log
+      const techArray = Object.keys(data).map((key) => ({
+        key,  // Add the key as the ID
+        ...data[key],  // Spread the data
+      }));
+      setTechnologies(techArray);
     } catch (error) {
       console.error("Failed to fetch technologies:", error);
     }

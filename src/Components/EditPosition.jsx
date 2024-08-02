@@ -56,7 +56,6 @@ const EditPosition = () => {
         description,
         department,
         status,
-        imageFile
       );
       toast.success("Position updated successfully!");
       navigate("/position-management");
