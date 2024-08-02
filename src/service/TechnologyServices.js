@@ -4,8 +4,31 @@ import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadUR
 import { database, storage } from "../firebaseConfig";
 
 
-export const postCreateTechnology = async (name, description, status, imageFile) => {
-  // function implementation
+export const postCreateTechnology = async (name, description, category, status, imageFile) => {
+  try {
+    const newTechnologyRef = push(ref(db, 'technologies'));
+
+    let imageUrl = null;
+    if (imageFile) {
+      // Upload the image to Firebase Storage
+      const imageRef = storageRef(storageInstance, `images/${newTechnologyRef.key}/${imageFile.name}`);
+      const snapshot = await uploadBytes(imageRef, imageFile);
+      imageUrl = await getDownloadURL(snapshot.ref);
+    }
+
+    await set(newTechnologyRef, {
+      name,
+      description,
+      category,
+      status,
+      imageUrl,
+    });
+
+    return newTechnologyRef.key;
+  } catch (error) {
+    console.error("Failed to create technology:", error);
+    throw error;
+  }
 };
 export const fetchTechnologyById = async (id) => {
   try {
@@ -23,19 +46,19 @@ export const fetchTechnologyById = async (id) => {
 
 export const fetchAllTechnology = async () => {
   try {
-    const techRef = ref(database, 'technologies');
-    const snapshot = await get(techRef);
+    const technologiesRef = ref(db, "technologies");
+    const snapshot = await get(technologiesRef);
     if (snapshot.exists()) {
       const data = snapshot.val();
       return Object.keys(data).map((key) => ({
-        id: key,
-        ...data[key],
+        key,  // Add the key as the ID
+        ...data[key],  // Spread the data
       }));
     } else {
-      return []; // Return an empty array if no data available
+      return [];
     }
   } catch (error) {
-    console.error("Error fetching technologies:", error);
+    console.error("Failed to fetch technologies:", error);
     throw error;
   }
 };
