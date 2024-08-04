@@ -56,7 +56,7 @@ const ProjectDetail = () => {
         setTechnologies(
           allTechnologies.map((tech) => ({
             label: tech.name,
-            value: tech.key,
+            value: tech.id,
           }))
         );
         setLanguages(

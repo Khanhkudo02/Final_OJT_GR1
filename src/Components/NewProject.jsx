@@ -109,7 +109,7 @@ const NewProject = () => {
         const data = await fetchAllTechnology();
         const techOptions = data.map((tech) => ({
           label: tech.name,
-          value: tech.key, // Use key as value for Option
+          value: tech.id, // Use key as value for Option
         }));
         setTechnologies(techOptions);
       } catch (err) {
