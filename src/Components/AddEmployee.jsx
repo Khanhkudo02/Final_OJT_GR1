@@ -10,7 +10,9 @@ import {
   fetchAllEmployees,
   postCreateEmployee,
   fetchAllPositions,
+  fetchAllSkills,
 } from "../service/EmployeeServices";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const { Option } = Select;
 const { Column } = Table;
@@ -24,6 +26,8 @@ const AddEmployee = () => {
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [positions, setPositions] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -36,32 +40,19 @@ const AddEmployee = () => {
     { value: "customer_service", label: t("departmentCustomerService") },
   ];
 
-  const skillOptions = [
-    { value: "active_listening", label: t("skillActiveListening") },
-    { value: "communication", label: t("skillCommunication") },
-    { value: "computer", label: t("skillComputer") },
-    { value: "customer_service", label: t("skillCustomerService") },
-    { value: "interpersonal", label: t("skillInterpersonal") },
-    { value: "leadership", label: t("skillLeadership") },
-    { value: "management", label: t("skillManagement") },
-    { value: "problem_solving", label: t("skillProblemSolving") },
-    { value: "time_management", label: t("skillTimeManagement") },
-    { value: "transferable", label: t("skillTransferable") },
-  ];
-
-  const loadEmployees = async () => {
-    try {
-      const data = await fetchAllEmployees();
-      const filteredData = data.filter(
-        (employee) => employee.role === "employee"
-      ); // Filter by role "employee"
-      setEmployees(filteredData);
-    } catch (error) {
-      console.error("Failed to fetch employees:", error);
-    }
-  };
-
   useEffect(() => {
+    const loadEmployees = async () => {
+      try {
+        const data = await fetchAllEmployees();
+        const filteredData = data.filter(
+          (employee) => employee.role === "employee"
+        ); // Filter by role "employee"
+        setEmployees(filteredData);
+      } catch (error) {
+        console.error("Failed to fetch employees:", error);
+      }
+    };
+
     loadEmployees();
 
     const fetchPositions = async () => {
@@ -73,8 +64,42 @@ const AddEmployee = () => {
       }
     };
 
+    const fetchSkills = async () => {
+      try {
+        const skillsData = await fetchAllSkills();
+        setSkills(skillsData.map((skill) => ({ value: skill.key, label: skill.label })));
+      } catch (error) {
+        console.error("Failed to fetch skills:", error);
+      }
+    };
+
     fetchPositions();
+    fetchSkills();
   }, []);
+
+  const uploadImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const storage = getStorage();
+      const storageRef = ref(storage, `employee/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        null,
+        (error) => {
+          reject(error);
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadURL);
+          } catch (error) {
+            reject(error);
+          }
+        }
+      );
+    });
+  };
 
   const handleAddEmployee = async (values) => {
     const {
@@ -90,7 +115,6 @@ const AddEmployee = () => {
       position,
     } = values;
 
-    // Kiểm tra email đã tồn tại chưa
     try {
       const emailExists = await checkEmailExists(email);
       if (emailExists) {
@@ -100,8 +124,12 @@ const AddEmployee = () => {
             errors: [t("emailAlreadyExists")],
           },
         ]);
-        return; // Dừng xử lý tiếp
+        return; // Stop processing
       }
+
+      setUploading(true);
+
+
       await postCreateEmployee(
         name,
         email,
@@ -116,11 +144,18 @@ const AddEmployee = () => {
         "employee",
         imageFiles[0]
       );
+
       localStorage.setItem("employeeAdded", "true");
       navigate("/employee-management");
       form.resetFields();
+      setImageFiles([]);
+      setImagePreviews([]);
+      loadEmployees();
+      toast.success(t("employeeAddedSuccessfully"));
     } catch (error) {
       toast.error(t("failedToAddEmployee"));
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -128,7 +163,6 @@ const AddEmployee = () => {
     const email = e.target.value;
     form.setFieldsValue({ email });
 
-    // Kiểm tra email khi người dùng nhập
     try {
       const emailExists = await checkEmailExists(email);
       if (emailExists) {
@@ -168,9 +202,7 @@ const AddEmployee = () => {
 
   const handlePhoneNumberChange = (e) => {
     const value = e.target.value;
-    // Remove all non-numeric characters
     const numericValue = value.replace(/\D/g, "");
-    // Limit to 10 digits
     if (numericValue.length <= 10) {
       form.setFieldsValue({ phoneNumber: numericValue });
     }
@@ -199,11 +231,6 @@ const AddEmployee = () => {
     } catch (error) {
       // Do nothing, Ant Design will automatically show error message
     }
-  };
-
-  const getSkillLabel = (value) => {
-    const skill = skillOptions.find((option) => option.value === value);
-    return skill ? skill.label : value;
   };
 
   return (
@@ -265,14 +292,14 @@ const AddEmployee = () => {
           name="phoneNumber"
           rules={[
             { required: true, message: t("pleaseEnterPhoneNumber") },
-            { len: 10, message: t("phoneNumberLength") },
+            { pattern: /^[0-9]{10}$/, message: t("invalidPhoneNumber") },
           ]}
         >
           <Input
             type="text"
             maxLength={10}
-            onChange={handlePhoneNumberChange}
             onBlur={() => handleFieldBlur("phoneNumber")}
+            onChange={handlePhoneNumberChange}
           />
         </Form.Item>
         <Form.Item
@@ -280,30 +307,16 @@ const AddEmployee = () => {
           name="skills"
           rules={[{ required: true, message: t("pleaseSelectSkills") }]}
         >
-          <Select
-            mode="multiple"
-            placeholder={t("selectSkills")}
-            style={{ width: "100%" }}
-            onBlur={() => handleFieldBlur("skills")}
-          >
-            {skillOptions.map((skill) => (
-              <Option key={skill.value} value={skill.value}>
-                {skill.label}
-              </Option>
-            ))}
-          </Select>
+          <Select mode="multiple" options={skills} onBlur={() => handleFieldBlur("skills")} />
         </Form.Item>
         <Form.Item
           label={t("status")}
           name="status"
           rules={[{ required: true, message: t("pleaseSelectStatus") }]}
         >
-          <Select
-            placeholder={t("selectStatus")}
-            onBlur={() => handleFieldBlur("status")}
-          >
-            <Option value="active">{t("active")}</Option>
-            <Option value="inactive">{t("inactive")}</Option>
+          <Select onBlur={() => handleFieldBlur("status")}>
+            <Option value="active">{t("statusActive")}</Option>
+            <Option value="inactive">{t("statusInactive")}</Option>
           </Select>
         </Form.Item>
         <Form.Item
@@ -311,29 +324,14 @@ const AddEmployee = () => {
           name="department"
           rules={[{ required: true, message: t("pleaseSelectDepartment") }]}
         >
-          <Select
-            placeholder={t("selectDepartment")}
-            style={{ width: "100%" }}
-            onBlur={() => handleFieldBlur("department")}
-          >
-            {departmentOptions.map((dept) => (
-              <Option key={dept.value} value={dept.value}>
-                {dept.label}
-              </Option>
-            ))}
-          </Select>
+          <Select options={departmentOptions} onBlur={() => handleFieldBlur("department")} />
         </Form.Item>
-        <Form.Item label="Position" name="position">
-          <Select
-            placeholder="Select position"
-            onBlur={() => handleFieldBlur("position")}
-          >
-            {positions.map((pos) => (
-              <Option key={pos.value} value={pos.value}>
-                {pos.label}
-              </Option>
-            ))}
-          </Select>
+        <Form.Item
+          label={t("position")}
+          name="position"
+          rules={[{ required: true, message: t("pleaseSelectPosition") }]}
+        >
+          <Select options={positions} onBlur={() => handleFieldBlur("position")} />
         </Form.Item>
         <Form.Item label={t("images")}>
           <Upload
@@ -360,11 +358,60 @@ const AddEmployee = () => {
           </div>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={uploading}>
             {t("submit")}
           </Button>
         </Form.Item>
       </Form>
+      <Table dataSource={employees} rowKey="id">
+        <Column title={t("name")} dataIndex="name" key="name" />
+        <Column title={t("email")} dataIndex="email" key="email" />
+        <Column title={t("phoneNumber")} dataIndex="phoneNumber" key="phoneNumber" />
+        <Column
+          title={t("actions")}
+          key="actions"
+          render={(text, record) => (
+            <Space>
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() => handleViewEmployee(record)}
+              >
+                {t("view")}
+              </Button>
+              <Button
+                icon={<DeleteOutlined />}
+                onClick={() => handleDeleteEmployee(record.id)}
+              >
+                {t("delete")}
+              </Button>
+            </Space>
+          )}
+        />
+      </Table>
+
+      {selectedEmployee && (
+        <Modal
+          title={t("employeeDetails")}
+          visible={viewModalVisible}
+          onCancel={() => setViewModalVisible(false)}
+          footer={null}
+        >
+          <p>{t("name")}: {selectedEmployee.name}</p>
+          <p>{t("email")}: {selectedEmployee.email}</p>
+          <p>{t("phoneNumber")}: {selectedEmployee.phoneNumber}</p>
+          {/* Add other details as necessary */}
+          <div>
+            {selectedEmployee.images && selectedEmployee.images.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`employee-${index}`}
+                style={{ width: 100, height: 100, margin: 5 }}
+              />
+            ))}
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

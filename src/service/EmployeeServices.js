@@ -98,6 +98,20 @@ const fetchAllPositions = async () => {
     }
 };
 
+const fetchAllSkills = async () => {
+    try {
+        const skillsRef = ref(db, "skills");
+        const snapshot = await get(skillsRef);
+        const data = snapshot.val();
+        return data
+            ? Object.entries(data).map(([key, value]) => ({ key, label: value.name }))
+            : [];
+    } catch (error) {
+        console.error("Failed to fetch skills:", error);
+        throw error;
+    }
+};
+
 
 // Fetch all employees
 const fetchAllEmployees = async () => {
@@ -238,5 +252,6 @@ export {
     fetchEmployeeById,
     postCreateEmployee,
     putUpdateEmployee,
-    fetchAllPositions
+    fetchAllPositions,
+    fetchAllSkills
 };

@@ -18,6 +18,7 @@ import "../assets/style/Pages/EmployeeManagement.scss";
 import {
   deleteEmployeeById,
   fetchAllEmployees,
+  fetchAllSkills
 } from "../service/EmployeeServices";
 
 const { Column } = Table;
@@ -34,6 +35,7 @@ const EmployeeManagement = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [skillsList, setSkillsList] = useState([]); // or pass as a prop
 
   const formatSkill = (skill) =>
     skill
@@ -49,6 +51,20 @@ const EmployeeManagement = () => {
         .replace(/\b\w/g, (char) => char.toUpperCase());
     }
     return department;
+  };
+
+  const loadSkills = async () => {
+    try {
+      const skillsData = await fetchAllSkills();
+      setSkillsList(skillsData.map((skill) => ({ key: skill.key, name: skill.label })));
+    } catch (error) {
+      message.error("Failed to fetch skills");
+    }
+  };
+
+  const getSkillNameById = (skillId, skills) => {
+    const skill = skills.find((sk) => sk.key === skillId);
+    return skill ? skill.name : "Unknown Skill";
   };
 
   const loadEmployees = async () => {
@@ -75,6 +91,7 @@ const EmployeeManagement = () => {
   };
 
   useEffect(() => {
+    loadSkills();
     loadEmployees();
 
     const employeeAdded = localStorage.getItem("employeeAdded");
@@ -446,14 +463,10 @@ const EmployeeManagement = () => {
           render={(text) => {
             if (Array.isArray(text)) {
               return text
-                .map((skill) =>
-                  t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
-                    defaultValue: skill.replace(/_/g, " "),
-                  })
-                )
+                .map((skillId) => getSkillNameById(skillId, skillsList))
                 .join(", ");
             }
-            return text;
+            return getSkillNameById(text, skillsList);
           }}
         />
         <Column
@@ -461,10 +474,8 @@ const EmployeeManagement = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
-            // Dịch giá trị của text
             const translatedText = t(text);
 
-            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
               translatedText === t("active")
                 ? "status-active"
@@ -474,7 +485,7 @@ const EmployeeManagement = () => {
               <span className={className}>
                 {translatedText
                   ? translatedText.charAt(0).toUpperCase() +
-                    translatedText.slice(1)
+                  translatedText.slice(1)
                   : ""}
               </span>
             );

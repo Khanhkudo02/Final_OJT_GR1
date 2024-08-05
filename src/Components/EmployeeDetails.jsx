@@ -2,7 +2,7 @@ import { Button, Spin, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchEmployeeById, fetchAllPositions } from "../service/EmployeeServices";
+import { fetchEmployeeById, fetchAllPositions, fetchAllSkills } from "../service/EmployeeServices";
 
 const EmployeeDetails = () => {
   const { id } = useParams();
