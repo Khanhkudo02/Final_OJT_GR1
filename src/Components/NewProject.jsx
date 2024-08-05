@@ -12,7 +12,7 @@ import emailjs from "emailjs-com";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { fetchAllEmployees } from "../service/EmployeeServices";
+import { fetchAllEmployees, updateEmployeeStatus } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
@@ -49,6 +49,10 @@ const NewProject = () => {
       await postCreateProject(projectData, imageFile);
       // Gửi email thông báo cho các thành viên mới
       const teamMembers = values.teamMembers || [];
+      await Promise.all(
+        teamMembers.map((memberId) => updateEmployeeStatus(memberId, "involved"))
+      );
+  
       const memberEmails = employees
         .filter((emp) => teamMembers.includes(emp.value))
         .map((emp) => emp.email);

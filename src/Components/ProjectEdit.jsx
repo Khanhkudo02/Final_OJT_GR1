@@ -14,7 +14,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchAllEmployees } from "../service/EmployeeServices";
+import { fetchAllEmployees, updateEmployeeStatusToActive, updateEmployeeStatusToInvolved } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
@@ -258,6 +258,9 @@ const ProjectEdit = () => {
             const memberData = employees.find((emp) => emp.value === member);
             if (memberData) {
               sendNotificationEmail(memberData.email, values.name, "added");
+
+              // Cập nhật trạng thái của nhân viên mới thành "involved"
+            await updateEmployeeStatusToInvolved(member);
             }
           }
 
@@ -266,8 +269,17 @@ const ProjectEdit = () => {
             const memberData = employees.find((emp) => emp.value === member);
             if (memberData) {
               sendNotificationEmail(memberData.email, values.name, "removed");
+            // Cập nhật trạng thái của nhân viên thành "active" nếu không còn thuộc dự án nào
+            const allProjects = await fetchAllProjects();
+            const isInAnyProject = allProjects.some((project) =>
+              project.teamMembers.includes(member)
+            );
+
+            if (!isInAnyProject) {
+              await updateEmployeeStatusToActive(member);
             }
           }
+        }
 
           navigate(`/project/${id}`);
         } catch (error) {
