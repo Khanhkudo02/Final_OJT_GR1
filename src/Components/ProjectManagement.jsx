@@ -216,7 +216,8 @@ const ProjectManagement = () => {
       title: t("actions"),
       key: "actions",
       render: (text, record) => (
-        <Space size="middle">
+        <div className="actions-container">
+          <Space size="middle">
           <Button
             icon={<EyeOutlined />}
             style={{ color: "green", borderColor: "green" }}
@@ -235,6 +236,7 @@ const ProjectManagement = () => {
             />
           )}
         </Space>
+        </div>
       ),
     },
   ];
