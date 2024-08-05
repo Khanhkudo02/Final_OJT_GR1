@@ -68,7 +68,9 @@ const EmployeeManagement = () => {
         setFilteredEmployees(
           filteredData.filter((e) => e.status === "inactive")
         );
-      } else {
+      } else if (activeTab === "involved") {
+        setFilteredEmployees(filteredData.filter((e) => e.status === "involved"));
+      }else {
         setFilteredEmployees(filteredData); // Tab "All Employees"
       }
       setEmployees(filteredData);
@@ -104,6 +106,8 @@ const EmployeeManagement = () => {
       setFilteredEmployees(searchData.filter((e) => e.status === "active"));
     } else if (activeTab === "inactive") {
       setFilteredEmployees(searchData.filter((e) => e.status === "inactive"));
+    }else if (activeTab === "involved") {
+      setFilteredEmployees(searchData.filter((e) => e.status === "involved"));
     } else {
       setFilteredEmployees(searchData); // Tab "All Employees"
     }
@@ -410,6 +414,9 @@ const EmployeeManagement = () => {
         </TabPane>
         <TabPane tab={t("inactive")} key="inactive">
           {/* Inactive Employees tab content */}
+        </TabPane>
+        <TabPane tab={t("involved")} key="involved">
+         {/* Involved Employees tab content */}
         </TabPane>
       </Tabs>
 

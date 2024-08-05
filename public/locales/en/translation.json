@@ -243,5 +243,7 @@
   "Add New Position": "Add New Position",
   "Add New Project": "Add New Project",
   "Add New Employee": "Add New Employee",
-  "Add New Administrator": "Add New Administrator"
+  "Add New Administrator": "Add New Administrator",
+  "searchbyname":"Search by Name",
+  "searchbynameproject":"Search by Project Name"
 }

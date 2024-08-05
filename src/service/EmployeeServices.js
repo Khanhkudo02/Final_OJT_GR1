@@ -114,6 +114,37 @@ const fetchAllEmployees = async () => {
     }
 };
 
+const updateEmployeeStatus = async (employeeId, status) => {
+    try {
+        // Cập nhật trạng thái của nhân viên trong cơ sở dữ liệu
+        await update(ref(db, `users/${employeeId}`), { status });
+    } catch (error) {
+        console.error("Failed to update employee status:", error);
+        throw error;
+    }
+};
+
+// Cập nhật trạng thái của nhân viên thành "active"
+const updateEmployeeStatusToActive = async (employeeId) => {
+    try {
+      await update(ref(db, `users/${employeeId}`), { status: "active" });
+    } catch (error) {
+      console.error("Failed to update employee status to active:", error);
+      throw error;
+    }
+  };
+
+  // Cập nhật trạng thái của nhân viên thành "involved"
+const updateEmployeeStatusToInvolved = async (employeeId) => {
+    try {
+      await update(ref(db, `users/${employeeId}`), { status: "involved" });
+    } catch (error) {
+      console.error("Failed to update employee status to involved:", error);
+      throw error;
+    }
+  };
+  
+  
 // Update existing employee
 const putUpdateEmployee = async (
     id,
@@ -239,5 +270,8 @@ export {
     fetchEmployeeById,
     postCreateEmployee,
     putUpdateEmployee,
-    fetchAllPositions
+    fetchAllPositions,
+    updateEmployeeStatus,
+    updateEmployeeStatusToActive,
+    updateEmployeeStatusToInvolved
 };

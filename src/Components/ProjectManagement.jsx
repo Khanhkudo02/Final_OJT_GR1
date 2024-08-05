@@ -260,13 +260,15 @@ const ProjectManagement = () => {
           {t("Add New Project")} 
         </Button>
         <Button
-          type="default"
+          type="primary"
           icon={<InboxOutlined />}
           onClick={() => navigate("/archived-projects")}
           style={{ marginLeft: "auto" }}
-        />
+        >
+          {t("Archived Projects")}
+        </Button>
         <Input
-          placeholder={t("search")}
+          placeholder={t("searchbynameproject")}
           value={searchTerm}
           onChange={handleSearchChange}
           style={{ width: "250px", marginBottom: 16 }}
