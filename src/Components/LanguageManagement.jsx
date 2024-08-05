@@ -111,6 +111,11 @@ const LanguageManagement = () => {
     currentPage * pageSize
   );
 
+  const formatDescription = (description) => {
+    const translatedDescription = t(description);
+    return translatedDescription ? translatedDescription.charAt(0).toUpperCase() + translatedDescription.slice(1) : null;
+  };
+
   return (
     <div>
       <Button
@@ -119,7 +124,9 @@ const LanguageManagement = () => {
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
         icon={<PlusOutlined />}
-      ></Button>
+      >
+        {t("Add New Programming Language")}
+      </Button>
       <Input
         placeholder={t("search")}
         value={searchTerm}
@@ -152,7 +159,8 @@ const LanguageManagement = () => {
           title={t("Description")}
           dataIndex="description"
           key="description"
-        />
+          render={(text) => formatDescription(text)}
+        /> 
         <Column
           title={t("status")}
           dataIndex="status"

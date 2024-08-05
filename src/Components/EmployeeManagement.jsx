@@ -376,7 +376,9 @@ const EmployeeManagement = () => {
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
         icon={<PlusOutlined />}
-      ></Button>
+      >
+        {t("Add New Employee")}
+      </Button>
       <Button
         className="btn"
         type="primary"
