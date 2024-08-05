@@ -77,7 +77,7 @@ function ChangePassword() {
   return (
     <div className="change-password-container">
       <div className="change-password-form">
-        <h1>{t("Change Password")}</h1>
+        <h1>{t("changePassword")}</h1>
         <Form form={form} onFinish={handleChangePassword} layout="vertical">
           <Form.Item
             label={t("Old Password")}
@@ -110,7 +110,7 @@ function ChangePassword() {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              {t("Change Password")}
+              {t("changePassword")}
             </Button>
           </Form.Item>
         </Form>

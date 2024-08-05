@@ -41,6 +41,10 @@ body {
   margin-bottom: 10px;
 }
 
+.title {
+  font-weight: 700;
+}
+
 .form-group {
   margin-bottom: 10px;
 }
@@ -69,6 +73,11 @@ body {
 
 .status-inactive {
   color: red;
+  font-weight: 700;
+}
+
+.status-involved {
+  color: blue;
   font-weight: 700;
 }
 

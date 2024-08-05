@@ -81,6 +81,10 @@ const EmployeeManagement = () => {
         setFilteredEmployees(
           filteredData.filter((e) => e.status === "inactive")
         );
+      } else if (activeTab === "involved") {
+        setFilteredEmployees(
+          filteredData.filter((e) => e.status === "involved")
+        );
       } else {
         setFilteredEmployees(filteredData); // Tab "All Employees"
       }
@@ -108,9 +112,10 @@ const EmployeeManagement = () => {
 
   useEffect(() => {
     // Filter employees based on search term
-    const searchData = employees.filter((employee) =>
-      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const searchData = employees.filter(
+      (employee) =>
+        employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Apply tab filter
@@ -118,6 +123,8 @@ const EmployeeManagement = () => {
       setFilteredEmployees(searchData.filter((e) => e.status === "active"));
     } else if (activeTab === "inactive") {
       setFilteredEmployees(searchData.filter((e) => e.status === "inactive"));
+    } else if (activeTab === "involved") {
+      setFilteredEmployees(searchData.filter((e) => e.status === "involved"));
     } else {
       setFilteredEmployees(searchData); // Tab "All Employees"
     }
@@ -393,7 +400,9 @@ const EmployeeManagement = () => {
         style={{ marginBottom: 16 }}
         onClick={showAddPage}
         icon={<PlusOutlined />}
-      ></Button>
+      >
+        {t("Add New Employee")}
+      </Button>
       <Button
         className="btn"
         type="primary"
@@ -421,6 +430,9 @@ const EmployeeManagement = () => {
         </TabPane>
         <TabPane tab={t("inactive")} key="inactive">
           {/* Inactive Employees tab content */}
+        </TabPane>
+        <TabPane tab={t("involved")} key="involved">
+          {/* Involved Employees tab content */}
         </TabPane>
       </Tabs>
 
@@ -479,7 +491,11 @@ const EmployeeManagement = () => {
             const className =
               translatedText === t("active")
                 ? "status-active"
-                : "status-inactive";
+                : translatedText === t("inactive")
+                  ? "status-inactive"
+                  : translatedText === t("involved")
+                    ? "status-involved"
+                    : "";
 
             return (
               <span className={className}>

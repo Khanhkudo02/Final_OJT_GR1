@@ -26,12 +26,13 @@ const TechnologyManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
+  // Load technologies from the server
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
       setTechnologies(data);
     } catch (error) {
-      console.error("Failed to fetch technologies:", error);
+      console.error(t("Failed to fetch technologies:"), error);
     }
   };
 
@@ -39,30 +40,33 @@ const TechnologyManagement = () => {
     loadTechnologies();
   }, []);
 
+  // Handle table pagination changes
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);
     setPageSize(pagination.pageSize);
   };
 
+  // Show add technology page
   const showAddPage = () => {
     navigate("/technology-management/add");
   };
 
+  // Handle technology deletion
   const handleDelete = (record) => {
     if (record.status.toLowerCase() !== "inactive") {
-      message.error("Only inactive technologies can be deleted.");
+      message.error(t("Only inactive technologies can be deleted."));
       return;
     }
 
     confirm({
-      title: "Are you sure you want to delete this technology?",
+      title: t("Are you sure you want to delete this technology?"),
       onOk: async () => {
         try {
           await deleteTechnology(record.id);
-          message.success("Technology deleted successfully!");
+          message.success(t("Technology deleted successfully!"));
           loadTechnologies(); // Reload technologies after deletion
         } catch (error) {
-          message.error("Failed to delete technology.");
+          message.error(t("Failed to delete technology."));
         }
       },
       onCancel() {
@@ -71,16 +75,19 @@ const TechnologyManagement = () => {
     });
   };
 
+  // Handle tab change
   const handleTabChange = (key) => {
     setFilteredStatus(key);
     setCurrentPage(1); // Reset to first page when changing tabs
   };
 
+  // Handle search input change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // Reset to first page when searching
   };
 
+  // Filter and paginate data
   const filteredData = technologies.filter((item) => {
     const matchesStatus =
       filteredStatus === "All Technology" ||
@@ -96,11 +103,17 @@ const TechnologyManagement = () => {
     currentPage * pageSize
   );
 
+  // Tab items for filtering
   const tabItems = [
-    { key: "All Technology", label: "All Technology" },
-    { key: "active", label: "Active" },
-    { key: "inactive", label: "Inactive" },
+    { key: "All Technology", label: t("All Technologies") },
+    { key: "active", label: t("Active") },
+    { key: "inactive", label: t("Inactive") },
   ];
+
+  const formatDescription = (description) => {
+    const translatedDescription = t(description);
+    return translatedDescription ? translatedDescription.charAt(0).toUpperCase() + translatedDescription.slice(1) : null;
+  };
 
   return (
     <div>
@@ -111,10 +124,10 @@ const TechnologyManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       >
-        Add Technology
+        {t("Add New Technology")}
       </Button>
       <Input
-        placeholder={t("search")}
+        placeholder={t("searchbyname")}
         value={searchTerm}
         onChange={handleSearchChange}
         style={{ width: "250px", marginBottom: 16 }}
@@ -138,7 +151,7 @@ const TechnologyManagement = () => {
         }}
       >
         <Column
-          title="Image"
+          title={t("Image")}
           dataIndex="imageUrl"
           key="imageUrl"
           render={(imageUrl) =>
@@ -157,24 +170,39 @@ const TechnologyManagement = () => {
             )
           }
         />
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Description" dataIndex="description" key="description" />
+        <Column title={t("name")} dataIndex="name" key="name" />
         <Column
-          title="Status"
+          title={t("Description")}
+          dataIndex="description"
+          key="description"
+          render={(text) => formatDescription(text)}
+        /> 
+        <Column
+          title={t("Status")}
           dataIndex="status"
           key="status"
           render={(text) => {
+            // Dịch giá trị của text
+            const translatedText = t(text);
+
+            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
-              text === "active" ? "status-active" : "status-inactive";
+              translatedText === t("active")
+                ? "status-active"
+                : "status-inactive";
+
             return (
               <span className={className}>
-                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+                {translatedText
+                  ? translatedText.charAt(0).toUpperCase() +
+                    translatedText.slice(1)
+                  : ""}
               </span>
             );
           }}
         />
         <Column
-          title="Actions"
+          title={t("Actions")}
           key="actions"
           render={(text, record) => (
             <Space>

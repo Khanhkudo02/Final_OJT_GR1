@@ -107,7 +107,9 @@ const EmployeeDetails = () => {
               className={
                 employee.status === "active"
                   ? "status-active"
-                  : "status-inactive"
+                  : employee.status === "involved"
+                    ? "status-involved"
+                    : "status-inactive"
               }
             >
               {employee.status

@@ -113,6 +113,11 @@ const PositionManagement = () => {
     { key: "inactive", label: t("inactive") },
   ];
 
+  const formatDescription = (description) => {
+    const translatedDescription = t(description);
+    return translatedDescription ? translatedDescription.charAt(0).toUpperCase() + translatedDescription.slice(1) : null;
+  };
+
   return (
     <div>
       <Button
@@ -122,6 +127,7 @@ const PositionManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       >
+        {t("Add New Position")}
       </Button>
       <Input
         placeholder={t("search")}
@@ -148,7 +154,12 @@ const PositionManagement = () => {
         }}
       >
         <Column title={t("name")} dataIndex="name" key="name" />
-        <Column title={t("Description")} dataIndex="description" key="description" />
+        <Column
+          title={t("Description")}
+          dataIndex="description"
+          key="description"
+          render={(text) => formatDescription(text)}
+        /> 
         <Column title={t("Department")} dataIndex="department" key="department" />
         <Column
           title={t("Status")}

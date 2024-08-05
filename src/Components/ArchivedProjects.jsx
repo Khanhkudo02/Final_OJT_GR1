@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Table, Space, Button, Pagination, message, Modal } from "antd";
+import { Table, Space, Button, Pagination, message, Modal, Input } from "antd";
 import { useNavigate } from "react-router-dom"; 
 import { fetchArchivedProjects, deleteProjectPermanently, restoreProject } from "../service/Project";
-import { DeleteOutlined, RollbackOutlined, ArrowLeftOutlined } from "@ant-design/icons";
-
+import { DeleteOutlined, RollbackOutlined, ArrowLeftOutlined, SearchOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import "../assets/style/Global.scss";
 
 const ArchivedProjects = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredStatus, setFilteredStatus] = useState("");
   const [data, setData] = useState([]);
   const pageSize = 10;
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +53,19 @@ const ArchivedProjects = () => {
     });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const filteredData = data.filter((item) => {
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.projectManager &&
+        item.projectManager.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesSearch;
+  });
+
   const handleRestore = (key) => {
     Modal.confirm({
       title: 'Are you sure you want to restore this project?',
@@ -68,12 +84,12 @@ const ArchivedProjects = () => {
 
   const columns = [
     {
-      title: "Project Name",
+      title: t("ProjectName"),
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "Actions",
+      title: t("Actions"),
       key: "actions",
       render: (text, record) => (
         <Space size="middle">
@@ -94,16 +110,28 @@ const ArchivedProjects = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button 
+      <Button
+        className="btn-length"
         type="default" 
         icon={<ArrowLeftOutlined />} 
         onClick={() => navigate("/project-management")}
         style={{ marginBottom: "16px" }}
       >
+        {t("Back")}
       </Button>
+      <Input
+        placeholder={t("search")}
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ width: "250px", marginBottom: 16 }}
+        prefix={<SearchOutlined />}
+      />
       <Table 
         columns={columns} 
-        dataSource={paginatedData} 
+        dataSource={filteredData.slice(
+          (currentPage - 1) * pageSize,
+          currentPage * pageSize
+        )}
         pagination={false} 
       />
       <div style={{ marginTop: "16px", textAlign: "right" }}>

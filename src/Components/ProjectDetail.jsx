@@ -138,18 +138,6 @@ const ProjectDetail = () => {
     employees
   );
 
-  const formatCategory = (category) =>
-    category
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-
-  const formattedCategories = Array.isArray(project.category)
-    ? project.category.map(formatCategory).join(", ")
-    : project.category
-    ? formatCategory(project.category)
-    : "No categories";
-
   const handleBack = () => {
     const userRole = JSON.parse(localStorage.getItem("user"))?.role;
     const redirectPath =
@@ -185,13 +173,13 @@ const ProjectDetail = () => {
         <strong>{t("Description")}:</strong> {project.description}
       </p>
       <p>
-        <strong>{t("Client")}:</strong> {project.clientName}
+        <strong>{t("ClientName")}:</strong> {project.clientName}
       </p>
       <p>
         <strong>{t("ProjectManager")}:</strong> {project.projectManager}
       </p>
       <p>
-        <strong>{t("Email")}:</strong> {project.email}
+        <strong>{t("ClientEmail")}:</strong> {project.clientEmail}
       </p>
       <p>
         <strong>{t("phoneNumber")}:</strong> {project.phoneNumber}
@@ -207,9 +195,6 @@ const ProjectDetail = () => {
       </p>
       <p>
         <strong>{t("Priority")}:</strong> {project.priority}
-      </p>
-      <p>
-        <strong>{t("Category")}:</strong> {formattedCategories}
       </p>
       <p>
         <strong>{t("StartDate")}:</strong> {formatDate(project.startDate)}

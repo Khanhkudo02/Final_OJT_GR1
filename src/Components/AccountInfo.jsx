@@ -36,28 +36,38 @@ function AccountInfo() {
     return <p>{t("loading")}</p>;
   }
 
+  // Hàm để viết hoa chữ cái đầu tiên của mỗi từ
+  const capitalizeWords = (text) => {
+    if (typeof text !== 'string') return text; // Kiểm tra loại dữ liệu
+    return text
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   return (
     <div className="account-info-container">
       <Card title={t("userProfile")} className="account-info-card">
         <Descriptions bordered column={1}>
           {userData.email && (
             <Descriptions.Item label={t("email")}>
-              {userData.email}
+              {capitalizeWords(userData.email)}
             </Descriptions.Item>
           )}
           {userData.name && (
             <Descriptions.Item label={t("name")}>
-              {userData.name}
+              {capitalizeWords(userData.name)}
             </Descriptions.Item>
           )}
           {userData.role && (
             <Descriptions.Item label={t("role")}>
-              {userData.role}
+              {capitalizeWords(t(userData.role))}
             </Descriptions.Item>
           )}
           {userData.status && (
             <Descriptions.Item label={t("status")}>
-              {userData.status}
+              {capitalizeWords(t(userData.status))}
             </Descriptions.Item>
           )}
           {userData.createdAt && (
@@ -72,22 +82,24 @@ function AccountInfo() {
           )}
           {userData.address && (
             <Descriptions.Item label={t("address")}>
-              {userData.address}
+              {capitalizeWords(userData.address)}
             </Descriptions.Item>
           )}
           {userData.phoneNumber && (
             <Descriptions.Item label={t("phoneNumber")}>
-              {userData.phoneNumber}
+              {capitalizeWords(userData.phoneNumber)}
             </Descriptions.Item>
           )}
           {userData.skills && userData.skills.length > 0 && (
             <Descriptions.Item label={t("skills")}>
-              {userData.skills.join(", ")}
+              {userData.skills.map(skill => capitalizeWords(t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
+                defaultValue: skill.replace(/_/g, " "),
+              }))).join(", ")}
             </Descriptions.Item>
           )}
           {userData.department && (
             <Descriptions.Item label={t("department")}>
-              {userData.department}
+              {capitalizeWords(t(userData.department))}
             </Descriptions.Item>
           )}
         </Descriptions>
