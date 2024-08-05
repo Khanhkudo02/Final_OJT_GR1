@@ -128,7 +128,7 @@ const LanguageManagement = () => {
         {t("Add New Programming Language")}
       </Button>
       <Input
-        placeholder={t("search")}
+        placeholder={t("searchbyname")}
         value={searchTerm}
         onChange={handleSearchChange}
         style={{ width: "250px" }}
