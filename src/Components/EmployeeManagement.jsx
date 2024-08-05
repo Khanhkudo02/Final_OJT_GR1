@@ -19,6 +19,7 @@ import {
   deleteEmployeeById,
   fetchAllEmployees,
 } from "../service/EmployeeServices";
+import { get, getDatabase, ref } from "firebase/database";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -34,6 +35,8 @@ const EmployeeManagement = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [userData, setUserData] = useState(null);
+  const [data, setData] = useState([]);
 
   const formatSkill = (skill) =>
     skill
@@ -367,7 +370,7 @@ const EmployeeManagement = () => {
       console.error("Error exporting to Word:", error);
     }
   };
-
+  
   return (
     <div>
       <Button
