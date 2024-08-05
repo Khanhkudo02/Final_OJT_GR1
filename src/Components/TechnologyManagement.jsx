@@ -114,7 +114,7 @@ const TechnologyManagement = () => {
         Add Technology
       </Button>
       <Input
-        placeholder={t("search")}
+        placeholder={t("searchbyname")}
         value={searchTerm}
         onChange={handleSearchChange}
         style={{ width: "250px", marginBottom: 16 }}

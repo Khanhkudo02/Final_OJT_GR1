@@ -194,5 +194,7 @@
   "EditProject": "Edit Project",
   "ProjectDetail": "Project Detail",
   "Clients": "Client",
-  "Back": "Back"
+  "Back": "Back",
+
+  "searchbyname": "Search by Name"
 }

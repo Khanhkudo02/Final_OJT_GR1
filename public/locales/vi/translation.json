@@ -194,5 +194,7 @@
   "EditProject": "Chỉnh sửa dự án",
   "ProjectDetail": "Chi tiết dự án",
   "Clients": "Khách",
-  "Back": "Quay về"
+  "Back": "Quay về",
+
+  "searchbyname": "Tìm kiếm bằng tên"
 }
