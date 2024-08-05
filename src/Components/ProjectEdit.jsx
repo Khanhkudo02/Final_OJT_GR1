@@ -102,7 +102,7 @@ const ProjectEdit = () => {
         const data = await fetchAllLanguages();
         const languageOptions = data.map((lang) => ({
           label: lang.name,
-          value: lang.name, // Sử dụng name làm giá trị cho Option
+          value: lang.key, // Use key as value for Option
         }));
         setLanguages(languageOptions);
       } catch (err) {
@@ -125,7 +125,7 @@ const ProjectEdit = () => {
           .filter((emp) => emp.role === "employee")
           .map((emp) => ({
             label: emp.name,
-            value: emp.name, // Sử dụng name làm giá trị cho Option
+            value: emp.key, // Use key as value for Option
             email: emp.email,
           }));
         setEmployees(employeeOptions);

@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Tag,
-  Space,
-  Button,
-  Avatar,
-  Pagination,
-  Tabs,
-  Input,
-} from "antd";
-import { useNavigate } from "react-router-dom";
-import { fetchEmployeeProjects } from "../service/Project"; // Đảm bảo import đúng cách
 import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  Avatar,
+  Button,
+  Input,
+  Pagination,
+  Space,
+  Table,
+  Tabs,
+  Tag,
+} from "antd";
+import { onValue, ref } from "firebase/database"; // Import ref và onValue từ Firebase Database
 import moment from "moment";
-import "../assets/style/Pages/ProjectManagement.scss";
-import "../assets/style/Global.scss";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import "../assets/style/Global.scss";
+import "../assets/style/Pages/ProjectManagement.scss";
+import { database } from "../firebaseConfig"; // Import cấu hình Firebase
 
 const statusColors = {
   COMPLETED: "green",
@@ -33,13 +34,30 @@ const EmployeeProjectManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
+  // Lấy userId của employee đăng nhập từ localStorage
+  const userId = localStorage.getItem("userId");
+
   useEffect(() => {
     const fetchData = async () => {
-      const projects = await fetchEmployeeProjects(); // Gọi API để lấy dự án của nhân viên
-      setData(projects.reverse());
+      const projectsRef = ref(database, "projects");
+      onValue(projectsRef, (snapshot) => {
+        const projectsData = snapshot.val();
+        const projects = [];
+        for (const key in projectsData) {
+          projects.push({ key, ...projectsData[key] });
+        }
+        // Kiểm tra xem dự án có mảng teamMembers chứa userId của employee đăng nhập không
+        const employeeProjects = projects.filter((project) => {
+          if (project.teamMembers && Array.isArray(project.teamMembers)) {
+            return project.teamMembers.includes(userId); // So sánh với userId
+          }
+          return false;
+        });
+        setData(employeeProjects.reverse());
+      });
     };
     fetchData();
-  }, []);
+  }, [userId]); // Thay đổi phụ thuộc vào userId
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -47,12 +65,12 @@ const EmployeeProjectManagement = () => {
 
   const handleTabChange = (key) => {
     setFilteredStatus(key);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to the first page when changing tabs
   };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   const filteredData = data.filter((item) => {
@@ -102,20 +120,16 @@ const EmployeeProjectManagement = () => {
       value = String(value);
     }
     if (!value) return "";
-
     const hasDollarSign = value.startsWith("$");
     const hasVND = value.endsWith("VND");
-
     let numericValue = value.replace(/[^\d]/g, "");
     numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
     if (hasDollarSign) {
       numericValue = `$${numericValue}`;
     }
     if (hasVND) {
       numericValue = `${numericValue}VND`;
     }
-
     return numericValue;
   };
 
@@ -131,7 +145,7 @@ const EmployeeProjectManagement = () => {
       key: "startDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = moment(date);
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
           : "Invalid Date";
@@ -143,7 +157,7 @@ const EmployeeProjectManagement = () => {
       key: "endDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = moment(date);
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
           : "Invalid Date";
@@ -198,10 +212,10 @@ const EmployeeProjectManagement = () => {
 
   const tabItems = [
     { key: "All Projects", label: "All Projects" },
-    { key: "ONGOING", label: "Ongoing" },
-    { key: "NOT STARTED", label: "Not Started" },
-    { key: "COMPLETED", label: "Completed" },
-    { key: "PENDING", label: "Pending" },
+    { key: "Ongoing", label: "Ongoing" },
+    { key: "Not Started", label: "Not Started" },
+    { key: "Completed", label: "Completed" },
+    { key: "Pending", label: "Pending" },
   ];
 
   return (
