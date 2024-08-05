@@ -32,13 +32,13 @@ function ForgetPassword() {
         const resetLink = `http://localhost:5173/reset-password?userId=${encodeURIComponent(userId)}`; 
 
         const response = await emailjs.send(
-          'service_38z8rf8',      // Service ID của bạn
-          'template_yh7totx',     // Template ID của bạn
+          'service_9r2qdij',      // Service ID của bạn
+          'template_mhg9xqb',     // Template ID của bạn
           { 
             user_email: email,    // Tên biến khớp với template
             reset_link: resetLink 
           },  
-          'BLOiZZ22_oSBTDilA'     // User ID của bạn
+          'RSDnD2F8I4qw38cFd'     // User ID của bạn
         );
         console.log("Email sent successfully:", response);
         setSuccessMessage("Password reset instructions sent to your email.");

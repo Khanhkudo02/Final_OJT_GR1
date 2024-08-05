@@ -71,10 +71,10 @@ const NewProject = () => {
 
       emailjs
         .send(
-          "service_38z8rf8",
-          "template_bcwpepg",
+          "service_9r2qdij",
+          "template_orarn6c",
           templateParams,
-          "BLOiZZ22_oSBTDilA"
+          "RSDnD2F8I4qw38cFd"
         )
         .then((response) => {
           console.log(

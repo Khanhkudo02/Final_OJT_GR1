@@ -12,12 +12,12 @@ import {
 import emailjs from "emailjs-com";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { fetchAllProjects, putUpdateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
-import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -206,12 +206,12 @@ const ProjectEdit = () => {
     };
 
     emailjs
-      .send(
-        "service_38z8rf8", // ID dịch vụ
-        "template_bcwpepg", // ID mẫu
-        templateParams,
-        "BLOiZZ22_oSBTDilA" // User ID
-      )
+    .send(
+      "service_9r2qdij",
+      "template_orarn6c",
+      templateParams,
+      "RSDnD2F8I4qw38cFd"
+    )
       .then((response) => {
         console.log("Email sent successfully:", response.status, response.text);
       })
