@@ -245,5 +245,6 @@
   "Add New Employee": "Thêm mới Nhân Viên",
   "Add New Administrator": "Thêm mới Quản Trị Viên",
   "searchbyname":"Tìm kiếm bằng tên",
-  "searchbynameproject":"Tìm kiếm bằng tên dự án"
+  "searchbynameproject":"Tìm kiếm bằng tên dự án",
+  "involved":"Trong dự án"
 }
