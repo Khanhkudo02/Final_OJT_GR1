@@ -139,41 +139,41 @@ const ProjectEdit = () => {
     loadEmployees();
   }, []);
 
-  const formatBudget = (value) => {
-    let numericValue = value.replace(/[^\d$VND]/g, "");
-    const hasDollarSign = numericValue.startsWith("$");
-    const hasVND = numericValue.endsWith("VND");
-
-    if (hasDollarSign) {
-      numericValue = numericValue.slice(1);
-    }
-    if (hasVND) {
-      numericValue = numericValue.slice(0, -3);
-    }
-
-    numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-    if (hasDollarSign) {
-      numericValue = `$${numericValue}`;
-    }
-    if (hasVND) {
-      numericValue = `${numericValue}VND`;
-    }
-
-    return numericValue;
+  const handleBudgetBlur = () => {
+    form.validateFields(['budget'])
+      .then(() => {
+        // Handle successful validation if needed
+      })
+      .catch((error) => {
+        // Handle validation errors if needed
+        console.error('Validation error:', error);
+      });
   };
-
+  const formatNumberWithCommas = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "";
+    }
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+  
   const handleBudgetChange = (e) => {
-    const { value } = e.target;
-    const formattedValue = formatBudget(value);
-    form.setFieldsValue({ budget: formattedValue });
+    const value = e.target.value;
+    // Remove all commas for validation and storage
+    const cleanedValue = value.replace(/,/g, "");
+    form.setFieldsValue({ budget: formatNumberWithCommas(cleanedValue) });
   };
-
-  const handleBudgetBlur = async () => {
-    const value = form.getFieldValue("budget");
-    if (!value.includes("$") && !value.includes("VND")) {
-      message.error("Budget must include either $ or VND");
+  
+  const validateBudget = (rule, value) => {
+    if (!value) {
+      return Promise.reject("Please input the budget!");
     }
+    // Remove commas for validation
+    const cleanedValue = value.replace(/,/g, "");
+    const regex = /^\d+(\.\d{1,2})?\s?(VND|USD)?$/;
+    if (!regex.test(cleanedValue)) {
+      return Promise.reject("Invalid budget format. Use 'amount currency' format.");
+    }
+    return Promise.resolve();
   };
 
   const updateStatusOptions = (currentStatus) => {
@@ -310,7 +310,7 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project name!" },
           ]}
         >
-          <Input />
+          <Input placeholder="Enter project name"/>
         </Form.Item>
 
         <Form.Item
@@ -323,7 +323,7 @@ const ProjectEdit = () => {
             },
           ]}
         >
-          <TextArea rows={4} />
+          <TextArea rows={4} placeholder="Enter project description"/>
         </Form.Item>
 
         <Form.Item
@@ -331,7 +331,7 @@ const ProjectEdit = () => {
           name="startDate"
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
-          <DatePicker format="YYYY-MM-DD" />
+          <DatePicker format="YYYY-MM-DD" placeholder="Select start date"/>
         </Form.Item>
 
         <Form.Item
@@ -339,26 +339,26 @@ const ProjectEdit = () => {
           name="endDate"
           rules={[{ required: true, message: "Please select the end date!" }]}
         >
-          <DatePicker format="YYYY-MM-DD" />
+          <DatePicker format="YYYY-MM-DD" placeholder="Select end date"/>
         </Form.Item>
 
         <Form.Item
-          label={t("name")}
+          label={t("ClientName")}
           name="clientName"
           rules={[{ required: true, message: "Please input the client name!" }]}
         >
-          <Input />
+          <Input placeholder="Enter client name"/>
         </Form.Item>
 
         <Form.Item
-          label={t("Email")}
-          name="email"
+          label={t("ClientEmail")}
+          name="clientEmail"
           rules={[
             { required: true, message: "Please input the client email!" },
             { type: "email", message: "Please enter a valid email!" },
           ]}
         >
-          <Input placeholder="emailname@gmail.com" />
+          <Input placeholder="example@gmail.com" />
         </Form.Item>
 
         <Form.Item
@@ -382,7 +382,7 @@ const ProjectEdit = () => {
             { required: true, message: "Please input the project manager!" },
           ]}
         >
-          <Input />
+          <Input placeholder="Enter project manager"/>
         </Form.Item>
 
         <Form.Item
@@ -404,14 +404,13 @@ const ProjectEdit = () => {
         <Form.Item
           label={t("Budget")}
           name="budget"
-          rules={[
-            { required: true, message: "Please input the project budget!" },
-          ]}
+          rules={[{ required: true, validator: validateBudget }]}
         >
           <Input
-            onBlur={handleBudgetBlur}
+            placeholder="Enter budget (e.g., 1,000,000 VND or 500 USD)"
             onChange={handleBudgetChange}
-            maxLength={20}
+            onBlur={handleBudgetBlur}
+            maxLength={50} // Optional: to limit input length
           />
         </Form.Item>
 
@@ -438,29 +437,17 @@ const ProjectEdit = () => {
             { required: true, message: "Please select the project priority!" },
           ]}
         >
-          <Select>
+          <Select placeholder="Select the project priority">
             <Option value="HIGH">High</Option>
             <Option value="MEDIUM">Medium</Option>
             <Option value="LOW">Low</Option>
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label={t("Category")}
-          name="category"
-          rules={[
-            { required: true, message: "Please select the project category!" },
-          ]}
-        >
-          <Select mode="multiple" placeholder="Select categories">
-            <Option value="WEB DESIGN">Web Design</Option>
-            <Option value="MOBILE APP">Mobile App Development</Option>
-            <Option value="UI/UX">UI/UX</Option>
-          </Select>
-        </Form.Item>
-
         {/* Select technologies */}
-        <Form.Item label={t("TechnologiesUsed")} name="technologies">
+        <Form.Item label={t("TechnologiesUsed")} name="technologies"  rules={[
+            { required: true, message: "Please select technologies used!" },
+          ]}>
           <Select mode="multiple" placeholder="Select technologies">
             {technologies.map((tech) => (
               <Option key={tech.value} value={tech.value}>
@@ -471,7 +458,9 @@ const ProjectEdit = () => {
         </Form.Item>
 
         {/* Select programming languages */}
-        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages">
+        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages"  rules={[
+            { required: true, message: "Please select programming language used!" },
+          ]}>
           <Select mode="multiple" placeholder="Select languages">
             {languages.map((lang) => (
               <Option key={lang.value} value={lang.value}>
