@@ -1,12 +1,12 @@
 import { Button, Modal, message } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { deleteProjectPermanently, fetchAllProjects } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
-import { useTranslation } from "react-i18next";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -23,13 +23,13 @@ const ProjectDetail = () => {
     return dateObj.format("DD/MM/YYYY");
   };
 
-  // Convert names to string from the provided list
-  const getNamesFromValues = (values = [], options = []) => {
-    if (!Array.isArray(values) || !Array.isArray(options)) return "";
+  // Convert IDs to names using the provided list
+  const getNamesFromIds = (ids = [], options = []) => {
+    if (!Array.isArray(ids) || !Array.isArray(options)) return "";
     return options
-      .filter((option) => values.includes(option.value))
+      .filter((option) => ids.includes(option.value))
       .map((option) => option.label)
-      .join(", ");
+      .join(", "); // Join names with a comma
   };
 
   useEffect(() => {
@@ -49,23 +49,20 @@ const ProjectDetail = () => {
         } else {
           message.error("Project not found");
           const userRole = JSON.parse(localStorage.getItem("user"))?.role;
-          const redirectPath =
-            userRole === "admin"
-              ? "/project-management"
-              : "/employee-ProjectManagement";
+          const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
           navigate(redirectPath);
         }
 
         setTechnologies(
           allTechnologies.map((tech) => ({
             label: tech.name,
-            value: tech.name, // Use name as value for Option
+            value: tech.id,
           }))
         );
         setLanguages(
           allLanguages.map((lang) => ({
             label: lang.name,
-            value: lang.name, // Use name as value for Option
+            value: lang.key,
           }))
         );
         setEmployees(
@@ -73,17 +70,14 @@ const ProjectDetail = () => {
             .filter((emp) => emp.role === "employee")
             .map((emp) => ({
               label: emp.name,
-              value: emp.name, // Use name as value for Option
+              value: emp.key,
             }))
         );
       } catch (error) {
         console.error("Error fetching project or related data:", error);
         message.error("Error fetching project data");
         const userRole = JSON.parse(localStorage.getItem("user"))?.role;
-        const redirectPath =
-          userRole === "admin"
-            ? "/project-management"
-            : "/employee-ProjectManagement";
+        const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
         navigate(redirectPath);
       }
     };
@@ -97,10 +91,7 @@ const ProjectDetail = () => {
         await deleteProjectPermanently(project.key);
         message.success("Project deleted successfully");
         const userRole = JSON.parse(localStorage.getItem("user"))?.role;
-        const redirectPath =
-          userRole === "admin"
-            ? "/project-management"
-            : "/employee-ProjectManagement";
+        const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
         navigate(redirectPath);
       } else {
         message.error("Project not found");
@@ -125,15 +116,15 @@ const ProjectDetail = () => {
     return <div>Loading...</div>;
   }
 
-  const displayedTechnologies = getNamesFromValues(
+  const displayedTechnologies = getNamesFromIds(
     project.technologies || [],
     technologies
   );
-  const displayedLanguages = getNamesFromValues(
+  const displayedLanguages = getNamesFromIds(
     project.languages || [],
     languages
   );
-  const displayedTeamMembers = getNamesFromValues(
+  const displayedTeamMembers = getNamesFromIds(
     project.teamMembers || [],
     employees
   );
@@ -152,10 +143,7 @@ const ProjectDetail = () => {
 
   const handleBack = () => {
     const userRole = JSON.parse(localStorage.getItem("user"))?.role;
-    const redirectPath =
-      userRole === "admin"
-        ? "/project-management"
-        : "/employee-ProjectManagement";
+    const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
     navigate(redirectPath);
   };
 

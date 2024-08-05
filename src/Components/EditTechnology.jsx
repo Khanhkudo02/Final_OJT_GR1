@@ -27,6 +27,7 @@ const EditTechnology = () => {
   useEffect(() => {
     const loadTechnology = async () => {
       try {
+        console.log("Fetching technology with ID:", id);
         const data = await fetchTechnologyById(id);
         form.setFieldsValue({
           name: data.name,
@@ -160,3 +161,4 @@ const EditTechnology = () => {
 };
 
 export default EditTechnology;
+

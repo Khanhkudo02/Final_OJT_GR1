@@ -109,7 +109,7 @@ const NewProject = () => {
         const data = await fetchAllTechnology();
         const techOptions = data.map((tech) => ({
           label: tech.name,
-          value: tech.name, // Use name as value for Option
+          value: tech.id, // Use key as value for Option
         }));
         setTechnologies(techOptions);
       } catch (err) {
@@ -129,7 +129,7 @@ const NewProject = () => {
         const data = await fetchAllLanguages();
         const languageOptions = data.map((lang) => ({
           label: lang.name,
-          value: lang.name, // Use name as value for Option
+          value: lang.key, // Use key as value for Option
         }));
         setLanguages(languageOptions);
       } catch (err) {
@@ -151,7 +151,7 @@ const NewProject = () => {
           .filter((emp) => emp.role === "employee")
           .map((emp) => ({
             label: emp.name,
-            value: emp.name, // Use name as value for Option
+            value: emp.key, // Use key as value for Option
             email: emp.email,
           }));
         setEmployees(employeeOptions);
@@ -459,7 +459,7 @@ const NewProject = () => {
 
         <Form.Item>
           <Button type="primary" htmlType="submit" disabled={!agreement}>
-            {t("Register")}
+            {t("Resister")}
           </Button>
         </Form.Item>
       </Form>
