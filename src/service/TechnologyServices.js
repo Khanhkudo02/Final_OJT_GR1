@@ -2,7 +2,7 @@ import { get, push, ref, remove, set, update } from "firebase/database";
 import { database } from "../firebaseConfig";
 
 // Function to create a technology
-export const postCreateTechnology = async (
+const postCreateTechnology = async (
   name,
   description,
   status,
@@ -24,7 +24,7 @@ export const postCreateTechnology = async (
 };
 
 // Function to fetch a technology by ID
-export const fetchTechnologyById = async (id) => {
+const fetchTechnologyById = async (id) => {
   try {
     const technologyRef = ref(database, `technologies/${id}`);
     const snapshot = await get(technologyRef);
@@ -42,9 +42,9 @@ export const fetchTechnologyById = async (id) => {
 };
 
 // Function to fetch all technologies
-export const fetchAllTechnology = async () => {
+const fetchAllTechnology = async () => {
   try {
-    const techRef = ref(database, "technologies");
+    const techRef = ref(database, 'technologies');
     const snapshot = await get(techRef);
     const data = snapshot.val();
     return data
@@ -57,7 +57,7 @@ export const fetchAllTechnology = async () => {
 };
 
 // Function to update a technology
-export const putUpdateTechnology = async (
+const putUpdateTechnology = async (
   id,
   name,
   description,
@@ -79,7 +79,7 @@ export const putUpdateTechnology = async (
 };
 
 // Function to delete a technology
-export const deleteTechnology = async (id) => {
+const deleteTechnology = async (id) => {
   try {
     const techRef = ref(database, `technologies/${id}`);
     await remove(techRef);
@@ -88,3 +88,5 @@ export const deleteTechnology = async (id) => {
     throw error;
   }
 };
+
+export { postCreateTechnology, fetchTechnologyById, fetchAllTechnology, putUpdateTechnology, deleteTechnology }

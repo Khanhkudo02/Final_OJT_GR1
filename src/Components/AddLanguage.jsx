@@ -132,7 +132,12 @@ const AddLanguage = () => {
       <h2>{t("ExistingLanguage")}</h2>
       <Table dataSource={languages} rowKey="key" pagination={false}>
         <Column title={t("name")} dataIndex="name" key="name" />
-        <Column title={t("Description")} dataIndex="description" key="description" />
+        <Column
+          title={t("Description")}
+          dataIndex="description"
+          key="description"
+          render={(text) => formatDescription(text)}
+        /> 
         <Column
           title={t("Status")}
           dataIndex="status"

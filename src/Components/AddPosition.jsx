@@ -136,7 +136,12 @@ const AddPosition = () => {
       <h2>{t("ExistingPosition")}</h2>
       <Table dataSource={positions} rowKey="key" pagination={false}>
         <Column title={t("name")} dataIndex="name" key="name" />
-        <Column title={t("Description")} dataIndex="description" key="description" />
+        <Column
+          title={t("Description")}
+          dataIndex="description"
+          key="description"
+          render={(text) => formatDescription(text)}
+        /> 
         <Column title={t("Department")} dataIndex="department" key="department" />
         <Column
           title={t("Status")}
