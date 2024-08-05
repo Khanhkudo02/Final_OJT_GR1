@@ -262,6 +262,7 @@ const fetchEmployeeById = async (id) => {
     }
 };
 
+
 export {
     checkEmailExists,
     deleteEmployeeById,

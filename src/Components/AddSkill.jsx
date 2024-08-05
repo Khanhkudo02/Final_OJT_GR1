@@ -122,7 +122,7 @@ const AddSkill = () => {
                 style={{ marginLeft: 8 }}
                 onClick={() => navigate("/position-management")}
             >
-                {t("Back to Position Management")}
+                {t("Back to Skill Management")}
             </Button>
 
             <h2>{t("ExistingSkill")}</h2>
