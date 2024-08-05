@@ -244,6 +244,10 @@
   "Add New Project": "Thêm mới Dự Án",
   "Add New Employee": "Thêm mới Nhân Viên",
   "Add New Administrator": "Thêm mới Quản Trị Viên",
+  "Add New Skill": "Thêm mới Kĩ Năng",
+  "All Skills": "Tất cả các Kỹ Năng",
+  "ExistingSkill" : "Những Kỹ Năng hiện có",
+  "Back to Skill Management": "Quay về quản lý Kỹ Năng",
   "searchbyname":"Tìm kiếm bằng tên",
   "searchbynameproject":"Tìm kiếm bằng tên dự án",
   "involved":"Trong dự án"

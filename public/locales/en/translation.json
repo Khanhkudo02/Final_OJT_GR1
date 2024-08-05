@@ -244,6 +244,10 @@
   "Add New Project": "Add New Project",
   "Add New Employee": "Add New Employee",
   "Add New Administrator": "Add New Administrator",
+  "Add New Skill": "Add New Skill",
+  "All Skills": "All Skills",
+  "ExistingSkill" : "Existing Skills",
+  "Back to Skill Management": "Back to Skill Management",
   "searchbyname":"Search by Name",
   "searchbynameproject":"Search by Project Name",
   "involved":"Involved"
