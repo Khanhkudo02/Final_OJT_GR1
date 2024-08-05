@@ -33,8 +33,9 @@ import EditEmployee from "./Components/EditEmployee";
 import EmployeeDetails from "./Components/EmployeeDetails";
 import EmployeeProjectManagement from "./Components/EmployeeProjectManagement";
 import SkillManagement from "./Components/SkillManagement.jsx";
+// import ProjectTracking from "./Components/ProjectTracking";
 import AddSkill from "./Components/AddSkill.jsx";
-import EditSkill from "./Components/EditSkill.jsx"
+import EditSkill from "./Components/EditSkill.jsx";
 
 const { Content } = Layout;
 
@@ -177,6 +178,10 @@ const App = () => {
                           path="/programing-language/view/:id"
                           element={<LanguageDetails />}
                         />
+                        {/* <Route
+                          path="/project-tracking"
+                          element={<ProjectTracking />}
+                        /> */}
                         <Route
                           path="/employee-ProjectManagement"
                           element={<EmployeeProjectManagement />}
