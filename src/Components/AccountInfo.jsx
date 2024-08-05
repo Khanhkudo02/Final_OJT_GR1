@@ -59,6 +59,16 @@ function AccountInfo() {
       .join(' ');
   };
 
+  // Hàm định dạng ngày theo dạng "dd/mm/yyyy"
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const day = ("0" + date.getDate()).slice(-2);
+    const month = ("0" + (date.getMonth() + 1)).slice(-2);
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <div className="account-info-container">
       <Card title={t("userProfile")} className="account-info-card">
@@ -85,12 +95,14 @@ function AccountInfo() {
           )}
           {userData.createdAt && (
             <Descriptions.Item label={t("createdAt")}>
-              {new Date(userData.createdAt).toLocaleDateString()}
+              {/* {new Date(userData.createdAt).toLocaleDateString()} */}
+              {formatDate(userData.createdAt)}
             </Descriptions.Item>
           )}
           {userData.dateOfBirth && (
             <Descriptions.Item label={t("dateOfBirth")}>
-              {new Date(userData.dateOfBirth).toLocaleDateString()}
+              {/* {new Date(userData.dateOfBirth).toLocaleDateString()} */}
+              {formatDate(userData.dateOfBirth)}
             </Descriptions.Item>
           )}
           {userData.address && (
