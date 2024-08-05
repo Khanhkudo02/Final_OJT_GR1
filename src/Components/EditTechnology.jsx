@@ -26,10 +26,12 @@ const EditTechnology = () => {
         setInitialImageUrl(data.imageUrl);
       } catch (error) {
         console.error("Failed to fetch technology:", error);
+        message.error("Technology not found. Redirecting...");
+        navigate("/technology-management"); // Redirect user if the technology is not found
       }
     };
     fetchTechnology();
-  }, [id, form]);
+  }, [id, form, navigate]);
 
   const handleImageChange = ({ fileList }) => {
     setFileList(fileList);

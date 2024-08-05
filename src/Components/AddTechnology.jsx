@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { UploadOutlined, PlusOutlined, EyeOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Select, Upload, Table, Modal, Space } from "antd";
@@ -84,7 +85,8 @@ const AddTechnology = () => {
     setFileList(fileList);
     if (fileList.length > 0) {
       setImageFile(fileList[fileList.length - 1].originFileObj);
-    } else {setImageFile(null);
+    } else {
+      setImageFile(null);
     }
   };
 
@@ -185,7 +187,7 @@ const AddTechnology = () => {
                 style={{ color: "red", borderColor: "red" }}
                 onClick={() => handleDeleteTechnology(record.id)}
               />
-              </Space>
+            </Space>
           )}
         />
       </Table>
