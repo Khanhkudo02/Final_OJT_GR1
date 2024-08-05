@@ -81,12 +81,11 @@ const ProjectManagement = () => {
   );
 
   const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-  };
+    if (!name) return ''; // Handle undefined or null name
+    const parts = name.split(' ');
+    if (parts.length < 2) return name.charAt(0).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
 
   const getRandomColor = () => {
     const colors = [
@@ -257,7 +256,9 @@ const ProjectManagement = () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate("/new-project")}
-        />
+        >
+          {t("Add New Project")} 
+        </Button>
         <Button
           type="default"
           icon={<InboxOutlined />}

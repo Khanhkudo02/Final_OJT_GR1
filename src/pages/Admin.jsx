@@ -342,7 +342,9 @@ function AdminPage() {
           type="primary"
           onClick={() => setModalVisible(true)}
           icon={<PlusOutlined />}
-        ></Button>
+        >
+          {t("Add New Administrator")}
+        </Button>
         <Input
           prefix={<SearchOutlined />}
           placeholder={t("search")}

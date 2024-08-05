@@ -135,12 +135,12 @@ const EmployeeProjectManagement = () => {
 
   const columns = [
     {
-      title: "Project Name",
+      title: t("ProjectName"),
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "Start Date",
+      title: t("StartDate"),
       dataIndex: "startDate",
       key: "startDate",
       render: (date) => {
@@ -152,7 +152,7 @@ const EmployeeProjectManagement = () => {
       },
     },
     {
-      title: "End Date",
+      title: t("EndDate"),
       dataIndex: "endDate",
       key: "endDate",
       render: (date) => {
@@ -164,7 +164,7 @@ const EmployeeProjectManagement = () => {
       },
     },
     {
-      title: "Project Manager",
+      title: t("ProjectManager"),
       dataIndex: "projectManager",
       key: "projectManager",
       className: "text-align-start",
@@ -180,13 +180,13 @@ const EmployeeProjectManagement = () => {
       ),
     },
     {
-      title: "Budget",
+      title:  t("Budget"),
       dataIndex: "budget",
       key: "budget",
       render: formatBudget,
     },
     {
-      title: "Status",
+      title: t("status"),
       dataIndex: "status",
       key: "status",
       render: (status) => (
