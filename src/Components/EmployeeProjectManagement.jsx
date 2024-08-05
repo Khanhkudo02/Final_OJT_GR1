@@ -196,7 +196,7 @@ const EmployeeProjectManagement = () => {
       ),
     },
     {
-      title: "Actions",
+      title: t("actions"),
       key: "actions",
       render: (text, record) => (
         <Space size="middle">
@@ -211,11 +211,11 @@ const EmployeeProjectManagement = () => {
   ];
 
   const tabItems = [
-    { key: "All Projects", label: "All Projects" },
-    { key: "Ongoing", label: "Ongoing" },
-    { key: "Not Started", label: "Not Started" },
-    { key: "Completed", label: "Completed" },
-    { key: "Pending", label: "Pending" },
+    { key: "All Projects", label: t("AllProject") },
+    { key: "Ongoing", label: t("Ongoing") },
+    { key: "Not Started", label: t("NotStarted") },
+    { key: "Completed", label: t("Completed") },
+    { key: "Pending", label: t("Pending") },
   ];
 
   return (
