@@ -266,7 +266,7 @@ const ProjectManagement = () => {
           style={{ marginLeft: "auto" }}
         />
         <Input
-          placeholder={t("search")}
+          placeholder={t("searchbynameproject")}
           value={searchTerm}
           onChange={handleSearchChange}
           style={{ width: "250px", marginBottom: 16 }}
