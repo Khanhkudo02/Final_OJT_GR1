@@ -20,6 +20,7 @@ import {
   fetchAllEmployees,
   fetchAllSkills
 } from "../service/EmployeeServices";
+import { get, getDatabase, ref, onValue } from "firebase/database";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -29,12 +30,15 @@ const { Search } = Input;
 const EmployeeManagement = () => {
   const { t } = useTranslation();
   const [employees, setEmployees] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [userData, setUserData] = useState(null);
+  const [data, setData] = useState([]);
   const [skillsList, setSkillsList] = useState([]); // or pass as a prop
 
   const formatSkill = (skill) =>
@@ -157,6 +161,42 @@ const EmployeeManagement = () => {
     });
   };
 
+  const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const db = getDatabase();
+        const userRef = ref(db, `users/${userId}`);
+        const snapshot = await get(userRef);
+        const data = snapshot.val();
+        setUserData(data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    const fetchProjects = async () => {
+      const projectsRef = ref(getDatabase(), "projects");
+      onValue(projectsRef, (snapshot) => {
+        const projectsData = snapshot.val();
+        const projectsList = [];
+        for (const key in projectsData) {
+          projectsList.push({ key, ...projectsData[key] });
+        }
+        const userProjects = projectsList.filter((project) =>
+          project.teamMembers?.includes(userId)
+        );
+        setProjects(userProjects.reverse());
+      });
+    };
+
+    if (userId) {
+      fetchUserData();
+      fetchProjects();
+    }
+  }, [userId]);
+
   const exportToExcel = () => {
     const filteredEmployees = employees.map(
       ({ key, createdAt, password, imageUrl, isAdmin, ...rest }) => rest
@@ -173,7 +213,7 @@ const EmployeeManagement = () => {
     currentPage * pageSize
   );
 
-  const exportToWord = async (employee) => {
+  const exportToWord = async (employee, project) => {
     try {
       // Create a new Document
       const doc = new Document({
@@ -408,6 +448,7 @@ const EmployeeManagement = () => {
         type="primary"
         style={{ marginBottom: 16 }}
         onClick={exportToExcel}
+        icon={<ExportOutlined />}
       >
         {t("exportToExcel")}
       </Button>

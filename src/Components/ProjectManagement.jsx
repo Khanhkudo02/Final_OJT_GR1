@@ -107,14 +107,14 @@ const ProjectManagement = () => {
 
   const handleDelete = (key) => {
     Modal.confirm({
-      title: "Are you sure you want to archive this project?",
+      title: t("Are you sure you want to archive this project?"),
       onOk: async () => {
         try {
           await moveToArchive(key);
           setData((prevData) => prevData.filter((item) => item.key !== key));
-          message.success("Project archived successfully");
+          message.success(t("Project archived successfully"));
         } catch (error) {
-          message.error("Failed to archive project");
+          message.error(t("Failed to archive project"));
         }
       },
     });
@@ -216,7 +216,8 @@ const ProjectManagement = () => {
       title: t("actions"),
       key: "actions",
       render: (text, record) => (
-        <Space size="middle">
+        <div className="actions-container">
+          <Space size="middle">
           <Button
             icon={<EyeOutlined />}
             style={{ color: "green", borderColor: "green" }}
@@ -235,6 +236,7 @@ const ProjectManagement = () => {
             />
           )}
         </Space>
+        </div>
       ),
     },
   ];

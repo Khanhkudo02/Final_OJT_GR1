@@ -315,8 +315,8 @@ const AddEmployee = () => {
           rules={[{ required: true, message: t("pleaseSelectStatus") }]}
         >
           <Select onBlur={() => handleFieldBlur("status")}>
-            <Option value="active">{t("statusActive")}</Option>
-            <Option value="inactive">{t("statusInactive")}</Option>
+            <Option value="active">{t("Active")}</Option>
+            <Option value="inactive">{t("Inactive")}</Option>
           </Select>
         </Form.Item>
         <Form.Item

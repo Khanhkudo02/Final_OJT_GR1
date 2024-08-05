@@ -121,6 +121,7 @@ const SkillManagement = () => {
                 onClick={showAddPage}
                 icon={<PlusOutlined />}
             >
+                {t("Add New Skill")}
             </Button>
             <Input
                 placeholder={t("search")}

@@ -113,6 +113,7 @@ const fetchAllSkills = async () => {
 };
 
 
+
 // Fetch all employees
 const fetchAllEmployees = async () => {
     try {
@@ -167,10 +168,10 @@ const putUpdateEmployee = async (
     dateOfBirth,
     address,
     phoneNumber,
-    skills,
+    skills = [], // Ensure default value for skills
     status,
     department,
-    position, // Add position parameter
+    position,
     imageFile,
     oldImageUrl
 ) => {
@@ -209,10 +210,10 @@ const putUpdateEmployee = async (
             dateOfBirth: formattedDateOfBirth,
             address,
             phoneNumber,
-            skills,
+            skills: skills || [], // Ensure skills is not undefined
             status,
             department,
-            position, // Add position to updates
+            position,
             imageUrl: imageUrl || currentData.imageUrl,
         };
 
@@ -275,6 +276,7 @@ const fetchEmployeeById = async (id) => {
         throw error;
     }
 };
+
 
 export {
     checkEmailExists,
