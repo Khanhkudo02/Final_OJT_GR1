@@ -49,7 +49,10 @@ const ProjectDetail = () => {
         } else {
           message.error("Project not found");
           const userRole = JSON.parse(localStorage.getItem("user"))?.role;
-          const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
+          const redirectPath =
+            userRole === "admin"
+              ? "/project-management"
+              : "/employee-ProjectManagement";
           navigate(redirectPath);
         }
 
@@ -77,7 +80,10 @@ const ProjectDetail = () => {
         console.error("Error fetching project or related data:", error);
         message.error("Error fetching project data");
         const userRole = JSON.parse(localStorage.getItem("user"))?.role;
-        const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
+        const redirectPath =
+          userRole === "admin"
+            ? "/project-management"
+            : "/employee-ProjectManagement";
         navigate(redirectPath);
       }
     };
@@ -91,7 +97,10 @@ const ProjectDetail = () => {
         await deleteProjectPermanently(project.key);
         message.success("Project deleted successfully");
         const userRole = JSON.parse(localStorage.getItem("user"))?.role;
-        const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
+        const redirectPath =
+          userRole === "admin"
+            ? "/project-management"
+            : "/employee-ProjectManagement";
         navigate(redirectPath);
       } else {
         message.error("Project not found");
@@ -143,7 +152,10 @@ const ProjectDetail = () => {
 
   const handleBack = () => {
     const userRole = JSON.parse(localStorage.getItem("user"))?.role;
-    const redirectPath = userRole === "admin" ? "/project-management" : "/employee-ProjectManagement";
+    const redirectPath =
+      userRole === "admin"
+        ? "/project-management"
+        : "/employee-ProjectManagement";
     navigate(redirectPath);
   };
 

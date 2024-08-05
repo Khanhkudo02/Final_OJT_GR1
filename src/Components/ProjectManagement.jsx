@@ -243,7 +243,7 @@ const ProjectManagement = () => {
   // Tabs items
   const tabItems = [
     { key: "All Projects", label: t("AllProject") },
-    { key: "Ongoing", label: t("Ongoing" )},
+    { key: "Ongoing", label: t("Ongoing") },
     { key: "Not Started", label: t("NotStarted") },
     { key: "Completed", label: t("Completed") },
     { key: "Pending", label: t("Pending") },

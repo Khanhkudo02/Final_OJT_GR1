@@ -47,7 +47,9 @@ export const fetchAllTechnology = async () => {
     const techRef = ref(database, "technologies");
     const snapshot = await get(techRef);
     const data = snapshot.val();
-    return data ? Object.entries(data).map(([key, value]) => ({ id: key, ...value })) : [];
+    return data
+      ? Object.entries(data).map(([key, value]) => ({ id: key, ...value }))
+      : [];
   } catch (error) {
     console.error("Failed to fetch technologies:", error);
     throw error;
