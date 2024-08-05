@@ -9,6 +9,7 @@ function AccountInfo() {
   const { t } = useTranslation();
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -24,6 +25,18 @@ function AccountInfo() {
         const snapshot = await get(userRef);
         const data = snapshot.val();
         setUserData(data);
+
+         // Lấy thông tin dự án liên quan đến nhân viên
+        const projectsRef = ref(db, `projects`);
+        const projectsSnapshot = await get(projectsRef);
+        const allProjects = projectsSnapshot.val();
+        
+        // Lọc các dự án mà nhân viên đang tham gia
+        const userProjects = Object.values(allProjects).filter(project =>
+          project.teamMembers.includes(userId)
+        );
+        
+        setProjects(userProjects || []);
       } catch (error) {
         message.error(t("errorFetchingUserData"));
       }
@@ -100,6 +113,21 @@ function AccountInfo() {
           {userData.department && (
             <Descriptions.Item label={t("department")}>
               {capitalizeWords(t(userData.department))}
+            </Descriptions.Item>
+          )}
+          {/* Hiển thị thông tin dự án */}
+          {projects.length > 0 && (
+            <Descriptions.Item label={t("projects")}>
+              {projects.map(project => (
+                <div key={project.id}>
+                  <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
+                  <p><strong>{t("Description")}:</strong> {project.description}</p>
+                  <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
+                  <p><strong>{t("Budget")}:</strong> {project.budget}</p>
+                  <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
+                  <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
+                </div>
+              ))}
             </Descriptions.Item>
           )}
         </Descriptions>
