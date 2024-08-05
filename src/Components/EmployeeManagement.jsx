@@ -384,6 +384,7 @@ const EmployeeManagement = () => {
         type="primary"
         style={{ marginBottom: 16 }}
         onClick={exportToExcel}
+        icon={<ExportOutlined /> }
       >
         {t("exportToExcel")}
       </Button>
