@@ -246,5 +246,7 @@
   "Add New Administrator": "Thêm mới Quản Trị Viên",
   "searchbyname":"Tìm kiếm bằng tên",
   "searchbynameproject":"Tìm kiếm bằng tên dự án",
-  "involved":"Trong dự án"
+  "involved":"Trong dự án",
+  "clientName":"Tên khách hàng",
+  "clientEmail":"Email khách hàng"
 }

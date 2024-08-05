@@ -288,7 +288,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label={t("ClientName")}
+          label={t("clientName")}
           name="clientName"
           rules={[{ required: true, message: "Please input the client name!" }]}
         >
@@ -296,7 +296,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label={t("ClientEmail")}
+          label={t("clientEmail")}
           name="clientEmail"
           rules={[
             { required: true, message: "Please input the client email!" },

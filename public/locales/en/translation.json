@@ -246,5 +246,7 @@
   "Add New Administrator": "Add New Administrator",
   "searchbyname":"Search by Name",
   "searchbynameproject":"Search by Project Name",
-  "involved":"Involved"
+  "involved":"Involved",
+  "clientName":"Client Name",
+  "clientEmail":"Client Email"
 }
