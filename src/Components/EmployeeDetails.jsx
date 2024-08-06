@@ -109,7 +109,7 @@ const EmployeeDetails = () => {
             <strong>{t('phoneNumber')}:</strong> {employee.phoneNumber}
           </p>
           <p>
-            <strong>Skills:</strong> {employee.skills.map((skillId) => getSkillNameById(skillId, skillsList)).join(', ')}
+            <strong>{t('skills')}:</strong> {employee.skills.map((skillId) => getSkillNameById(skillId, skillsList)).join(', ')}
           </p>
           <p>
             <strong>{t('department')}:</strong> {formatDepartment(employee.department)}
