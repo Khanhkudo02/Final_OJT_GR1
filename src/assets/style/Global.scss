@@ -93,6 +93,14 @@ body {
   width: 25%;
 }
 
+.project-detail {
+  display: flex;
+}
+
+.project-detail-item {
+  width: 250px;
+}
+
 .detail-button {
   background-color: #f6a206;
   border-color: #f6a206;
