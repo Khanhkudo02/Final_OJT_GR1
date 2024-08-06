@@ -18,6 +18,7 @@ import "../assets/style/Pages/EmployeeManagement.scss";
 import {
   deleteEmployeeById,
   fetchAllEmployees,
+  fetchAllSkills,
 } from "../service/EmployeeServices";
 import { get, getDatabase, ref, onValue } from "firebase/database";
 
@@ -38,6 +39,7 @@ const EmployeeManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [userData, setUserData] = useState(null);
   const [data, setData] = useState([]);
+  const [skillsList, setSkillsList] = useState([]); // or pass as a prop
 
   const formatSkill = (skill) =>
     skill
@@ -55,32 +57,22 @@ const EmployeeManagement = () => {
     return department;
   };
 
-  // const loadEmployees = async () => {
-  //   try {
-  //     const data = await fetchAllEmployees();
-  //     const filteredData = data
-  //       .filter((employee) => employee.role === "employee")
-  //       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const loadSkills = async () => {
+    try {
+      const skillsData = await fetchAllSkills();
+      setSkillsList(
+        skillsData.map((skill) => ({ key: skill.key, name: skill.label }))
+      );
+    } catch (error) {
+      message.error("Failed to fetch skills");
+    }
+  };
 
-  //     // Lọc dữ liệu theo tab
-  //     if (activeTab === "active") {
-  //       setFilteredEmployees(filteredData.filter((e) => e.status === "active"));
-  //     } else if (activeTab === "inactive") {
-  //       setFilteredEmployees(
-  //         filteredData.filter((e) => e.status === "inactive")
-  //       );
-  //     } else if (activeTab === "involved") {
-  //       setFilteredEmployees(
-  //         filteredData.filter((e) => e.status === "involved")
-  //       );
-  //     } else {
-  //       setFilteredEmployees(filteredData); // Tab "All Employees"
-  //     }
-  //     setEmployees(filteredData);
-  //   } catch (error) {
-  //     console.error(t("errorFetchingEmployees"), error);
-  //   }
-  // };
+  const getSkillNameById = (skillId, skills) => {
+    const skill = skills.find((sk) => sk.key === skillId);
+    return skill ? skill.name : "Unknown Skill";
+  };
+
   const loadEmployees = async () => {
     try {
       // Lấy tất cả thông tin nhân viên
@@ -126,6 +118,7 @@ const EmployeeManagement = () => {
   console.log(employees);
 
   useEffect(() => {
+    loadSkills();
     loadEmployees();
 
     const employeeAdded = localStorage.getItem("employeeAdded");
@@ -455,14 +448,10 @@ const EmployeeManagement = () => {
           render={(text) => {
             if (Array.isArray(text)) {
               return text
-                .map((skill) =>
-                  t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
-                    defaultValue: skill.replace(/_/g, " "),
-                  })
-                )
+                .map((skillId) => getSkillNameById(skillId, skillsList))
                 .join(", ");
             }
-            return text;
+            return getSkillNameById(text, skillsList);
           }}
         />
         <Column
@@ -470,10 +459,8 @@ const EmployeeManagement = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
-            // Dịch giá trị của text
             const translatedText = t(text);
 
-            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
               translatedText === t("active")
                 ? "status-active"
