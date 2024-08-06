@@ -92,6 +92,40 @@ const EmployeeManagement = () => {
     }
   }, [t, activeTab]);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          navigate("/login"); // Chuyển hướng đến trang đăng nhập nếu không có người dùng
+          return;
+        }
+
+        const db = getDatabase();
+        const userRef = ref(db, `users/${userId}`);
+        const snapshot = await get(userRef);
+        const data = snapshot.val();
+        setUserData(data);
+
+         // Lấy thông tin dự án liên quan đến nhân viên
+        const projectsRef = ref(db, `projects`);
+        const projectsSnapshot = await get(projectsRef);
+        const allProjects = projectsSnapshot.val();
+        
+        // Lọc các dự án mà nhân viên đang tham gia
+        const userProjects = Object.values(allProjects).filter(project =>
+          project.teamMembers.includes(userId)
+        );
+        
+        setProjects(userProjects || []);
+      } catch (error) {
+        message.error(t("errorFetchingUserData"));
+      }
+    };
+
+    fetchUserData();
+  }, [navigate, t]);
+
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);
     setPageSize(pagination.pageSize);
@@ -196,21 +230,19 @@ const EmployeeManagement = () => {
     currentPage * pageSize
   );
 
-  const exportToWord = async (employee, project) => {
+  const exportToWord = async (employee) => {
     try {
-      // Create a new Document
       const doc = new Document({
         sections: [
           {
             properties: {},
             children: [
-              // Name and Address Section
               new Paragraph({
                 children: [
                   new TextRun({
                     text: employee.name || "Name not available",
                     bold: true,
-                    size: 32, // Optional: Adjust font size
+                    size: 32,
                   }),
                 ],
               }),
@@ -255,10 +287,8 @@ const EmployeeManagement = () => {
                 ],
               }),
 
-              // Add a blank paragraph to create space
               new Paragraph({}),
 
-              // WORKING EXPERIENCE Section
               new Paragraph({
                 children: [
                   new TextRun({
@@ -271,7 +301,7 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Skill: ",
+                    text: "Skills: ",
                     bold: true,
                     size: 24,
                   }),
@@ -286,10 +316,8 @@ const EmployeeManagement = () => {
                 ],
               }),
 
-              // Add a blank paragraph to create space
               new Paragraph({}),
 
-              // TYPICAL PROJECTS Section
               new Paragraph({
                 children: [
                   new TextRun({
@@ -299,18 +327,13 @@ const EmployeeManagement = () => {
                   }),
                 ],
               }),
-              ...(Array.isArray(employee.projects) &&
-              employee.projects.length > 0
-                ? employee.projects.map((project, index) => [
+              ...(Array.isArray(employee.projects) && employee.projects.length > 0
+                ? employee.projects.map((project) => [
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Project name: ",
+                          text: project.title || "No title",
                           bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.name || "No name provided",
                           size: 24,
                         }),
                       ],
@@ -318,85 +341,19 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Role: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.role || "No role provided",
+                          text: project.description || "No description",
                           size: 24,
                         }),
                       ],
                     }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Description: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text:
-                            project.description || "No description provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Specification: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text:
-                            project.specification ||
-                            "No specification provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Languages and frameworks: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: Array.isArray(project.languagesAndFrameworks)
-                            ? project.languagesAndFrameworks.join(", ")
-                            : "Not provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Technologies: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: Array.isArray(project.technologies)
-                            ? project.technologies.join(", ")
-                            : "Not provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    // Add a blank paragraph to create space between projects
                     new Paragraph({}),
                   ])
                 : [
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Not yet joined the project",
+                          text: "Chưa tham gia project",
                           size: 24,
-                          italics: true,
                         }),
                       ],
                     }),
@@ -406,12 +363,11 @@ const EmployeeManagement = () => {
         ],
       });
 
-      // Save the document as a .docx file
-      Packer.toBlob(doc).then((blob) => {
-        saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
-      });
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
     } catch (error) {
       console.error("Error exporting to Word:", error);
+      message.error("Failed to export CV to Word");
     }
   };
 
