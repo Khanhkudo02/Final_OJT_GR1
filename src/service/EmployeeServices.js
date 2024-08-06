@@ -98,6 +98,21 @@ const fetchAllPositions = async () => {
     }
 };
 
+const fetchAllSkills = async () => {
+    try {
+        const skillsRef = ref(db, "skills");
+        const snapshot = await get(skillsRef);
+        const data = snapshot.val();
+        return data
+            ? Object.entries(data).map(([key, value]) => ({ key, label: value.name }))
+            : [];
+    } catch (error) {
+        console.error("Failed to fetch skills:", error);
+        throw error;
+    }
+};
+
+
 
 // Fetch all employees
 const fetchAllEmployees = async () => {
@@ -127,24 +142,24 @@ const updateEmployeeStatus = async (employeeId, status) => {
 // Cập nhật trạng thái của nhân viên thành "active"
 const updateEmployeeStatusToActive = async (employeeId) => {
     try {
-      await update(ref(db, `users/${employeeId}`), { status: "active" });
+        await update(ref(db, `users/${employeeId}`), { status: "active" });
     } catch (error) {
-      console.error("Failed to update employee status to active:", error);
-      throw error;
+        console.error("Failed to update employee status to active:", error);
+        throw error;
     }
-  };
+};
 
-  // Cập nhật trạng thái của nhân viên thành "involved"
+// Cập nhật trạng thái của nhân viên thành "involved"
 const updateEmployeeStatusToInvolved = async (employeeId) => {
     try {
-      await update(ref(db, `users/${employeeId}`), { status: "involved" });
+        await update(ref(db, `users/${employeeId}`), { status: "involved" });
     } catch (error) {
-      console.error("Failed to update employee status to involved:", error);
-      throw error;
+        console.error("Failed to update employee status to involved:", error);
+        throw error;
     }
-  };
-  
-  
+};
+
+
 // Update existing employee
 const putUpdateEmployee = async (
     id,
@@ -153,10 +168,10 @@ const putUpdateEmployee = async (
     dateOfBirth,
     address,
     phoneNumber,
-    skills,
+    skills = [], // Ensure default value for skills
     status,
     department,
-    position, // Add position parameter
+    position,
     imageFile,
     oldImageUrl
 ) => {
@@ -195,10 +210,10 @@ const putUpdateEmployee = async (
             dateOfBirth: formattedDateOfBirth,
             address,
             phoneNumber,
-            skills,
+            skills: skills || [], // Ensure skills is not undefined
             status,
             department,
-            position, // Add position to updates
+            position,
             imageUrl: imageUrl || currentData.imageUrl,
         };
 
@@ -268,6 +283,7 @@ export {
     deleteEmployeeById,
     fetchAllEmployees,
     fetchEmployeeById,
+    fetchAllSkills,
     postCreateEmployee,
     putUpdateEmployee,
     fetchAllPositions,

@@ -8,6 +8,7 @@ import {
   fetchEmployeeById,
   fetchAllPositions, // Ensure this function is imported
   putUpdateEmployee,
+  fetchAllSkills,
 } from "../service/EmployeeServices";
 
 const { Option } = Select;
@@ -20,6 +21,7 @@ const EditEmployee = () => {
   const [fileList, setFileList] = useState([]);
   const [oldImageUrl, setOldImageUrl] = useState("");
   const [positions, setPositions] = useState([]); // State for positions
+  const [skillsList, setSkillsList] = useState([]);
 
   // Các tùy chọn được chuyển ngữ
   const departmentOptions = [
@@ -29,19 +31,6 @@ const EditEmployee = () => {
     { value: "administration", label: t("departmentAdministration") },
     { value: "human_resources", label: t("departmentHumanResources") },
     { value: "customer_service", label: t("departmentCustomerService") },
-  ];
-
-  const skillOptions = [
-    { value: "active_listening", label: t("skillActiveListening") },
-    { value: "communication", label: t("skillCommunication") },
-    { value: "computer", label: t("skillComputer") },
-    { value: "customer_service", label: t("skillCustomerService") },
-    { value: "interpersonal", label: t("skillInterpersonal") },
-    { value: "leadership", label: t("skillLeadership") },
-    { value: "management", label: t("skillManagement") },
-    { value: "problem_solving", label: t("skillProblemSolving") },
-    { value: "time_management", label: t("skillTimeManagement") },
-    { value: "transferable", label: t("skillTransferable") },
   ];
 
   useEffect(() => {
@@ -86,12 +75,22 @@ const EditEmployee = () => {
         const positionsData = await fetchAllPositions();
         setPositions(positionsData.map((pos) => ({ key: pos.key, name: pos.label }))); // Adjust based on your data structure
       } catch (error) {
-        message.error(t("failedToFetchPositions"));
+        message.error(t("failed To Fetch Positions"));
+      }
+    };
+
+    const loadSkills = async () => {
+      try {
+        const skillsData = await fetchAllSkills();
+        setSkillsList(skillsData.map((skill) => ({ key: skill.key, name: skill.label })));
+      } catch (error) {
+        message.error("Failed to fetch skills");
       }
     };
 
     loadEmployee();
     loadPositions();
+    loadSkills();
   }, [id, form, t]);
 
   const handlePhoneNumberChange = (e) => {
@@ -116,7 +115,7 @@ const EditEmployee = () => {
         formattedDateOfBirth,
         values.address,
         values.phoneNumber,
-        values.skills,
+        values.skills || [],
         values.status,
         values.department,
         values.position, // Pass position value
@@ -124,10 +123,10 @@ const EditEmployee = () => {
         oldImageUrl
       );
 
-      message.success(t("employeeUpdatedSuccessfully"));
+      message.success(t("employee Updated Successfully"));
       navigate("/employee-management");
     } catch (error) {
-      message.error(t("failedToUpdateEmployee"));
+      message.error(t("failed To Update Employee"));
       console.error("Error details:", error);
     }
   };
@@ -157,7 +156,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("name")}
         name="name"
-        rules={[{ required: true, message: t("nameRequired") }]}
+        rules={[{ required: true, message: t("name Required") }]}
       >
         <Input placeholder={t("name")} />
       </Form.Item>
@@ -165,7 +164,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("email")}
         name="email"
-        rules={[{ type: 'email', message: t("invalidEmail") }, { required: true, message: t("emailRequired") }]}
+        rules={[{ type: 'email', message: t("invalid Email") }, { required: true, message: t("email Required") }]}
       >
         <Input placeholder={t("email")} disabled />
       </Form.Item>
@@ -173,11 +172,10 @@ const EditEmployee = () => {
       <Form.Item
         label={t("department")}
         name="department"
-        rules={[{ required: true, message: t("departmentRequired") }]}
+        rules={[{ required: true, message: t("department Required") }]}
       >
         <Select
           placeholder={t("department")}
-          mode="multiple"
         >
           {departmentOptions.map((dept) => (
             <Option key={dept.value} value={dept.value}>
@@ -188,23 +186,27 @@ const EditEmployee = () => {
       </Form.Item>
 
       <Form.Item
-        label={t("position")}
-        name="position"
-        rules={[{ required: true, message: t("positionRequired") }]} // Add validation for position
+        label={t("skills")}
+        name="skills"
+        rules={[{ required: true, message: t("skills Required") }]}
       >
-        <Select placeholder={t("position")}>
-          {positions.map((pos) => (
-            <Option key={pos.key} value={pos.key}>
-              {pos.name}
+        <Select
+          placeholder={t("skills")}
+          mode="multiple"
+        >
+          {skillsList.map((skill) => (
+            <Option key={skill.key} value={skill.key}>
+              {skill.name}
             </Option>
           ))}
         </Select>
       </Form.Item>
 
+
       <Form.Item
         label={t("status")}
         name="status"
-        rules={[{ required: true, message: t("statusRequired") }]}
+        rules={[{ required: true, message: t("status Required") }]}
       >
         <Select placeholder={t("status")}>
           <Option value="active">{t("active")}</Option>
@@ -215,7 +217,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("dateOfBirth")}
         name="dateOfBirth"
-        rules={[{ required: true, message: t("dateOfBirthRequired") }]}
+        rules={[{ required: true, message: t("date Of Birth Required") }]}
       >
         <Input type="date" />
       </Form.Item>
@@ -223,7 +225,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("address")}
         name="address"
-        rules={[{ required: true, message: t("addressRequired") }]}
+        rules={[{ required: true, message: t("address Required") }]}
       >
         <Input placeholder={t("address")} />
       </Form.Item>
@@ -232,8 +234,8 @@ const EditEmployee = () => {
         label={t("phoneNumber")}
         name="phoneNumber"
         rules={[
-          { required: true, message: t("phoneNumberRequired") },
-          { pattern: /^\d{10}$/, message: t("phoneNumberInvalid") }
+          { required: true, message: t("phoneNumber Required") },
+          { pattern: /^\d{10}$/, message: t("phoneNumber Invalid") }
         ]}
       >
         <Input
@@ -244,17 +246,14 @@ const EditEmployee = () => {
       </Form.Item>
 
       <Form.Item
-        label={t("skills")}
-        name="skills"
-        rules={[{ required: true, message: t("skillsRequired") }]}
+        label={t("position")}
+        name="position"
+        rules={[{ required: true, message: t("position Required") }]} // Add validation for position
       >
-        <Select
-          mode="multiple"
-          placeholder={t("skills")}
-        >
-          {skillOptions.map((skill) => (
-            <Option key={skill.value} value={skill.value}>
-              {skill.label}
+        <Select placeholder={t("position")}>
+          {positions.map((pos) => (
+            <Option key={pos.key} value={pos.key}>
+              {pos.name}
             </Option>
           ))}
         </Select>
@@ -269,11 +268,11 @@ const EditEmployee = () => {
           listType="picture"
           showUploadList={false}
         >
-          <Button type="primary" icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
+          <Button type="primary" icon={<PlusOutlined />}>{t("upload Image Button")}</Button>
         </Upload>
         {fileList.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <img src={fileList[0].url} alt={t("imagePreview")} width="30%" />
+            <img src={fileList[0].url} alt={t("image Preview")} width="30%" />
           </div>
         )}
       </Form.Item>
@@ -286,7 +285,7 @@ const EditEmployee = () => {
           style={{ marginLeft: 8 }}
           onClick={() => navigate("/employee-management")}
         >
-          {t("backToEmployeeManagement")}
+          {t("back To Employee Management")}
         </Button>
       </Form.Item>
     </Form>
