@@ -75,47 +75,30 @@ const EmployeeManagement = () => {
 
   const loadEmployees = async () => {
     try {
-      // Lấy tất cả thông tin nhân viên
       const data = await fetchAllEmployees();
       const filteredData = data
         .filter((employee) => employee.role === "employee")
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
+
       // Lọc dữ liệu theo tab
-      let tabFilteredData;
       if (activeTab === "active") {
-        tabFilteredData = filteredData.filter((e) => e.status === "active");
+        setFilteredEmployees(filteredData.filter((e) => e.status === "active"));
       } else if (activeTab === "inactive") {
-        tabFilteredData = filteredData.filter((e) => e.status === "inactive");
-      } else if (activeTab === "involved") {
-        tabFilteredData = filteredData.filter((e) => e.status === "involved");
-      } else {
-        tabFilteredData = filteredData; // Tab "All Employees"
-      }
-  
-      // Lấy thông tin dự án liên quan đến từng nhân viên
-      const db = getDatabase();
-      const projectsRef = ref(db, 'projects');
-      const projectsSnapshot = await get(projectsRef);
-      const allProjects = projectsSnapshot.val();
-  
-      // Lọc các dự án mà từng nhân viên đang tham gia
-      const employeesWithProjects = tabFilteredData.map(employee => {
-        const userProjects = Object.values(allProjects).filter(project =>
-          project.teamMembers.includes(employee.id)
+        setFilteredEmployees(
+          filteredData.filter((e) => e.status === "inactive")
         );
-        return { ...employee, projects: userProjects || [] };
-      });
-  
-      // Cập nhật trạng thái nhân viên với dự án liên quan
-      setEmployees(employeesWithProjects);
-      setFilteredEmployees(tabFilteredData);
+      } else if (activeTab === "involved") {
+        setFilteredEmployees(
+          filteredData.filter((e) => e.status === "involved")
+        );
+      } else {
+        setFilteredEmployees(filteredData); // Tab "All Employees"
+      }
+      setEmployees(filteredData);
     } catch (error) {
       console.error(t("errorFetchingEmployees"), error);
     }
   };
-  
-  console.log(employees);
 
   useEffect(() => {
     loadSkills();
@@ -232,32 +215,116 @@ const EmployeeManagement = () => {
     currentPage * pageSize
   );
 
-  const exportToWord = async (projects) => {
+  const exportToWord = async (employee, project) => {
     try {
-      // Tạo tài liệu Word mới
+      // Create a new Document
       const doc = new Document({
         sections: [
           {
             properties: {},
             children: [
-              // Phần tiêu đề
+              // Name and Address Section
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "PROJECT DETAILS",
+                    text: employee.name || "Name not available",
                     bold: true,
                     size: 32, // Optional: Adjust font size
                   }),
                 ],
               }),
-  
-              // Nếu có dự án, thêm thông tin cho từng dự án
-              ...(projects.length > 0
-                ? projects.flatMap(project => [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Address: ",
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text: employee.address || "Address not available",
+                    size: 24,
+                  }),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Email: ",
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text: employee.email || "Email not available",
+                    size: 24,
+                  }),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Department: ",
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text:
+                      formatDepartment(employee.department) || "Not provided",
+                    size: 24,
+                  }),
+                ],
+              }),
+
+              // Add a blank paragraph to create space
+              new Paragraph({}),
+
+              // WORKING EXPERIENCE Section
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "WORKING EXPERIENCE",
+                    bold: true,
+                    size: 24,
+                  }),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Skill: ",
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text: Array.isArray(employee.skills)
+                      ? employee.skills.map(formatSkill).join(", ")
+                      : employee.skills
+                      ? formatSkill(employee.skills)
+                      : "Not provided",
+                    size: 24,
+                  }),
+                ],
+              }),
+
+              // Add a blank paragraph to create space
+              new Paragraph({}),
+
+              // TYPICAL PROJECTS Section
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "TYPICAL PROJECTS",
+                    bold: true,
+                    size: 24,
+                  }),
+                ],
+              }),
+              ...(Array.isArray(employee.projects) &&
+              employee.projects.length > 0
+                ? employee.projects.map((project, index) => [
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Project Name: ",
+                          text: "Project name: ",
                           bold: true,
                           size: 24,
                         }),
@@ -270,12 +337,26 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
+                          text: "Role: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text: project.role || "No role provided",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
                           text: "Description: ",
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.description || "No description provided",
+                          text:
+                            project.description || "No description provided",
                           size: 24,
                         }),
                       ],
@@ -283,12 +364,14 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Client Name: ",
+                          text: "Specification: ",
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.clientName || "No client name provided",
+                          text:
+                            project.specification ||
+                            "No specification provided",
                           size: 24,
                         }),
                       ],
@@ -296,12 +379,14 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Budget: ",
+                          text: "Languages and frameworks: ",
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.budget || "No budget provided",
+                          text: Array.isArray(project.languagesAndFrameworks)
+                            ? project.languagesAndFrameworks.join(", ")
+                            : "Not provided",
                           size: 24,
                         }),
                       ],
@@ -309,41 +394,26 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Start Date: ",
+                          text: "Technologies: ",
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.startDate
-                            ? new Date(project.startDate).toLocaleDateString()
-                            : "No start date provided",
+                          text: Array.isArray(project.technologies)
+                            ? project.technologies.join(", ")
+                            : "Not provided",
                           size: 24,
                         }),
                       ],
                     }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "End Date: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.endDate
-                            ? new Date(project.endDate).toLocaleDateString()
-                            : "No end date provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    // Thêm đoạn trống để tạo khoảng cách giữa các dự án
+                    // Add a blank paragraph to create space between projects
                     new Paragraph({}),
                   ])
                 : [
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Not yet joined any projects",
+                          text: "Not yet joined the project",
                           size: 24,
                           italics: true,
                         }),
@@ -354,10 +424,10 @@ const EmployeeManagement = () => {
           },
         ],
       });
-  
-      // Lưu tài liệu dưới dạng tệp .docx
+
+      // Save the document as a .docx file
       Packer.toBlob(doc).then((blob) => {
-        saveAs(blob, "Project_Details.docx");
+        saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
       });
     } catch (error) {
       console.error("Error exporting to Word:", error);
