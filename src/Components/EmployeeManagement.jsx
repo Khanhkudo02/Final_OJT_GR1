@@ -18,6 +18,7 @@ import "../assets/style/Pages/EmployeeManagement.scss";
 import {
   deleteEmployeeById,
   fetchAllEmployees,
+  fetchAllSkills
 } from "../service/EmployeeServices";
 import { get, getDatabase, ref, onValue } from "firebase/database";
 
@@ -38,6 +39,7 @@ const EmployeeManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [userData, setUserData] = useState(null);
   const [data, setData] = useState([]);
+  const [skillsList, setSkillsList] = useState([]); // or pass as a prop
 
   const formatSkill = (skill) =>
     skill
@@ -53,6 +55,20 @@ const EmployeeManagement = () => {
         .replace(/\b\w/g, (char) => char.toUpperCase());
     }
     return department;
+  };
+
+  const loadSkills = async () => {
+    try {
+      const skillsData = await fetchAllSkills();
+      setSkillsList(skillsData.map((skill) => ({ key: skill.key, name: skill.label })));
+    } catch (error) {
+      message.error("Failed to fetch skills");
+    }
+  };
+
+  const getSkillNameById = (skillId, skills) => {
+    const skill = skills.find((sk) => sk.key === skillId);
+    return skill ? skill.name : "Unknown Skill";
   };
 
   const loadEmployees = async () => {
@@ -83,6 +99,7 @@ const EmployeeManagement = () => {
   };
 
   useEffect(() => {
+    loadSkills();
     loadEmployees();
 
     const employeeAdded = localStorage.getItem("employeeAdded");
@@ -279,8 +296,8 @@ const EmployeeManagement = () => {
                     text: Array.isArray(employee.skills)
                       ? employee.skills.map(formatSkill).join(", ")
                       : employee.skills
-                      ? formatSkill(employee.skills)
-                      : "Not provided",
+                        ? formatSkill(employee.skills)
+                        : "Not provided",
                     size: 24,
                   }),
                 ],
@@ -300,107 +317,107 @@ const EmployeeManagement = () => {
                 ],
               }),
               ...(Array.isArray(employee.projects) &&
-              employee.projects.length > 0
+                employee.projects.length > 0
                 ? employee.projects.map((project, index) => [
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Project name: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.name || "No name provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Role: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.role || "No role provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Description: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text:
-                            project.description || "No description provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Specification: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text:
-                            project.specification ||
-                            "No specification provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Languages and frameworks: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: Array.isArray(project.languagesAndFrameworks)
-                            ? project.languagesAndFrameworks.join(", ")
-                            : "Not provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Technologies: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: Array.isArray(project.technologies)
-                            ? project.technologies.join(", ")
-                            : "Not provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    // Add a blank paragraph to create space between projects
-                    new Paragraph({}),
-                  ])
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Project name: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: project.name || "No name provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Role: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: project.role || "No role provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Description: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text:
+                          project.description || "No description provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Specification: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text:
+                          project.specification ||
+                          "No specification provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Languages and frameworks: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: Array.isArray(project.languagesAndFrameworks)
+                          ? project.languagesAndFrameworks.join(", ")
+                          : "Not provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Technologies: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: Array.isArray(project.technologies)
+                          ? project.technologies.join(", ")
+                          : "Not provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  // Add a blank paragraph to create space between projects
+                  new Paragraph({}),
+                ])
                 : [
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Not yet joined the project",
-                          size: 24,
-                          italics: true,
-                        }),
-                      ],
-                    }),
-                  ]),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Not yet joined the project",
+                        size: 24,
+                        italics: true,
+                      }),
+                    ],
+                  }),
+                ]),
             ],
           },
         ],
@@ -499,14 +516,10 @@ const EmployeeManagement = () => {
           render={(text) => {
             if (Array.isArray(text)) {
               return text
-                .map((skill) =>
-                  t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
-                    defaultValue: skill.replace(/_/g, " "),
-                  })
-                )
+                .map((skillId) => getSkillNameById(skillId, skillsList))
                 .join(", ");
             }
-            return text;
+            return getSkillNameById(text, skillsList);
           }}
         />
         <Column
@@ -514,24 +527,22 @@ const EmployeeManagement = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
-            // Dịch giá trị của text
             const translatedText = t(text);
 
-            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
               translatedText === t("active")
                 ? "status-active"
                 : translatedText === t("inactive")
-                ? "status-inactive"
-                : translatedText === t("involved")
-                ? "status-involved"
-                : "";
+                  ? "status-inactive"
+                  : translatedText === t("involved")
+                    ? "status-involved"
+                    : "";
 
             return (
               <span className={className}>
                 {translatedText
                   ? translatedText.charAt(0).toUpperCase() +
-                    translatedText.slice(1)
+                  translatedText.slice(1)
                   : ""}
               </span>
             );
