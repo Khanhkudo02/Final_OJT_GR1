@@ -7,6 +7,8 @@ import {
   fetchAllPositions,
   fetchAllSkills,
 } from "../service/EmployeeServices";
+import { get, getDatabase, ref } from "firebase/database";
+import "../assets/style/Global.scss";
 
 const EmployeeDetails = () => {
   const { id } = useParams();
@@ -16,12 +18,26 @@ const EmployeeDetails = () => {
   const [skillsList, setSkillsList] = useState([]);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     const loadEmployee = async () => {
       try {
         const data = await fetchEmployeeById(id);
         setEmployee(data);
+
+        // Lấy thông tin dự án liên quan đến nhân viên
+        const db = getDatabase();
+        const projectsRef = ref(db, `projects`);
+        const projectsSnapshot = await get(projectsRef);
+        const allProjects = projectsSnapshot.val();
+
+        // Lọc các dự án mà nhân viên đang tham gia
+        const userProjects = Object.values(allProjects).filter(project =>
+          project.teamMembers.includes(id)
+        );
+
+        setProjects(userProjects || []);
       } catch (error) {
         message.error(t("failedToFetchEmployeeDetails"));
       } finally {
@@ -147,8 +163,21 @@ const EmployeeDetails = () => {
                 : ""}
             </span>
           </p>
+          <div className="project-detail">
+          {projects.map(project => (
+                <div className="project-detail-item" key={project.id}>
+                  <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
+                  <p><strong>{t("Description")}:</strong> {project.description}</p>
+                  <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
+                  <p><strong>{t("Budget")}:</strong> {project.budget}</p>
+                  <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
+                  <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
+                </div>
+              ))}
+          </div>
           <Button
             type="primary"
+            className="btn"
             onClick={() => navigate("/employee-management")}
             style={{ marginTop: "16px" }}
           >
