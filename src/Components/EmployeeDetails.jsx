@@ -9,6 +9,7 @@ const EmployeeDetails = () => {
   const [employee, setEmployee] = useState(null);
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [skillsList, setSkillsList] = useState([]);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -24,6 +25,15 @@ const EmployeeDetails = () => {
       }
     };
 
+    const loadSkills = async () => {
+      try {
+        const skillsData = await fetchAllSkills();
+        setSkillsList(skillsData.map((skill) => ({ key: skill.key, name: skill.label })));
+      } catch (error) {
+        message.error("Failed to fetch skills");
+      }
+    };
+
     const loadPositions = async () => {
       try {
         const positionsData = await fetchAllPositions();
@@ -35,11 +45,17 @@ const EmployeeDetails = () => {
 
     loadEmployee();
     loadPositions();
+    loadSkills();
   }, [id, t]);
 
   const getPositionNameById = (positionId, positions) => {
     const position = positions.find((pos) => pos.key === positionId);
     return position ? position.name : t("unknownPosition");
+  };
+
+  const getSkillNameById = (skillId, skills) => {
+    const skill = skills.find((sk) => sk.key === skillId);
+    return skill ? skill.name : "Unknown Skill";
   };
 
   if (loading) return <Spin size="large" />;
@@ -93,7 +109,7 @@ const EmployeeDetails = () => {
             <strong>{t('phoneNumber')}:</strong> {employee.phoneNumber}
           </p>
           <p>
-            <strong>{t('skills')}:</strong> {formattedSkills}
+            <strong>Skills:</strong> {employee.skills.map((skillId) => getSkillNameById(skillId, skillsList)).join(', ')}
           </p>
           <p>
             <strong>{t('department')}:</strong> {formatDepartment(employee.department)}

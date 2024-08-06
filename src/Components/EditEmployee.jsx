@@ -176,7 +176,6 @@ const EditEmployee = () => {
       >
         <Select
           placeholder={t("department")}
-          mode="multiple"
         >
           {departmentOptions.map((dept) => (
             <Option key={dept.value} value={dept.value}>
