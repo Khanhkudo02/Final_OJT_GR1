@@ -2,7 +2,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Select, Upload } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchEmployeeById,
@@ -43,11 +43,13 @@ const EditEmployee = () => {
             email: employee.email || "",
             department: employee.department || [],
             status: employee.status || "",
-            dateOfBirth: employee.dateOfBirth ? moment(employee.dateOfBirth) : "",
+            dateOfBirth: employee.dateOfBirth
+              ? moment(employee.dateOfBirth)
+              : "",
             address: employee.address || "",
             phoneNumber: employee.phoneNumber || "",
             skills: employee.skills || [],
-            position: employee.position || "" // Set position value
+            position: employee.position || "", // Set position value
           });
 
           setOldImageUrl(employee.imageUrl || "");
@@ -73,7 +75,9 @@ const EditEmployee = () => {
     const loadPositions = async () => {
       try {
         const positionsData = await fetchAllPositions();
-        setPositions(positionsData.map((pos) => ({ key: pos.key, name: pos.label }))); // Adjust based on your data structure
+        setPositions(
+          positionsData.map((pos) => ({ key: pos.key, name: pos.label }))
+        ); // Adjust based on your data structure
       } catch (error) {
         message.error(t("failed To Fetch Positions"));
       }
@@ -82,7 +86,9 @@ const EditEmployee = () => {
     const loadSkills = async () => {
       try {
         const skillsData = await fetchAllSkills();
-        setSkillsList(skillsData.map((skill) => ({ key: skill.key, name: skill.label })));
+        setSkillsList(
+          skillsData.map((skill) => ({ key: skill.key, name: skill.label }))
+        );
       } catch (error) {
         message.error("Failed to fetch skills");
       }
@@ -148,7 +154,7 @@ const EditEmployee = () => {
       initialValues={{
         department: [],
         skills: [],
-        position: "" // Initial value for position
+        position: "", // Initial value for position
       }}
     >
       <h2>{t("editEmployee")}</h2>
@@ -174,9 +180,7 @@ const EditEmployee = () => {
         name="department"
         rules={[{ required: true, message: t("departmentRequired") }]}
       >
-        <Select
-          placeholder={t("department")}
-        >
+        <Select placeholder={t("department")}>
           {departmentOptions.map((dept) => (
             <Option key={dept.value} value={dept.value}>
               {dept.label}
@@ -190,10 +194,7 @@ const EditEmployee = () => {
         name="skills"
         rules={[{ required: true, message: t("skillsRequired") }]}
       >
-        <Select
-          placeholder={t("skills")}
-          mode="multiple"
-        >
+        <Select placeholder={t("skills")} mode="multiple">
           {skillsList.map((skill) => (
             <Option key={skill.key} value={skill.key}>
               {skill.name}
@@ -201,7 +202,6 @@ const EditEmployee = () => {
           ))}
         </Select>
       </Form.Item>
-
 
       <Form.Item
         label={t("status")}

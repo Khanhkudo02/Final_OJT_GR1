@@ -5,46 +5,49 @@ import { ref, onValue } from "firebase/database"; // Import ref và onValue từ
 import { database } from "../firebaseConfig";
 import { Packer, Document, Paragraph, TextRun } from "docx";
 
-const CVWord = async (employee) => {
+const CVWord = async (employee, projects) => {
+  const formatSkill = (skill) =>
+    skill
+      .replace(/_/g, " ")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+  const formatDepartment = (department) => {
+    if (typeof department === "string") {
+      return department
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+    return department;
+  };
+
   try {
-    // Fetch the employee's projects from Firebase
-    const fetchEmployeeProjects = async () => {
-      const projectsRef = ref(database, "projects");
-      const snapshot = await new Promise((resolve) =>
-        onValue(projectsRef, (snap) => resolve(snap.val()))
-      );
-      const projectsData = snapshot;
-      const projects = [];
-      for (const key in projectsData) {
-        projects.push({ key, ...projectsData[key] });
-      }
-      return projects.filter((project) =>
-        project.teamMembers?.includes(employee.id) // Sử dụng ID của nhân viên
-      );
-    };
-
-    const employeeProjects = await fetchEmployeeProjects();
-
-    // Create the Word document
+    // Create a new Document
     const doc = new Document({
       sections: [
         {
           properties: {},
           children: [
-            // Employee Information Section
+            // Name and Address Section
             new Paragraph({
               children: [
                 new TextRun({
-                  text: `Employee Name: ${employee.name || "N/A"}`,
-                  size: 24,
+                  text: employee.name || "Name not available",
                   bold: true,
+                  size: 32, // Optional: Adjust font size
                 }),
               ],
             }),
             new Paragraph({
               children: [
                 new TextRun({
-                  text: `Position: ${employee.position || "N/A"}`,
+                  text: "Address: ",
+                  bold: true,
+                  size: 24,
+                }),
+                new TextRun({
+                  text: employee.address || "Address not available",
                   size: 24,
                 }),
               ],
@@ -52,38 +55,87 @@ const CVWord = async (employee) => {
             new Paragraph({
               children: [
                 new TextRun({
-                  text: `Department: ${employee.department || "N/A"}`,
+                  text: "Email: ",
+                  bold: true,
+                  size: 24,
+                }),
+                new TextRun({
+                  text: employee.email || "Email not available",
                   size: 24,
                 }),
               ],
             }),
-            new Paragraph({}), // Blank paragraph for spacing
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Department: ",
+                  bold: true,
+                  size: 24,
+                }),
+                new TextRun({
+                  text:
+                    formatDepartment(employee.department) || "Not provided",
+                  size: 24,
+                }),
+              ],
+            }),
 
-            // Projects Section
+            // Add a blank paragraph to create space
+            new Paragraph({}),
+
+            // WORKING EXPERIENCE Section
             new Paragraph({
               children: [
                 new TextRun({
-                  text: "Projects",
+                  text: "WORKING EXPERIENCE",
                   bold: true,
                   size: 24,
                 }),
               ],
             }),
-            ...employeeProjects.length > 0
-              ? employeeProjects.map((project) => [
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Skill: ",
+                  bold: true,
+                  size: 24,
+                }),
+                new TextRun({
+                  text: Array.isArray(employee.skills)
+                    ? employee.skills.map(formatSkill).join(", ")
+                    : employee.skills
+                    ? formatSkill(employee.skills)
+                    : "Not provided",
+                  size: 24,
+                }),
+              ],
+            }),
+
+            // Add a blank paragraph to create space
+            new Paragraph({}),
+
+            // TYPICAL PROJECTS Section
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "TYPICAL PROJECTS",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+            }),
+            ...(Array.isArray(employee.projects) &&
+            employee.projects.length > 0
+              ? employee.projects.map((project, index) => [
                   new Paragraph({
                     children: [
                       new TextRun({
-                        text: `Project Name: ${project.name || "N/A"}`,
-                        size: 24,
+                        text: "Project name: ",
                         bold: true,
+                        size: 24,
                       }),
-                    ],
-                  }),
-                  new Paragraph({
-                    children: [
                       new TextRun({
-                        text: `Status: ${project.status || "N/A"}`,
+                        text: project.name || "No name provided",
                         size: 24,
                       }),
                     ],
@@ -91,7 +143,12 @@ const CVWord = async (employee) => {
                   new Paragraph({
                     children: [
                       new TextRun({
-                        text: `Start Date: ${project.startDate || "N/A"}`,
+                        text: "Role: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: project.role || "No role provided",
                         size: 24,
                       }),
                     ],
@@ -99,53 +156,88 @@ const CVWord = async (employee) => {
                   new Paragraph({
                     children: [
                       new TextRun({
-                        text: `End Date: ${project.endDate || "N/A"}`,
+                        text: "Description: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text:
+                          project.description || "No description provided",
                         size: 24,
                       }),
                     ],
                   }),
-                  new Paragraph({}), // Add a blank paragraph for spacing
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Specification: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text:
+                          project.specification ||
+                          "No specification provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Languages and frameworks: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: Array.isArray(project.languagesAndFrameworks)
+                          ? project.languagesAndFrameworks.join(", ")
+                          : "Not provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "Technologies: ",
+                        bold: true,
+                        size: 24,
+                      }),
+                      new TextRun({
+                        text: Array.isArray(project.technologies)
+                          ? project.technologies.join(", ")
+                          : "Not provided",
+                        size: 24,
+                      }),
+                    ],
+                  }),
+                  // Add a blank paragraph to create space between projects
+                  new Paragraph({}),
                 ])
               : [
                   new Paragraph({
                     children: [
                       new TextRun({
-                        text: "Chưa tham gia project",
+                        text: "Not yet joined the project",
                         size: 24,
+                        italics: true,
                       }),
                     ],
                   }),
-                ],
-
-            // Additional Information Section
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: "ADDITIONAL INFORMATION",
-                  bold: true,
-                  size: 24,
-                }),
-              ],
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: "Additional notes or details can be added here.",
-                  size: 24,
-                }),
-              ],
-            }),
+                ]),
           ],
         },
       ],
     });
 
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, `${employee.name || "Employee"}.docx`);
+    // Save the document as a .docx file
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
+    });
   } catch (error) {
     console.error("Error exporting to Word:", error);
-    message.error("Failed to export data to Word.");
   }
-}
+};
 
 export default CVWord
