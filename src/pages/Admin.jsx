@@ -20,7 +20,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import LanguageSwitcher from "../Components/LanguageSwitcher";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/Admin.scss";
 
@@ -347,7 +346,7 @@ function AdminPage() {
         </Button>
         <Input
           prefix={<SearchOutlined />}
-          placeholder={t("search")}
+          placeholder={t("searchbyemail")}
           value={searchText}
           onChange={handleSearch}
           style={{ width: 250 }}
