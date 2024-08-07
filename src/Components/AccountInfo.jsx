@@ -5,12 +5,14 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/AccountInfo.scss";
 import "../assets/style/Global.scss";
+import { fetchAllSkills } from '../service/SkillServices';
 
 function AccountInfo() {
   const { t } = useTranslation();
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [allSkills, setAllSkills] = useState([]); // State để lưu trữ tất cả kỹ năng
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -38,6 +40,10 @@ function AccountInfo() {
         );
         
         setProjects(userProjects || []);
+
+        // Lấy tất cả các kỹ năng
+        const skills = await fetchAllSkills();
+        setAllSkills(skills);
       } catch (error) {
         message.error(t("errorFetchingUserData"));
       }
@@ -69,6 +75,12 @@ function AccountInfo() {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
+  // Tạo danh sách kỹ năng từ tất cả kỹ năng và kỹ năng của người dùng
+  const userSkills = userData.skills ? userData.skills.map(skillId => {
+    const skill = allSkills.find(s => s.key === skillId);
+    return skill ? skill.name : skillId;
+  }) : [];
 
   return (
     <div className="account-info-container">
@@ -116,11 +128,9 @@ function AccountInfo() {
               {capitalizeWords(userData.phoneNumber)}
             </Descriptions.Item>
           )}
-          {userData.skills && userData.skills.length > 0 && (
+           {userSkills.length > 0 && (
             <Descriptions.Item label={t("skills")}>
-              {userData.skills.map(skill => capitalizeWords(t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
-                defaultValue: skill.replace(/_/g, " "),
-              }))).join(", ")}
+              {userSkills.map(skill => capitalizeWords(skill)).join(", ")}
             </Descriptions.Item>
           )}
           {userData.department && (
@@ -129,22 +139,15 @@ function AccountInfo() {
             </Descriptions.Item>
           )}
           {/* Hiển thị thông tin dự án */}
-            {projects.length > 0 && (
-              <Descriptions.Item label={t("ListProject")}>
-                <div style={{display: 'flex'}}>
-                  {projects.map(project => (
-                    <div key={project.id} style={{width: '250px'}}>
-                      <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
-                      <p><strong>{t("Description")}:</strong> {project.description}</p>
-                      <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
-                      <p><strong>{t("Budget")}:</strong> {project.budget}</p>
-                      <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
-                      <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
-                    </div>
-                  ))}
+          {projects.length > 0 && (
+            <Descriptions.Item label={t("projects")}>
+              {projects.map(project => (
+                <div key={project.id}>
+                  <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
                 </div>
-              </Descriptions.Item>
-            )}
+              ))}
+            </Descriptions.Item>
+          )}
         </Descriptions>
       </Card>
     </div>

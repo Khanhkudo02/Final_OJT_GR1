@@ -286,5 +286,7 @@
   "Archived Projects": "Archived Projects",
   "Are you sure you want to archive this project?": "Are you sure you want to archive this project?",
   "Project archived successfully": "Project archived successfully",
-  "Failed to archive project": "Failed to archive project"
+  "Failed to archive project": "Failed to archive project",
+  "projects":"Projects Involved",
+  "searchbyemail":"Search by email"
 }
