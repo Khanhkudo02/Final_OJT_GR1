@@ -94,8 +94,8 @@ const EmployeeDetails = () => {
   const formattedSkills = Array.isArray(employee.skills)
     ? employee.skills.map(formatSkill).join(", ")
     : employee.skills
-    ? formatSkill(employee.skills)
-    : t("noSkills");
+      ? formatSkill(employee.skills)
+      : t("noSkills");
 
   const formatDepartment = (department) => {
     if (typeof department === "string") {
@@ -153,27 +153,27 @@ const EmployeeDetails = () => {
                 employee.status === "active"
                   ? "status-active"
                   : employee.status === "involved"
-                  ? "status-involved"
-                  : "status-inactive"
+                    ? "status-involved"
+                    : "status-inactive"
               }
             >
               {employee.status
                 ? employee.status.charAt(0).toUpperCase() +
-                  employee.status.slice(1)
+                employee.status.slice(1)
                 : ""}
             </span>
           </p>
           <div className="project-detail">
-          {projects.map(project => (
-                <div className="project-detail-item" key={project.id}>
-                  <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
-                  <p><strong>{t("Description")}:</strong> {project.description}</p>
-                  <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
-                  <p><strong>{t("Budget")}:</strong> {project.budget}</p>
-                  <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
-                  <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
-                </div>
-              ))}
+            {projects.map(project => (
+              <div className="project-detail-item" key={project.id}>
+                <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
+                <p><strong>{t("Description")}:</strong> {project.description}</p>
+                <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
+                <p><strong>{t("Budget")}:</strong> {project.budget}</p>
+                <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
+                <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
+              </div>
+            ))}
           </div>
           <Button
             type="primary"

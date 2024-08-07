@@ -162,7 +162,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("name")}
         name="name"
-        rules={[{ required: true, message: t("name Required") }]}
+        rules={[{ required: true, message: t("nameRequired") }]}
       >
         <Input placeholder={t("name")} />
       </Form.Item>
@@ -170,10 +170,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("email")}
         name="email"
-        rules={[
-          { type: "email", message: t("invalid Email") },
-          { required: true, message: t("email Required") },
-        ]}
+        rules={[{ type: 'email', message: t("invalidEmail") }, { required: true, message: t("email Required") }]}
       >
         <Input placeholder={t("email")} disabled />
       </Form.Item>
@@ -181,7 +178,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("department")}
         name="department"
-        rules={[{ required: true, message: t("department Required") }]}
+        rules={[{ required: true, message: t("departmentRequired") }]}
       >
         <Select placeholder={t("department")}>
           {departmentOptions.map((dept) => (
@@ -195,7 +192,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("skills")}
         name="skills"
-        rules={[{ required: true, message: t("skills Required") }]}
+        rules={[{ required: true, message: t("skillsRequired") }]}
       >
         <Select placeholder={t("skills")} mode="multiple">
           {skillsList.map((skill) => (
@@ -209,7 +206,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("status")}
         name="status"
-        rules={[{ required: true, message: t("status Required") }]}
+        rules={[{ required: true, message: t("statusRequired") }]}
       >
         <Select placeholder={t("status")}>
           <Option value="active">{t("active")}</Option>
@@ -220,7 +217,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("dateOfBirth")}
         name="dateOfBirth"
-        rules={[{ required: true, message: t("date Of Birth Required") }]}
+        rules={[{ required: true, message: t("dateOfBirthRequired") }]}
       >
         <Input type="date" />
       </Form.Item>
@@ -228,7 +225,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("address")}
         name="address"
-        rules={[{ required: true, message: t("address Required") }]}
+        rules={[{ required: true, message: t("addressRequired") }]}
       >
         <Input placeholder={t("address")} />
       </Form.Item>
@@ -237,8 +234,8 @@ const EditEmployee = () => {
         label={t("phoneNumber")}
         name="phoneNumber"
         rules={[
-          { required: true, message: t("phoneNumber Required") },
-          { pattern: /^\d{10}$/, message: t("phoneNumber Invalid") },
+          { required: true, message: t("phoneNumberRequired") },
+          { pattern: /^\d{10}$/, message: t("phoneNumberInvalid") }
         ]}
       >
         <Input
@@ -251,7 +248,7 @@ const EditEmployee = () => {
       <Form.Item
         label={t("position")}
         name="position"
-        rules={[{ required: true, message: t("position Required") }]} // Add validation for position
+        rules={[{ required: true, message: t("positionRequired") }]} // Add validation for position
       >
         <Select placeholder={t("position")}>
           {positions.map((pos) => (
@@ -271,13 +268,11 @@ const EditEmployee = () => {
           listType="picture"
           showUploadList={false}
         >
-          <Button type="primary" icon={<PlusOutlined />}>
-            {t("upload Image Button")}
-          </Button>
+          <Button type="primary" icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
         </Upload>
         {fileList.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <img src={fileList[0].url} alt={t("image Preview")} width="30%" />
+            <img src={fileList[0].url} alt={t("imagePreview")} width="30%" />
           </div>
         )}
       </Form.Item>
