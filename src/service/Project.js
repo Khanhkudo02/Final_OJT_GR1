@@ -193,7 +193,10 @@ const restoreProject = async (id) => {
 
     if (projectData) {
       const projectRef = ref(db, `projects/${id}`);
-      await set(projectRef, projectData);
+      await set(projectRef, {
+        ...projectData,
+        status: "NOT STARTED", // Set status to "Not Started"
+      });
       await remove(archivedProjectRef);
     } else {
       throw new Error("Project not found");
@@ -203,6 +206,7 @@ const restoreProject = async (id) => {
     throw error;
   }
 };
+
 
 export {
   fetchAllProjects,
