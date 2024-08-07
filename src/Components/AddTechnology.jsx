@@ -1,14 +1,27 @@
 
 import React, { useState, useEffect } from "react";
-import { UploadOutlined, PlusOutlined, EyeOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Select, Upload, Table, Modal, Space } from "antd";
-import { v4 as uuidv4 } from 'uuid';
-import { storage } from "../firebaseConfig"; // Ensure correct import
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { postCreateTechnology, fetchAllTechnology, deleteTechnology } from "../service/TechnologyServices";
+import {
+  UploadOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { Button, Form, Input, Select, Upload, Table, Modal, Space } from "antd";
+import { storage } from "../firebaseConfig";
+import {
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import {
+  postCreateTechnology,
+  fetchTechnologyById,
+  fetchAllTechnology,
+  putUpdateTechnology,
+  deleteTechnology,
+} from "../service/TechnologyServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Global.scss";
 
 const { Option } = Select;
 const { Column } = Table;
@@ -46,15 +59,21 @@ const AddTechnology = () => {
     }
 
     try {
-      const technologyId = uuidv4();
-
       // Upload image to Firebase Storage
-      const storageReference = storageRef(storage, `technologies/${technologyId}/${imageFile.name}`);
+      const storageReference = storageRef(
+        storage,
+        `technologies/${imageFile.name}`
+      );
       await uploadBytes(storageReference, imageFile);
       const imageUrl = await getDownloadURL(storageReference);
 
       // Save technology details to Firebase Database
-      await postCreateTechnology(technologyId, values.name, values.description, values.status, imageUrl);
+      const technologyId = await postCreateTechnology(
+        values.name,
+        values.description,
+        values.status,
+        imageUrl
+      );
       toast.success("Technology added successfully!");
       loadTechnologies(); // Reload the technologies after adding a new one
       navigate("/technology-management");
@@ -104,7 +123,9 @@ const AddTechnology = () => {
         <Form.Item
           label="Name"
           name="name"
-          rules={[{ required: true, message: "Please input the technology name!" }]}
+          rules={[
+            { required: true, message: "Please input the technology name!" },
+          ]}
         >
           <Input />
         </Form.Item>
@@ -112,7 +133,12 @@ const AddTechnology = () => {
         <Form.Item
           label="Description"
           name="description"
-          rules={[{ required: true, message: "Please input the technology description!" }]}
+          rules={[
+            {
+              required: true,
+              message: "Please input the technology description!",
+            },
+          ]}
         >
           <Input />
         </Form.Item>
@@ -120,7 +146,9 @@ const AddTechnology = () => {
         <Form.Item
           label="Status"
           name="status"
-          rules={[{ required: true, message: "Please select the technology status!" }]}
+          rules={[
+            { required: true, message: "Please select the technology status!" },
+          ]}
         >
           <Select>
             <Option value="active">Active</Option>
@@ -164,7 +192,8 @@ const AddTechnology = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
-            const className = text === "active" ? "status-active" : "status-inactive";
+            const className =
+              text === "active" ? "status-active" : "status-inactive";
             return (
               <span className={className}>
                 {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
@@ -178,7 +207,7 @@ const AddTechnology = () => {
           render={(text, record) => (
             <Space>
               <Button
-                icon={<EyeOutlined />}
+                icon={<UploadOutlined />}
                 style={{ color: "green", borderColor: "green" }}
                 onClick={() => handleViewTechnology(record)}
               />
@@ -194,7 +223,7 @@ const AddTechnology = () => {
 
       <Modal
         title="View Technology"
-        open={viewModalVisible}
+        visible={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>
@@ -216,7 +245,11 @@ const AddTechnology = () => {
             {selectedTechnology.imageUrl && (
               <p>
                 <strong>Image:</strong>
-                <img src={selectedTechnology.imageUrl} alt="Technology" style={{ width: "100%", height: "auto" }} />
+                <img
+                  src={selectedTechnology.imageUrl}
+                  alt="Technology"
+                  style={{ width: "100%", height: "auto" }}
+                />
               </p>
             )}
           </div>

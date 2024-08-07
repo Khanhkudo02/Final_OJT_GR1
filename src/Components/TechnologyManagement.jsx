@@ -1,11 +1,18 @@
-import React, { useState, useEffect } from "react";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { fetchAllTechnology, deleteTechnology } from "../service/TechnologyServices";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/TechnologyManagement.scss";
-import "../assets/style/Global.scss";
-import { useTranslation } from "react-i18next";
+import {
+  deleteTechnology,
+  fetchAllTechnology,
+} from "../service/TechnologyServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -16,18 +23,13 @@ const TechnologyManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [filteredStatus, setFilteredStatus] = useState("All Technology");
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
   const loadTechnologies = async () => {
     try {
       const data = await fetchAllTechnology();
-      console.log("Fetched technologies:", data); // Debug log
-      const techArray = Object.keys(data).map((key) => ({
-        key,  // Add the key as the ID
-        ...data[key],  // Spread the data
-      }));
-      setTechnologies(techArray);
+      setTechnologies(data);
     } catch (error) {
       console.error("Failed to fetch technologies:", error);
     }
@@ -35,12 +37,6 @@ const TechnologyManagement = () => {
 
   useEffect(() => {
     loadTechnologies();
-
-    const technologyAdded = localStorage.getItem("technologyAdded");
-    if (technologyAdded === "true") {
-      message.success("Technology added successfully!");
-      localStorage.removeItem("technologyAdded"); // Clear notification after displaying
-    }
   }, []);
 
   const handleTableChange = (pagination) => {
@@ -62,9 +58,9 @@ const TechnologyManagement = () => {
       title: "Are you sure you want to delete this technology?",
       onOk: async () => {
         try {
-          await deleteTechnology(record.key);
+          await deleteTechnology(record.id);
           message.success("Technology deleted successfully!");
-          loadTechnologies();
+          loadTechnologies(); // Reload technologies after deletion
         } catch (error) {
           message.error("Failed to delete technology.");
         }
@@ -86,8 +82,12 @@ const TechnologyManagement = () => {
   };
 
   const filteredData = technologies.filter((item) => {
-    const matchesStatus = filteredStatus === "All Technology" || item.status.toLowerCase() === filteredStatus.toLowerCase();
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filteredStatus === "All Technology" ||
+      item.status.toLowerCase() === filteredStatus.toLowerCase();
+    const matchesSearch = item.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -111,6 +111,7 @@ const TechnologyManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       >
+        Add Technology
       </Button>
       <Input
         placeholder={t("search")}
@@ -124,10 +125,10 @@ const TechnologyManagement = () => {
         onChange={handleTabChange}
         items={tabItems}
         centered
-      /> 
+      />
       <Table
         dataSource={paginatedData}
-        rowKey="key"
+        rowKey="id"
         pagination={{
           current: currentPage,
           pageSize: pageSize,
@@ -140,11 +141,21 @@ const TechnologyManagement = () => {
           title="Image"
           dataIndex="imageUrl"
           key="imageUrl"
-          render={(imageUrl) => (
-            imageUrl 
-              ? <img src={imageUrl} alt="Technology" style={{ width: 50, height: 50 }} onError={(e) => {e.target.onerror = null; e.target.src="path/to/placeholder.png"}} /> 
-              : <span>No Image</span>
-          )}
+          render={(imageUrl) =>
+            imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="Technology"
+                style={{ width: 50, height: 50 }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "path/to/placeholder.png";
+                }}
+              />
+            ) : (
+              <span>No Image</span>
+            )
+          }
         />
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Description" dataIndex="description" key="description" />
@@ -153,7 +164,8 @@ const TechnologyManagement = () => {
           dataIndex="status"
           key="status"
           render={(text) => {
-            const className = text === "active" ? "status-active" : "status-inactive";
+            const className =
+              text === "active" ? "status-active" : "status-inactive";
             return (
               <span className={className}>
                 {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
@@ -161,24 +173,26 @@ const TechnologyManagement = () => {
             );
           }}
         />
-       <Column
-  title="Actions"
-  key="actions"
-  render={(text, record) => (
-    <Space>
-      <Button
-        icon={<EditOutlined />}
-        style={{ color: "blue", borderColor: "blue" }}
-        onClick={() => navigate(`/technology-management/edit/${record.key}`)} // Use record.key to navigate
-      />
-      <Button
-        icon={<DeleteOutlined />}
-        style={{ color: "red", borderColor: "red" }}
-        onClick={() => handleDelete(record)}
-      />
-    </Space>
-  )}
-/>
+        <Column
+          title="Actions"
+          key="actions"
+          render={(text, record) => (
+            <Space>
+              <Button
+                icon={<EditOutlined />}
+                style={{ color: "blue", borderColor: "blue" }}
+                onClick={() =>
+                  navigate(`/technology-management/edit/${record.id}`)
+                }
+              />
+              <Button
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
+                onClick={() => handleDelete(record)}
+              />
+            </Space>
+          )}
+        />
       </Table>
     </div>
   );

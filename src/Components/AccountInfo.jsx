@@ -40,22 +40,56 @@ function AccountInfo() {
     <div className="account-info-container">
       <Card title={t("userProfile")} className="account-info-card">
         <Descriptions bordered column={1}>
-          <Descriptions.Item label={t("email")}>
-            {userData.email}
-          </Descriptions.Item>
-          <Descriptions.Item label={t("name")}>
-            {userData.name}
-          </Descriptions.Item>
-          <Descriptions.Item label={t("role")}>
-            {userData.role}
-          </Descriptions.Item>
-          <Descriptions.Item label={t("status")}>
-            {userData.status}
-          </Descriptions.Item>
-          <Descriptions.Item label={t("createdAt")}>
-            {new Date(userData.createdAt).toLocaleDateString()}
-          </Descriptions.Item>
-          {/* Hiển thị các thông tin khác của người dùng tại đây */}
+          {userData.email && (
+            <Descriptions.Item label={t("email")}>
+              {userData.email}
+            </Descriptions.Item>
+          )}
+          {userData.name && (
+            <Descriptions.Item label={t("name")}>
+              {userData.name}
+            </Descriptions.Item>
+          )}
+          {userData.role && (
+            <Descriptions.Item label={t("role")}>
+              {userData.role}
+            </Descriptions.Item>
+          )}
+          {userData.status && (
+            <Descriptions.Item label={t("status")}>
+              {userData.status}
+            </Descriptions.Item>
+          )}
+          {userData.createdAt && (
+            <Descriptions.Item label={t("createdAt")}>
+              {new Date(userData.createdAt).toLocaleDateString()}
+            </Descriptions.Item>
+          )}
+          {userData.dateOfBirth && (
+            <Descriptions.Item label={t("dateOfBirth")}>
+              {new Date(userData.dateOfBirth).toLocaleDateString()}
+            </Descriptions.Item>
+          )}
+          {userData.address && (
+            <Descriptions.Item label={t("address")}>
+              {userData.address}
+            </Descriptions.Item>
+          )}
+          {userData.phoneNumber && (
+            <Descriptions.Item label={t("phoneNumber")}>
+              {userData.phoneNumber}
+            </Descriptions.Item>
+          )}
+          {userData.skills && userData.skills.length > 0 && (
+            <Descriptions.Item label={t("skills")}>
+              {userData.skills.join(", ")}
+            </Descriptions.Item>
+          )}
+          {userData.department && (
+            <Descriptions.Item label={t("department")}>
+              {userData.department}
+            </Descriptions.Item>
+          )}
         </Descriptions>
       </Card>
     </div>

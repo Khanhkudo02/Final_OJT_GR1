@@ -9,13 +9,14 @@ import {
   Select,
   Upload,
 } from "antd";
+import emailjs from "emailjs-com";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { postCreateProject } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
-import emailjs from "emailjs-com";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -33,6 +34,7 @@ const NewProject = () => {
   const [fileList, setFileList] = useState([]);
   const [startDate, setStartDate] = useState(null); // State to store selected start date
   const [endDate, setEndDate] = useState(null); // State to store selected end date
+  const { t } = useTranslation();
 
   const onFinish = async (values) => {
     try {
@@ -107,7 +109,7 @@ const NewProject = () => {
         const data = await fetchAllTechnology();
         const techOptions = data.map((tech) => ({
           label: tech.name,
-          value: tech.key, // Use key as value for Option
+          value: tech.id, // Use key as value for Option
         }));
         setTechnologies(techOptions);
       } catch (err) {
@@ -231,10 +233,10 @@ const NewProject = () => {
         margin: "auto",
       }}
     >
-      <h2>New Project</h2>
+      <h2>{t("NewProject")}</h2>
       <Form form={form} onFinish={onFinish}>
         <Form.Item
-          label="Project Name"
+          label={t("ProjectName")}
           name="name"
           rules={[
             { required: true, message: "Please input the project name!" },
@@ -244,7 +246,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Description"
+          label={t("Description")}
           name="description"
           rules={[
             {
@@ -257,7 +259,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Start Date"
+          label={t("StartDate")}
           name="startDate"
           rules={[{ required: true, message: "Please select the start date!" }]}
         >
@@ -270,7 +272,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="End Date"
+          label={t("EndDate")}
           name="endDate"
           rules={[{ required: true, message: "Please select the end date!" }]}
         >
@@ -283,7 +285,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Name"
+          label={t("name")}
           name="clientName"
           rules={[{ required: true, message: "Please input the client name!" }]}
         >
@@ -291,7 +293,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Email"
+          label={t("Email")}
           name="email"
           rules={[
             { required: true, message: "Please input the client email!" },
@@ -302,7 +304,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Phone Number"
+          label={t("phoneNumber")}
           name="phoneNumber"
           rules={[
             { required: true, message: "Please input the phone number!" },
@@ -316,7 +318,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Project Manager"
+          label={t("ProjectManager")}
           name="projectManager"
           rules={[
             { required: true, message: "Please input the project manager!" },
@@ -326,7 +328,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Team Members"
+          label={t("TeamMember")}
           name="teamMembers"
           rules={[
             { required: true, message: "Please select the team members!" },
@@ -346,7 +348,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Budget"
+          label={t("Budget")}
           name="budget"
           rules={[
             { required: true, message: "Please input the project budget!" },
@@ -360,7 +362,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Status"
+          label={t("Status")}
           name="status"
           rules={[
             { required: true, message: "Please select the project status!" },
@@ -374,7 +376,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Priority"
+          label={t("Priority")}
           name="priority"
           rules={[
             { required: true, message: "Please select the project priority!" },
@@ -388,7 +390,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item
-          label="Category"
+          label={t("Category")}
           name="category"
           rules={[
             { required: true, message: "Please select the project category!" },
@@ -406,7 +408,7 @@ const NewProject = () => {
         </Form.Item>
 
         {/* Select technologies */}
-        <Form.Item label="Technologies Used" name="technologies">
+        <Form.Item label={t("TechnologiesUsed")} name="technologies">
           <Select
             mode="multiple"
             placeholder="Select technologies"
@@ -421,7 +423,7 @@ const NewProject = () => {
         </Form.Item>
 
         {/* Select programming languages */}
-        <Form.Item label="Programming Languages Used" name="languages">
+        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages">
           <Select
             mode="multiple"
             placeholder="Select languages"
@@ -435,29 +437,29 @@ const NewProject = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Attachments" name="attachments">
+        <Form.Item label={t("Attachments")} name="attachments">
           <Upload
             fileList={fileList}
             beforeUpload={() => false}
             onChange={handleImageChange}
             onBlur={() => handleFieldBlur("attachments")}
           >
-            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+            <Button icon={<UploadOutlined />}>{t("Click to Upload")}</Button>
           </Upload>
         </Form.Item>
 
         <Form.Item>
           <Checkbox checked={agreement} onChange={handleAgreementChange}>
-            I have read the agreement
+            {t("I have read the agreement")}
           </Checkbox>
           {!agreement && (
-            <div style={{ color: "red" }}>Should accept agreement</div>
+            <div style={{ color: "red" }}>{t("Should accept agreement")}</div>
           )}
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" disabled={!agreement}>
-            Register
+            {t("Resister")}
           </Button>
         </Form.Item>
       </Form>

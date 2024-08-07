@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
 import "../assets/style/Pages/LogoutButton.scss";
+import { useTranslation } from "react-i18next";
 
 // eslint-disable-next-line react/prop-types
 function LogoutButton({ collapsed }) {
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const handleLogout = () => {
     localStorage.removeItem("userId");
     navigate("/login");
@@ -21,7 +22,7 @@ function LogoutButton({ collapsed }) {
       icon={<LogoutOutlined />}
       onClick={handleLogout}
     >
-      {!collapsed && "Log Out"}
+      {!collapsed && t("LogOut")}
     </Button>
   );
 }

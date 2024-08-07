@@ -7,6 +7,7 @@ import {
   fetchPositionById,
 } from "../service/PositionServices";
 import { PlusOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { Header } = Layout;
@@ -14,7 +15,7 @@ const { Header } = Layout;
 const EditPosition = () => {
   const { id } = useParams(); // Lấy ID từ URL
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [department, setDepartment] = useState("");
@@ -65,7 +66,7 @@ const EditPosition = () => {
     }
   };
 
-  
+
   const beforeUpload = (file) => {
     handleImageChange({ file });
     return false;
@@ -73,10 +74,10 @@ const EditPosition = () => {
 
   return (
     <div>
-      <h2>Edit Position</h2>
+      <h2>{t("EditPosition")}</h2>
 
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
           placeholder="Name"
           value={name}
@@ -84,7 +85,7 @@ const EditPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Description</label>
+        <label>{t("Description")}</label>
         <Input.TextArea
           placeholder="Description"
           value={description}
@@ -92,7 +93,7 @@ const EditPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Department</label>
+        <label>{t("Department")}</label>
         <Input
           placeholder="Department"
           value={department}
@@ -100,14 +101,14 @@ const EditPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("Status")}</label>
         <Select
           placeholder="Select Status"
           value={status}
           onChange={(value) => setStatus(value)}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
+          <Option value="active">{t("active")}</Option>
+          <Option value="inactive">{t("inactive")}</Option>
         </Select>
       </div>
       <Button
@@ -115,13 +116,13 @@ const EditPosition = () => {
         onClick={handleUpdatePosition}
         disabled={!name || !description || !department || !status}
       >
-        Save
+        {t("save")}
       </Button>
       <Button
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/position-management")}
       >
-        Back to Position Management
+        {t("BacktoPositionManagement")}
       </Button>
     </div>
   );

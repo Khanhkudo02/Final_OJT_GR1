@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Tag,
-  Space,
-  Button,
-  Avatar,
-  Pagination,
-  Tabs,
-  Input,
-} from "antd";
-import { useNavigate } from "react-router-dom";
-import { fetchEmployeeProjects } from "../service/Project";
 import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  Avatar,
+  Button,
+  Input,
+  Pagination,
+  Space,
+  Table,
+  Tabs,
+  Tag,
+} from "antd";
+import { onValue, ref } from "firebase/database"; // Import ref và onValue từ Firebase Database
 import moment from "moment";
-import "../assets/style/Pages/ProjectManagement.scss";
-import "../assets/style/Global.scss";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import "../assets/style/Global.scss";
+import "../assets/style/Pages/ProjectManagement.scss";
+import { database } from "../firebaseConfig"; // Import cấu hình Firebase
 
 const statusColors = {
   COMPLETED: "green",
@@ -24,7 +25,7 @@ const statusColors = {
   PENDING: "yellow",
 };
 
-const EmployeeProjectManagement = ({ employeeId }) => {
+const EmployeeProjectManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredStatus, setFilteredStatus] = useState("All Projects");
   const [data, setData] = useState([]);
@@ -33,15 +34,30 @@ const EmployeeProjectManagement = ({ employeeId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
+  // Lấy userId của employee đăng nhập từ localStorage
+  const userId = localStorage.getItem("userId");
+
   useEffect(() => {
     const fetchData = async () => {
-      if (employeeId) {
-        const projects = await fetchEmployeeProjects(employeeId);
-        setData(projects.reverse());
-      }
+      const projectsRef = ref(database, "projects");
+      onValue(projectsRef, (snapshot) => {
+        const projectsData = snapshot.val();
+        const projects = [];
+        for (const key in projectsData) {
+          projects.push({ key, ...projectsData[key] });
+        }
+        // Kiểm tra xem dự án có mảng teamMembers chứa userId của employee đăng nhập không
+        const employeeProjects = projects.filter((project) => {
+          if (project.teamMembers && Array.isArray(project.teamMembers)) {
+            return project.teamMembers.includes(userId); // So sánh với userId
+          }
+          return false;
+        });
+        setData(employeeProjects.reverse());
+      });
     };
     fetchData();
-  }, [employeeId]);
+  }, [userId]); // Thay đổi phụ thuộc vào userId
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -49,12 +65,12 @@ const EmployeeProjectManagement = ({ employeeId }) => {
 
   const handleTabChange = (key) => {
     setFilteredStatus(key);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to the first page when changing tabs
   };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   const filteredData = data.filter((item) => {
@@ -104,26 +120,22 @@ const EmployeeProjectManagement = ({ employeeId }) => {
       value = String(value);
     }
     if (!value) return "";
-
     const hasDollarSign = value.startsWith("$");
     const hasVND = value.endsWith("VND");
-
     let numericValue = value.replace(/[^\d]/g, "");
     numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
     if (hasDollarSign) {
       numericValue = `$${numericValue}`;
     }
     if (hasVND) {
       numericValue = `${numericValue}VND`;
     }
-
     return numericValue;
   };
 
   const columns = [
     {
-      title: "Name",
+      title: "Project Name",
       dataIndex: "name",
       key: "name",
     },
@@ -133,10 +145,10 @@ const EmployeeProjectManagement = ({ employeeId }) => {
       key: "startDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = moment(date);
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
-          : "Ngày không hợp lệ";
+          : "Invalid Date";
       },
     },
     {
@@ -145,14 +157,14 @@ const EmployeeProjectManagement = ({ employeeId }) => {
       key: "endDate",
       render: (date) => {
         if (!date) return "";
-        const dateObj = moment(date);
+        const dateObj = moment(date); // Sử dụng moment để chuyển đổi định dạng ngày tháng
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
-          : "Ngày không hợp lệ";
+          : "Invalid Date";
       },
     },
     {
-      title: "Project Management",
+      title: "Project Manager",
       dataIndex: "projectManager",
       key: "projectManager",
       className: "text-align-start",
@@ -223,12 +235,7 @@ const EmployeeProjectManagement = ({ employeeId }) => {
         items={tabItems}
         centered
       />
-      <Table
-        columns={columns}
-        dataSource={paginatedData}
-        pagination={false}
-        rowKey="key"
-      />
+      <Table columns={columns} dataSource={paginatedData} pagination={false} />
       <div style={{ marginTop: "16px", textAlign: "right" }}>
         <Pagination
           current={currentPage}
