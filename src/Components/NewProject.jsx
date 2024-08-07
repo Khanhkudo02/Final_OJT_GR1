@@ -391,7 +391,7 @@ const NewProject = () => {
 
         {/* Select technologies */}
         <Form.Item label={t("TechnologiesUsed")} name="technologies" rules={[
-            { required: true, message: t("Please select technologies used!") },
+            { required: true,  },
           ]}>
           <Select
             mode="multiple"

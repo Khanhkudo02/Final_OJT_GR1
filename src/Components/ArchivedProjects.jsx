@@ -8,7 +8,6 @@ import "../assets/style/Global.scss";
 
 const ArchivedProjects = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredStatus, setFilteredStatus] = useState("");
   const [data, setData] = useState([]);
   const pageSize = 10;
   const navigate = useNavigate();
@@ -31,11 +30,6 @@ const ArchivedProjects = () => {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-
-  const paginatedData = data.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
 
   const handleDelete = (key) => {
     Modal.confirm({
@@ -71,9 +65,10 @@ const ArchivedProjects = () => {
       title: 'Are you sure you want to restore this project?',
       onOk: async () => {
         try {
-          await restoreProject(key);
+          await restoreProject(key, { status: 'NOT STARTED' });
           setData(prevData => prevData.filter(item => item.key !== key));
           message.success('Project restored successfully');
+          navigate("/project-management"); // Navigate to project management page after restoring
         } catch (error) {
           message.error('Failed to restore project');
           console.error('Failed to restore project:', error);
@@ -137,7 +132,7 @@ const ArchivedProjects = () => {
       <div style={{ marginTop: "16px", textAlign: "right" }}>
         <Pagination
           current={currentPage}
-          total={data.length}
+          total={filteredData.length}
           pageSize={pageSize}
           onChange={handlePageChange}
         />
