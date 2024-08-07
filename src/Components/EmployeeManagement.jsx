@@ -22,7 +22,7 @@ import {
 } from "../service/EmployeeServices";
 import { get, getDatabase, ref, onValue } from "firebase/database";
 import { format } from "date-fns";
-import { fetchAllLanguages } from "../service/LanguageServices";
+import { fetchAllLanguages2 } from "../service/LanguageServices";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
@@ -263,7 +263,7 @@ const EmployeeManagement = () => {
         const [allProjects, allTechnologies, allLanguages, allEmployees] =
           await Promise.all([
             fetchAllTechnology(),
-            fetchAllLanguages(),
+            fetchAllLanguages2(),
             fetchAllEmployees(),
           ]);
 
@@ -295,8 +295,9 @@ const EmployeeManagement = () => {
   }, [id, navigate]);
 
   const getLanguageNameById = (id, languagesList) => {
-    const language = languagesList.find((lang) => lang.id === id);
-    return language ? language.name : "No programming language";
+    const languages = languagesList.find((lang) => lang.id === id);
+    console.log(languages);
+    return languages ? languages.name : "No programming language";
   };
 
   const getTechnologyNameById = (id, technologiesList) => {
@@ -309,7 +310,7 @@ const EmployeeManagement = () => {
       const userProjects = await fetchUserProjects(employee.key);
 
       // Fetch all languages and technologies
-      const languagesList = await fetchAllLanguages();
+      const languagesList = await fetchAllLanguages2();
       const technologiesList = await fetchAllTechnology();
       // Tạo một Tài liệu mới
       const doc = new Document({
@@ -473,11 +474,29 @@ const EmployeeManagement = () => {
                           bold: true,
                           size: 24,
                         }),
+                        // new TextRun({
+                        //   text: Array.isArray(project.languages)
+                        //     ? project.languages
+                        //         .map((langId) =>
+                        //           getLanguageNameById(langId, languagesList)
+                        //         )
+                        //         .join(", ")
+                        //     : project.languages
+                        //     ? getLanguageNameById(
+                        //         project.languages,
+                        //         languagesList
+                        //       )
+                        //     : "Không được cung cấp",
+                        //   size: 24,
+                        // }),
                         new TextRun({
                           text: Array.isArray(project.languages)
                             ? project.languages
                                 .map((langId) =>
-                                  getLanguageNameById(langId, languagesList)
+                                  getLanguageNameById(
+                                    langId,
+                                    languagesList
+                                  )
                                 )
                                 .join(", ")
                             : project.languages
