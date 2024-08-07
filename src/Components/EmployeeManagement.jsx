@@ -178,26 +178,62 @@ const EmployeeManagement = () => {
       }
     };
 
-    const fetchProjects = async () => {
-      const projectsRef = ref(getDatabase(), "projects");
-      onValue(projectsRef, (snapshot) => {
-        const projectsData = snapshot.val();
-        const projectsList = [];
-        for (const key in projectsData) {
-          projectsList.push({ key, ...projectsData[key] });
-        }
-        const userProjects = projectsList.filter((project) =>
-          project.teamMembers?.includes(userId)
-        );
-        setProjects(userProjects.reverse());
-      });
-    };
+    // const fetchProjects = async () => {
+    //   const projectsRef = ref(getDatabase(), "projects");
+    //   onValue(projectsRef, (snapshot) => {
+    //     const projectsData = snapshot.val();
+    //     const projectsList = [];
+    //     for (const key in projectsData) {
+    //       projectsList.push({ key, ...projectsData[key] });
+    //     }
+    //     const userProjects = projectsList.filter((project) =>
+    //       project.teamMembers?.includes(userId)
 
+    //     );
+    //     console.log("userProjects", userProjects);
+    //     setProjects(userProjects.reverse());
+    //     console.log("List projects", projectsData);
+    //   });
+    // };
+
+    // const fetchProjects = async () => {
+    //   try {
+    //     const db = getDatabase();
+    //     const projectsRef = ref(db, "projects");
+        
+    //     // Lấy dữ liệu một lần
+    //     const snapshot = await get(projectsRef);
+    //     const projectsData = snapshot.val();
+        
+    //     // Chuyển đổi dữ liệu thành danh sách các dự án
+    //     const projectsList = [];
+    //     for (const key in projectsData) {
+    //       projectsList.push({ key, ...projectsData[key] });
+    //     }
+        
+    //     // ID của người dùng mà bạn muốn kiểm tra
+    //     const userId = '-O3aw34xXr_84iQoknYT';
+        
+    //     // Lọc các dự án dựa trên ID người dùng có mặt trong teamMembers
+    //     const userProjects = projectsList.filter((project) => 
+    //       project.teamMembers?.includes(userId)
+    //     );
+        
+    //     console.log("User projects", userProjects);
+    //     console.log("List projects", projectsList);
+    //     setProjects(userProjects.reverse());
+    //   } catch (error) {
+    //     console.error("Error fetching projects:", error);
+    //   }
+    // };
+
+    
     if (userId) {
       fetchUserData();
-      fetchProjects();
+      // fetchUserProjects();
     }
   }, [userId]);
+
 
   const exportToExcel = () => {
     const filteredEmployees = employees.map(
@@ -215,9 +251,32 @@ const EmployeeManagement = () => {
     currentPage * pageSize
   );
 
-  const exportToWord = async (employee) => {
-
+  
+  const fetchUserProjects = async (userId) => {
     try {
+      const db = getDatabase();
+      const projectsRef = ref(db, 'projects');
+      const snapshot = await get(projectsRef);
+      const projectsData = snapshot.val();
+  
+      const projectsList = [];
+      for (const key in projectsData) {
+        projectsList.push({ key, ...projectsData[key] });
+      }
+  
+      const userProjects = projectsList.filter(project => project.teamMembers?.includes(userId));
+      return userProjects;
+    } catch (error) {
+      console.error("Error fetching user projects:", error);
+      return [];
+    }
+  };
+
+  const exportToWord = async (employee) => {
+    try {
+      // Fetch user projects based on employee ID
+      const userProjects = await fetchUserProjects(employee.id);
+  
       // Create a new Document
       const doc = new Document({
         sections: [
@@ -268,16 +327,15 @@ const EmployeeManagement = () => {
                     size: 24,
                   }),
                   new TextRun({
-                    text:
-                      formatDepartment(employee.department) || "Not provided",
+                    text: formatDepartment(employee.department) || "Not provided",
                     size: 24,
                   }),
                 ],
               }),
-
+  
               // Add a blank paragraph to create space
               new Paragraph({}),
-
+  
               // WORKING EXPERIENCE Section
               new Paragraph({
                 children: [
@@ -305,10 +363,10 @@ const EmployeeManagement = () => {
                   }),
                 ],
               }),
-
+  
               // Add a blank paragraph to create space
               new Paragraph({}),
-
+  
               // TYPICAL PROJECTS Section
               new Paragraph({
                 children: [
@@ -319,9 +377,8 @@ const EmployeeManagement = () => {
                   }),
                 ],
               }),
-              ...(Array.isArray(employee.projects) &&
-              employee.projects.length > 0
-                ? employee.projects.map((project, index) => [
+              ...(userProjects.length > 0
+                ? userProjects.map((project, index) => [
                     new Paragraph({
                       children: [
                         new TextRun({
@@ -338,12 +395,25 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Role: ",
+                          text: "Start Date: ",
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.role || "No role provided",
+                          text: project.startDate || "No start date provided",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "End Date: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text: project.endDate || "No end date provided",
                           size: 24,
                         }),
                       ],
@@ -356,53 +426,7 @@ const EmployeeManagement = () => {
                           size: 24,
                         }),
                         new TextRun({
-                          text:
-                            project.description || "No description provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Specification: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text:
-                            project.specification ||
-                            "No specification provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Languages and frameworks: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: Array.isArray(project.languagesAndFrameworks)
-                            ? project.languagesAndFrameworks.join(", ")
-                            : "Not provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Technologies: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: Array.isArray(project.technologies)
-                            ? project.technologies.join(", ")
-                            : "Not provided",
+                          text: project.description || "No description provided",
                           size: 24,
                         }),
                       ],
@@ -425,7 +449,7 @@ const EmployeeManagement = () => {
           },
         ],
       });
-
+  
       // Save the document as a .docx file
       Packer.toBlob(doc).then((blob) => {
         saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
