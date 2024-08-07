@@ -215,7 +215,8 @@ const EmployeeManagement = () => {
     currentPage * pageSize
   );
 
-  const exportToWord = async (employee, project) => {
+  const exportToWord = async (employee) => {
+
     try {
       // Create a new Document
       const doc = new Document({
