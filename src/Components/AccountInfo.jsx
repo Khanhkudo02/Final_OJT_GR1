@@ -129,20 +129,22 @@ function AccountInfo() {
             </Descriptions.Item>
           )}
           {/* Hiển thị thông tin dự án */}
-          {projects.length > 0 && (
-            <Descriptions.Item label={t("projects")}>
-              {projects.map(project => (
-                <div key={project.id}>
-                  <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
-                  <p><strong>{t("Description")}:</strong> {project.description}</p>
-                  <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
-                  <p><strong>{t("Budget")}:</strong> {project.budget}</p>
-                  <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
-                  <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
+            {projects.length > 0 && (
+              <Descriptions.Item label={t("ListProject")}>
+                <div style={{display: 'flex'}}>
+                  {projects.map(project => (
+                    <div key={project.id} style={{width: '250px'}}>
+                      <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
+                      <p><strong>{t("Description")}:</strong> {project.description}</p>
+                      <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
+                      <p><strong>{t("Budget")}:</strong> {project.budget}</p>
+                      <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
+                      <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </Descriptions.Item>
-          )}
+              </Descriptions.Item>
+            )}
         </Descriptions>
       </Card>
     </div>

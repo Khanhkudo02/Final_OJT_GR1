@@ -258,6 +258,11 @@ const EmployeeManagement = () => {
       const projectsRef = ref(db, 'projects');
       const snapshot = await get(projectsRef);
       const projectsData = snapshot.val();
+
+      if (!projectsData) {
+        console.log("No projects data found");
+        return [];
+      }
   
       const projectsList = [];
       for (const key in projectsData) {
@@ -265,6 +270,7 @@ const EmployeeManagement = () => {
       }
   
       const userProjects = projectsList.filter(project => project.teamMembers?.includes(userId));
+      console.log("Filtered user projects:", userProjects);
       return userProjects;
     } catch (error) {
       console.error("Error fetching user projects:", error);
@@ -276,7 +282,7 @@ const EmployeeManagement = () => {
     try {
       // Fetch user projects based on employee ID
       const userProjects = await fetchUserProjects(employee.id);
-  
+      console.log("User project: ", userProjects)
       // Create a new Document
       const doc = new Document({
         sections: [
