@@ -112,6 +112,7 @@ const EditPosition = () => {
         </Select>
       </div>
       <Button
+        className="btn"
         type="primary"
         onClick={handleUpdatePosition}
         disabled={!name || !description || !department || !status}
@@ -119,6 +120,7 @@ const EditPosition = () => {
         {t("save")}
       </Button>
       <Button
+        className="btn-length"
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/position-management")}
       >

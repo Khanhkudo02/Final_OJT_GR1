@@ -41,6 +41,10 @@ body {
   margin-bottom: 10px;
 }
 
+.title {
+  font-weight: 700;
+}
+
 .form-group {
   margin-bottom: 10px;
 }
@@ -72,6 +76,11 @@ body {
   font-weight: 700;
 }
 
+.status-involved {
+  color: blue;
+  font-weight: 700;
+}
+
 .ant-table-cell {
   text-align: center !important;
 }
@@ -82,6 +91,14 @@ body {
 
 .length-cell {
   width: 25%;
+}
+
+.project-detail {
+  display: flex;
+}
+
+.project-detail-item {
+  width: 250px;
 }
 
 .detail-button {

@@ -14,6 +14,7 @@ import {
   fetchAllPositions,
 } from "../service/PositionServices";
 import { useTranslation } from "react-i18next";
+import SkillManagement from "./SkillManagement";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -59,7 +60,7 @@ const PositionManagement = () => {
   };
 
   const showAddPage = () => {
-    navigate("/positions/add");
+    navigate("/position-management/add");
   };
 
   const handleDelete = (record) => {
@@ -105,12 +106,17 @@ const PositionManagement = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-  
+
   const tabItems = [
     { key: "All Positions", label: t("AllPosition") },
     { key: "active", label: t("active") },
     { key: "inactive", label: t("inactive") },
   ];
+
+  const formatDescription = (description) => {
+    const translatedDescription = t(description);
+    return translatedDescription ? translatedDescription.charAt(0).toUpperCase() + translatedDescription.slice(1) : null;
+  };
 
   return (
     <div>
@@ -121,6 +127,7 @@ const PositionManagement = () => {
         onClick={showAddPage}
         icon={<PlusOutlined />}
       >
+        {t("Add New Position")}
       </Button>
       <Input
         placeholder={t("search")}
@@ -147,7 +154,12 @@ const PositionManagement = () => {
         }}
       >
         <Column title={t("name")} dataIndex="name" key="name" />
-        <Column title={t("Description")} dataIndex="description" key="description" />
+        <Column
+          title={t("Description")}
+          dataIndex="description"
+          key="description"
+          render={(text) => formatDescription(text)}
+        /> 
         <Column title={t("Department")} dataIndex="department" key="department" />
         <Column
           title={t("Status")}
@@ -167,7 +179,7 @@ const PositionManagement = () => {
               <span className={className}>
                 {translatedText
                   ? translatedText.charAt(0).toUpperCase() +
-                    translatedText.slice(1)
+                  translatedText.slice(1)
                   : ""}
               </span>
             );
@@ -194,6 +206,7 @@ const PositionManagement = () => {
           )}
         />
       </Table>
+      <SkillManagement />
     </div>
   );
 };

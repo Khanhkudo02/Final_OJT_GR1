@@ -81,11 +81,10 @@ const ProjectManagement = () => {
   );
 
   const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+    if (!name) return ""; // Handle undefined or null name
+    const parts = name.split(" ");
+    if (parts.length < 2) return name.charAt(0).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
   };
 
   const getRandomColor = () => {
@@ -108,14 +107,14 @@ const ProjectManagement = () => {
 
   const handleDelete = (key) => {
     Modal.confirm({
-      title: "Are you sure you want to archive this project?",
+      title: t("Are you sure you want to archive this project?"),
       onOk: async () => {
         try {
           await moveToArchive(key);
           setData((prevData) => prevData.filter((item) => item.key !== key));
-          message.success("Project archived successfully");
+          message.success(t("Project archived successfully"));
         } catch (error) {
-          message.error("Failed to archive project");
+          message.error(t("Failed to archive project"));
         }
       },
     });
@@ -131,7 +130,7 @@ const ProjectManagement = () => {
     if (!value) return "";
 
     // Check if the value has "$" or "VND"
-    const hasDollarSign = value.startsWith("$");
+    const hasUSD = value.endsWith("USD");
     const hasVND = value.endsWith("VND");
 
     // Remove "$" and "VND" for formatting
@@ -141,11 +140,11 @@ const ProjectManagement = () => {
     numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
     // Add "$" or "VND" back
-    if (hasDollarSign) {
-      numericValue = `$${numericValue}`;
+    if (hasUSD) {
+      numericValue = `${numericValue} USD`;
     }
     if (hasVND) {
-      numericValue = `${numericValue}VND`;
+      numericValue = `${numericValue} VND`;
     }
 
     return numericValue;
@@ -217,25 +216,27 @@ const ProjectManagement = () => {
       title: t("actions"),
       key: "actions",
       render: (text, record) => (
-        <Space size="middle">
-          <Button
-            icon={<EyeOutlined />}
-            style={{ color: "green", borderColor: "green" }}
-            onClick={() => navigate(`/project/${record.key}`)}
-          />
-          <Button
-            icon={<EditOutlined />}
-            style={{ color: "blue", borderColor: "blue" }}
-            onClick={() => navigate(`/edit-project/${record.key}`)}
-          />
-          {record.status !== "ONGOING" && (
+        <div className="actions-container">
+          <Space size="middle">
             <Button
-              icon={<DeleteOutlined />}
-              style={{ color: "red", borderColor: "red" }}
-              onClick={() => handleDelete(record.key)}
+              icon={<EyeOutlined />}
+              style={{ color: "green", borderColor: "green" }}
+              onClick={() => navigate(`/project/${record.key}`)}
             />
-          )}
-        </Space>
+            <Button
+              icon={<EditOutlined />}
+              style={{ color: "blue", borderColor: "blue" }}
+              onClick={() => navigate(`/edit-project/${record.key}`)}
+            />
+            {record.status !== "ONGOING" && (
+              <Button
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
+                onClick={() => handleDelete(record.key)}
+              />
+            )}
+          </Space>
+        </div>
       ),
     },
   ];
@@ -257,15 +258,19 @@ const ProjectManagement = () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate("/new-project")}
-        />
+        >
+          {t("Add New Project")}
+        </Button>
         <Button
-          type="default"
+          type="primary"
           icon={<InboxOutlined />}
           onClick={() => navigate("/archived-projects")}
           style={{ marginLeft: "auto" }}
-        />
+        >
+          {t("Archived Projects")}
+        </Button>
         <Input
-          placeholder={t("search")}
+          placeholder={t("searchbynameproject")}
           value={searchTerm}
           onChange={handleSearchChange}
           style={{ width: "250px", marginBottom: 16 }}

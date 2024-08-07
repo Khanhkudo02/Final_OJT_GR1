@@ -12,6 +12,7 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
@@ -23,6 +24,7 @@ const EditTechnology = () => {
   const [fileList, setFileList] = useState([]);
   const [initialImageUrl, setInitialImageUrl] = useState("");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadTechnology = async () => {
@@ -36,7 +38,7 @@ const EditTechnology = () => {
         });
         setInitialImageUrl(data.imageUrl || "");
       } catch (error) {
-        message.error("Failed to fetch technology data.");
+        message.error(t("Failed to fetch technology data."));
         console.error("Failed to fetch technology by ID:", error);
       }
     };
@@ -76,11 +78,11 @@ const EditTechnology = () => {
       );
 
       Modal.success({
-        content: "Technology updated successfully!",
+        content: t("Technology updated successfully!"),
         onOk: () => navigate("/technology-management"),
       });
     } catch (error) {
-      message.error("Failed to update technology.");
+      message.error(t("Failed to update technology."));
       console.error("Failed to update technology:", error);
     } finally {
       setLoading(false);
@@ -89,25 +91,25 @@ const EditTechnology = () => {
 
   return (
     <div className="edit-technology">
-      <h2>Edit Technology</h2>
+      <h2>{t("EditTechnology")}</h2>
       <Form form={form} onFinish={onFinish}>
         <Form.Item
-          label="Name"
+          label={t("name")}
           name="name"
           rules={[
-            { required: true, message: "Please input the technology name!" },
+            { required: true, message: t("Please input the technology name!")},
           ]}
         >
           <Input />
         </Form.Item>
 
         <Form.Item
-          label="Description"
+          label={t("Description")}
           name="description"
           rules={[
             {
               required: true,
-              message: "Please input the technology description!",
+              message: t("Please input the technology description!"),
             },
           ]}
         >
@@ -115,25 +117,25 @@ const EditTechnology = () => {
         </Form.Item>
 
         <Form.Item
-          label="Status"
+          label={t("Status")}
           name="status"
           rules={[
-            { required: true, message: "Please select the technology status!" },
+            { required: true, message: t("Please select the technology status!")},
           ]}
         >
           <Select>
-            <Option value="active">Active</Option>
-            <Option value="inactive">Inactive</Option>
+            <Option value="active">{t("active")}</Option>
+            <Option value="inactive">{t("inactive")}</Option>
           </Select>
         </Form.Item>
 
-        <Form.Item label="Image" name="image">
+        <Form.Item label={t("Image")} name="image">
           <Upload
             fileList={fileList}
             beforeUpload={() => false}
             onChange={handleImageChange}
           >
-            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+            <Button icon={<UploadOutlined />}>{t("Click to Upload")}</Button>
           </Upload>
           {initialImageUrl && !fileList.length && (
             <img
@@ -145,14 +147,15 @@ const EditTechnology = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            Save
+          <Button className="btn" type="primary" htmlType="submit" loading={loading}>
+            {t("save")}
           </Button>
           <Button
+            className="btn-length"
             style={{ marginLeft: 8 }}
             onClick={() => navigate("/technology-management")}
           >
-            Back
+            {t("Back")}
           </Button>
         </Form.Item>
       </Form>
