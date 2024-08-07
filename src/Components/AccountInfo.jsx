@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/AccountInfo.scss";
 import "../assets/style/Global.scss";
-import { fetchAllSkills } from '../service/SkillServices';
+import { fetchAllSkills } from "../service/SkillServices";
 
 function AccountInfo() {
   const { t } = useTranslation();
@@ -29,16 +29,16 @@ function AccountInfo() {
         const data = snapshot.val();
         setUserData(data);
 
-         // Lấy thông tin dự án liên quan đến nhân viên
+        // Lấy thông tin dự án liên quan đến nhân viên
         const projectsRef = ref(db, `projects`);
         const projectsSnapshot = await get(projectsRef);
         const allProjects = projectsSnapshot.val();
-        
+
         // Lọc các dự án mà nhân viên đang tham gia
-        const userProjects = Object.values(allProjects).filter(project =>
+        const userProjects = Object.values(allProjects).filter((project) =>
           project.teamMembers.includes(userId)
         );
-        
+
         setProjects(userProjects || []);
 
         // Lấy tất cả các kỹ năng
@@ -58,12 +58,12 @@ function AccountInfo() {
 
   // Hàm để viết hoa chữ cái đầu tiên của mỗi từ
   const capitalizeWords = (text) => {
-    if (typeof text !== 'string') return text; // Kiểm tra loại dữ liệu
+    if (typeof text !== "string") return text; // Kiểm tra loại dữ liệu
     return text
       .toLowerCase()
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   // Hàm định dạng ngày theo dạng "dd/mm/yyyy"
@@ -77,10 +77,12 @@ function AccountInfo() {
   };
 
   // Tạo danh sách kỹ năng từ tất cả kỹ năng và kỹ năng của người dùng
-  const userSkills = userData.skills ? userData.skills.map(skillId => {
-    const skill = allSkills.find(s => s.key === skillId);
-    return skill ? skill.name : skillId;
-  }) : [];
+  const userSkills = userData.skills
+    ? userData.skills.map((skillId) => {
+        const skill = allSkills.find((s) => s.key === skillId);
+        return skill ? skill.name : skillId;
+      })
+    : [];
 
   return (
     <div className="account-info-container">
@@ -128,9 +130,9 @@ function AccountInfo() {
               {capitalizeWords(userData.phoneNumber)}
             </Descriptions.Item>
           )}
-           {userSkills.length > 0 && (
+          {userSkills.length > 0 && (
             <Descriptions.Item label={t("skills")}>
-              {userSkills.map(skill => capitalizeWords(skill)).join(", ")}
+              {userSkills.map((skill) => capitalizeWords(skill)).join(", ")}
             </Descriptions.Item>
           )}
           {userData.department && (
@@ -140,12 +142,8 @@ function AccountInfo() {
           )}
           {/* Hiển thị thông tin dự án */}
           {projects.length > 0 && (
-            <Descriptions.Item label={t("projects")}>
-              {projects.map(project => (
-                <div key={project.id}>
-                  <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
-                </div>
-              ))}
+            <Descriptions.Item label={t("ListProject")}>
+              {projects.map((project) => project.name).join(", ")}
             </Descriptions.Item>
           )}
         </Descriptions>
