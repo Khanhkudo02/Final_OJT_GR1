@@ -18,17 +18,17 @@ const formatBudget = (value) => {
 
   if (!value) return "";
 
-  const hasDollarSign = value.startsWith("$");
-  const hasVND = value.endsWith("VND");
+  const hasUSD = value.toUpperCase().endsWith("USD");
+  const hasVND = value.toUpperCase().endsWith("VND");
 
   let numericValue = value.replace(/[^\d]/g, "");
   numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-  if (hasDollarSign) {
-    numericValue = `$${numericValue}`;
+  if (hasUSD) {
+    numericValue = `${numericValue} USD`;
   }
   if (hasVND) {
-    numericValue = `${numericValue}VND`;
+    numericValue = `${numericValue} VND`;
   }
 
   return numericValue;
