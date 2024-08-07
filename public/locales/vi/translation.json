@@ -287,5 +287,6 @@
   "Are you sure you want to archive this project?": "Bạn có chắc chắn muốn lưu trữ dự án này không?",
   "Project archived successfully": "Dự án được lưu trữ thành công",
   "Failed to archive project": "Không thể lưu trữ dự án",
-  "projects":"Những dự án được tham gia"
+  "projects":"Những dự án được tham gia",
+  "searchbyemail":"Tìm kiếm bằng email"
 }
