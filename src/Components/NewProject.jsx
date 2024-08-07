@@ -35,18 +35,18 @@ const NewProject = () => {
   const [endDate, setEndDate] = useState(null); // State to store selected end date
   const { t } = useTranslation();
 
-
   const onFinish = async (values) => {
     try {
       const projectData = {
         ...values,
         startDate: values.startDate.format("YYYY-MM-DD"),
         endDate: values.endDate.format("YYYY-MM-DD"),
-        technologies: values.technologies,
-        languages: values.languages,
+        technologies: values.technologies || [],
+        languages: values.languages || [],
         budget: values.budget.replace(/,/g, ""),
       };
       await postCreateProject(projectData, imageFile);
+
       // Gửi email thông báo cho các thành viên mới
       const teamMembers = values.teamMembers || [];
       await Promise.all(
@@ -62,6 +62,7 @@ const NewProject = () => {
       message.success("Project added successfully");
       navigate("/project-management");
     } catch (error) {
+      console.error("Failed to create project:", error);
       message.error("Failed to add project");
     }
   };
@@ -199,6 +200,7 @@ const NewProject = () => {
         console.error('Validation error:', error);
       });
   };
+
   const formatNumberWithCommas = (value) => {
     if (value === null || value === undefined || value === "") {
       return "";
@@ -225,6 +227,7 @@ const NewProject = () => {
     }
     return Promise.resolve();
   };
+
   return (
     <div
       style={{
@@ -390,9 +393,7 @@ const NewProject = () => {
         </Form.Item>
 
         {/* Select technologies */}
-        <Form.Item label={t("TechnologiesUsed")} name="technologies" rules={[
-            { required: true,  },
-          ]}>
+        <Form.Item label={t("TechnologiesUsed")} name="technologies">
           <Select
             mode="multiple"
             placeholder={t("Select technologies")}
@@ -407,9 +408,7 @@ const NewProject = () => {
         </Form.Item>
 
         {/* Select programming languages */}
-        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages" rules={[
-            { required: true, message: t("Please select programming language used!") },
-          ]}>
+        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages">
           <Select
             mode="multiple"
             placeholder={t("Select languages")}

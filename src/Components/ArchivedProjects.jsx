@@ -65,7 +65,7 @@ const ArchivedProjects = () => {
       title: 'Are you sure you want to restore this project?',
       onOk: async () => {
         try {
-          await restoreProject(key, { status: 'NOT STARTED' });
+          await restoreProject(key);
           setData(prevData => prevData.filter(item => item.key !== key));
           message.success('Project restored successfully');
           navigate("/project-management"); // Navigate to project management page after restoring

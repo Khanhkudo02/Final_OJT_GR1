@@ -81,11 +81,11 @@ const ProjectManagement = () => {
   );
 
   const getInitials = (name) => {
-    if (!name) return ''; // Handle undefined or null name
-    const parts = name.split(' ');
+    if (!name) return ""; // Handle undefined or null name
+    const parts = name.split(" ");
     if (parts.length < 2) return name.charAt(0).toUpperCase();
     return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
+  };
 
   const getRandomColor = () => {
     const colors = [
@@ -130,7 +130,7 @@ const ProjectManagement = () => {
     if (!value) return "";
 
     // Check if the value has "$" or "VND"
-    const hasDollarSign = value.startsWith("$");
+    const hasUSD = value.endsWith("USD");
     const hasVND = value.endsWith("VND");
 
     // Remove "$" and "VND" for formatting
@@ -140,11 +140,11 @@ const ProjectManagement = () => {
     numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
     // Add "$" or "VND" back
-    if (hasDollarSign) {
-      numericValue = `$${numericValue}`;
+    if (hasUSD) {
+      numericValue = `${numericValue} USD`;
     }
     if (hasVND) {
-      numericValue = `${numericValue}VND`;
+      numericValue = `${numericValue} VND`;
     }
 
     return numericValue;
@@ -218,24 +218,24 @@ const ProjectManagement = () => {
       render: (text, record) => (
         <div className="actions-container">
           <Space size="middle">
-          <Button
-            icon={<EyeOutlined />}
-            style={{ color: "green", borderColor: "green" }}
-            onClick={() => navigate(`/project/${record.key}`)}
-          />
-          <Button
-            icon={<EditOutlined />}
-            style={{ color: "blue", borderColor: "blue" }}
-            onClick={() => navigate(`/edit-project/${record.key}`)}
-          />
-          {record.status !== "ONGOING" && (
             <Button
-              icon={<DeleteOutlined />}
-              style={{ color: "red", borderColor: "red" }}
-              onClick={() => handleDelete(record.key)}
+              icon={<EyeOutlined />}
+              style={{ color: "green", borderColor: "green" }}
+              onClick={() => navigate(`/project/${record.key}`)}
             />
-          )}
-        </Space>
+            <Button
+              icon={<EditOutlined />}
+              style={{ color: "blue", borderColor: "blue" }}
+              onClick={() => navigate(`/edit-project/${record.key}`)}
+            />
+            {record.status !== "ONGOING" && (
+              <Button
+                icon={<DeleteOutlined />}
+                style={{ color: "red", borderColor: "red" }}
+                onClick={() => handleDelete(record.key)}
+              />
+            )}
+          </Space>
         </div>
       ),
     },
@@ -259,7 +259,7 @@ const ProjectManagement = () => {
           icon={<PlusOutlined />}
           onClick={() => navigate("/new-project")}
         >
-          {t("Add New Project")} 
+          {t("Add New Project")}
         </Button>
         <Button
           type="primary"

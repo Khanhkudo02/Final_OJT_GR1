@@ -3,7 +3,8 @@ import { get, getDatabase, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import "../assets/style/Pages/AccountInfo.scss"; // Đảm bảo rằng đường dẫn này đúng
+import "../assets/style/Pages/AccountInfo.scss";
+import "../assets/style/Global.scss";
 
 function AccountInfo() {
   const { t } = useTranslation();

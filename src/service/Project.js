@@ -18,17 +18,17 @@ const formatBudget = (value) => {
 
   if (!value) return "";
 
-  const hasDollarSign = value.startsWith("$");
-  const hasVND = value.endsWith("VND");
+  const hasUSD = value.toUpperCase().endsWith("USD");
+  const hasVND = value.toUpperCase().endsWith("VND");
 
   let numericValue = value.replace(/[^\d]/g, "");
   numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-  if (hasDollarSign) {
-    numericValue = `$${numericValue}`;
+  if (hasUSD) {
+    numericValue = `${numericValue} USD`;
   }
   if (hasVND) {
-    numericValue = `${numericValue}VND`;
+    numericValue = `${numericValue} VND`;
   }
 
   return numericValue;
@@ -193,7 +193,10 @@ const restoreProject = async (id) => {
 
     if (projectData) {
       const projectRef = ref(db, `projects/${id}`);
-      await set(projectRef, projectData);
+      await set(projectRef, {
+        ...projectData,
+        status: "NOT STARTED", // Set status to "Not Started"
+      });
       await remove(archivedProjectRef);
     } else {
       throw new Error("Project not found");
@@ -203,6 +206,7 @@ const restoreProject = async (id) => {
     throw error;
   }
 };
+
 
 export {
   fetchAllProjects,
