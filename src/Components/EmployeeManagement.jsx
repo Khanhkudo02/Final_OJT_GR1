@@ -11,7 +11,7 @@ import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/EmployeeManagement.scss";
@@ -21,6 +21,9 @@ import {
   fetchAllSkills,
 } from "../service/EmployeeServices";
 import { get, getDatabase, ref, onValue } from "firebase/database";
+import { format } from "date-fns";
+import { fetchAllLanguages } from "../service/LanguageServices";
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -40,6 +43,9 @@ const EmployeeManagement = () => {
   const [userData, setUserData] = useState(null);
   const [data, setData] = useState([]);
   const [skillsList, setSkillsList] = useState([]); // or pass as a prop
+  const { id } = useParams();
+  const [technologies, setTechnologies] = useState([]);
+  const [languages, setLanguages] = useState([]);
 
   const formatSkill = (skill) =>
     skill
@@ -178,62 +184,28 @@ const EmployeeManagement = () => {
       }
     };
 
-    // const fetchProjects = async () => {
-    //   const projectsRef = ref(getDatabase(), "projects");
-    //   onValue(projectsRef, (snapshot) => {
-    //     const projectsData = snapshot.val();
-    //     const projectsList = [];
-    //     for (const key in projectsData) {
-    //       projectsList.push({ key, ...projectsData[key] });
-    //     }
-    //     const userProjects = projectsList.filter((project) =>
-    //       project.teamMembers?.includes(userId)
+    const fetchProjects = async () => {
+      const projectsRef = ref(getDatabase(), "projects");
+      onValue(projectsRef, (snapshot) => {
+        const projectsData = snapshot.val();
+        const projectsList = [];
+        for (const key in projectsData) {
+          projectsList.push({ key, ...projectsData[key] });
+        }
+        const userProjects = projectsList.filter((project) =>
+          project.teamMembers?.includes(userId)
+        );
+        console.log("userProjects", userProjects);
+        setProjects(userProjects.reverse());
+        console.log("List projects", projectsData);
+      });
+    };
 
-    //     );
-    //     console.log("userProjects", userProjects);
-    //     setProjects(userProjects.reverse());
-    //     console.log("List projects", projectsData);
-    //   });
-    // };
-
-    // const fetchProjects = async () => {
-    //   try {
-    //     const db = getDatabase();
-    //     const projectsRef = ref(db, "projects");
-        
-    //     // Lấy dữ liệu một lần
-    //     const snapshot = await get(projectsRef);
-    //     const projectsData = snapshot.val();
-        
-    //     // Chuyển đổi dữ liệu thành danh sách các dự án
-    //     const projectsList = [];
-    //     for (const key in projectsData) {
-    //       projectsList.push({ key, ...projectsData[key] });
-    //     }
-        
-    //     // ID của người dùng mà bạn muốn kiểm tra
-    //     const userId = '-O3aw34xXr_84iQoknYT';
-        
-    //     // Lọc các dự án dựa trên ID người dùng có mặt trong teamMembers
-    //     const userProjects = projectsList.filter((project) => 
-    //       project.teamMembers?.includes(userId)
-    //     );
-        
-    //     console.log("User projects", userProjects);
-    //     console.log("List projects", projectsList);
-    //     setProjects(userProjects.reverse());
-    //   } catch (error) {
-    //     console.error("Error fetching projects:", error);
-    //   }
-    // };
-
-    
     if (userId) {
       fetchUserData();
       // fetchUserProjects();
     }
   }, [userId]);
-
 
   const exportToExcel = () => {
     const filteredEmployees = employees.map(
@@ -251,51 +223,107 @@ const EmployeeManagement = () => {
     currentPage * pageSize
   );
 
-  
   const fetchUserProjects = async (userId) => {
     try {
       const db = getDatabase();
-      const projectsRef = ref(db, 'projects');
+      const projectsRef = ref(db, "projects");
       const snapshot = await get(projectsRef);
       const projectsData = snapshot.val();
 
       if (!projectsData) {
-        console.log("No projects data found");
+        console.log(t("noProjectsDataFound"));
         return [];
       }
-  
-      const projectsList = [];
-      for (const key in projectsData) {
-        projectsList.push({ key, ...projectsData[key] });
-      }
-  
-      const userProjects = projectsList.filter(project => project.teamMembers?.includes(userId));
-      console.log("Filtered user projects:", userProjects);
-      return userProjects;
+
+      const projectsList = Object.keys(projectsData).map((key) => ({
+        key,
+        ...projectsData[key],
+      }));
+
+      return projectsList.filter((project) =>
+        project.teamMembers?.includes(userId)
+      );
     } catch (error) {
-      console.error("Error fetching user projects:", error);
+      console.error(t("errorFetchingUserProjects"), error);
       return [];
     }
   };
 
+  const formatDescription = (description) => {
+    const translatedDescription = t(description);
+    return translatedDescription
+      ? translatedDescription.charAt(0).toUpperCase() +
+          translatedDescription.slice(1)
+      : null;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [allProjects, allTechnologies, allLanguages, allEmployees] =
+          await Promise.all([
+            fetchAllTechnology(),
+            fetchAllLanguages(),
+            fetchAllEmployees(),
+          ]);
+
+        setTechnologies(
+          allTechnologies.map((tech) => ({
+            label: tech.name,
+            value: tech.id,
+          }))
+        );
+        setLanguages(
+          allLanguages.map((lang) => ({
+            label: lang.name,
+            value: lang.key,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching project or related data:", error);
+        message.error("Error fetching project data");
+        const userRole = JSON.parse(localStorage.getItem("user"))?.role;
+        const redirectPath =
+          userRole === "admin"
+            ? "/project-management"
+            : "/employee-ProjectManagement";
+        navigate(redirectPath);
+      }
+    };
+
+    fetchData();
+  }, [id, navigate]);
+
+  const getLanguageNameById = (id, languagesList) => {
+    const language = languagesList.find((lang) => lang.id === id);
+    return language ? language.name : "No programming language";
+  };
+
+  const getTechnologyNameById = (id, technologiesList) => {
+    const tech = technologiesList.find((tech) => tech.id === id);
+    return tech ? tech.name : "No technology";
+  };
   const exportToWord = async (employee) => {
     try {
-      // Fetch user projects based on employee ID
-      const userProjects = await fetchUserProjects(employee.id);
-      console.log("User project: ", userProjects)
-      // Create a new Document
+      // Lấy thông tin dự án của nhân viên dựa trên ID
+      const userProjects = await fetchUserProjects(employee.key);
+
+      // Fetch all languages and technologies
+      const languagesList = await fetchAllLanguages();
+      const technologiesList = await fetchAllTechnology();
+      // Tạo một Tài liệu mới
       const doc = new Document({
         sections: [
           {
             properties: {},
             children: [
-              // Name and Address Section
+              // Phần Tên và Địa chỉ
               new Paragraph({
                 children: [
                   new TextRun({
                     text: employee.name || "Name not available",
                     bold: true,
-                    size: 32, // Optional: Adjust font size
+                    size: 32, // Tùy chọn: Điều chỉnh kích thước phông chữ
                   }),
                 ],
               }),
@@ -333,16 +361,17 @@ const EmployeeManagement = () => {
                     size: 24,
                   }),
                   new TextRun({
-                    text: formatDepartment(employee.department) || "Not provided",
+                    text:
+                      formatDepartment(employee.department) || "Not provided",
                     size: 24,
                   }),
                 ],
               }),
-  
-              // Add a blank paragraph to create space
+
+              // Thêm một đoạn trống để tạo không gian
               new Paragraph({}),
-  
-              // WORKING EXPERIENCE Section
+
+              // Phần KINH NGHIỆM LÀM VIỆC
               new Paragraph({
                 children: [
                   new TextRun({
@@ -355,25 +384,29 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Skill: ",
+                    text: "Skills: ",
                     bold: true,
                     size: 24,
                   }),
                   new TextRun({
                     text: Array.isArray(employee.skills)
-                      ? employee.skills.map(formatSkill).join(", ")
+                      ? employee.skills
+                          .map((skillId) =>
+                            getSkillNameById(skillId, skillsList)
+                          )
+                          .join(", ")
                       : employee.skills
-                      ? formatSkill(employee.skills)
+                      ? getSkillNameById(employee.skills, skillsList)
                       : "Not provided",
                     size: 24,
                   }),
                 ],
               }),
-  
-              // Add a blank paragraph to create space
+
+              // Thêm một đoạn trống để tạo không gian
               new Paragraph({}),
-  
-              // TYPICAL PROJECTS Section
+
+              // Phần DỰ ÁN TIÊU BIỂU
               new Paragraph({
                 children: [
                   new TextRun({
@@ -384,7 +417,7 @@ const EmployeeManagement = () => {
                 ],
               }),
               ...(userProjects.length > 0
-                ? userProjects.map((project, index) => [
+                ? userProjects.flatMap((project) => [
                     new Paragraph({
                       children: [
                         new TextRun({
@@ -393,7 +426,7 @@ const EmployeeManagement = () => {
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.name || "No name provided",
+                          text: project.name || "Not provided",
                           size: 24,
                         }),
                       ],
@@ -401,25 +434,19 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Start Date: ",
+                          text: "Project Duration: ",
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.startDate || "No start date provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "End Date: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.endDate || "No end date provided",
+                          text:
+                            `${format(
+                              new Date(project.startDate),
+                              "dd/MM/yyyy"
+                            )} - ${format(
+                              new Date(project.endDate),
+                              "dd/MM/yyyy"
+                            )}` || "Dates not provided",
                           size: 24,
                         }),
                       ],
@@ -432,12 +459,65 @@ const EmployeeManagement = () => {
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.description || "No description provided",
+                          text:
+                            formatDescription(project.description) ||
+                            "Not provided",
                           size: 24,
                         }),
                       ],
                     }),
-                    // Add a blank paragraph to create space between projects
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Programming languages: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text: Array.isArray(project.languages)
+                            ? project.languages
+                                .map((langId) =>
+                                  getLanguageNameById(langId, languagesList)
+                                )
+                                .join(", ")
+                            : project.languages
+                            ? getLanguageNameById(
+                                project.languages,
+                                languagesList
+                              )
+                            : "Không được cung cấp",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Technologies: ",
+                          bold: true,
+                          size: 24,
+                        }),
+                        new TextRun({
+                          text: Array.isArray(project.technologies)
+                            ? project.technologies
+                                .map((techId) =>
+                                  getTechnologyNameById(
+                                    techId,
+                                    technologiesList
+                                  )
+                                )
+                                .join(", ")
+                            : project.technologies
+                            ? getTechnologyNameById(
+                                project.technologies,
+                                technologiesList
+                              )
+                            : "Không được cung cấp",
+                          size: 24,
+                        }),
+                      ],
+                    }),
+                    // Thêm một đoạn trống để tạo không gian giữa các dự án
                     new Paragraph({}),
                   ])
                 : [
@@ -455,13 +535,14 @@ const EmployeeManagement = () => {
           },
         ],
       });
-  
-      // Save the document as a .docx file
+
+      // Lưu tài liệu dưới dạng tệp .docx
       Packer.toBlob(doc).then((blob) => {
         saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
       });
     } catch (error) {
       console.error("Error exporting to Word:", error);
+      message.error("Unable to export to Word. Please try again.");
     }
   };
 
@@ -608,7 +689,7 @@ const EmployeeManagement = () => {
               <Button
                 icon={<ExportOutlined />}
                 style={{ color: "black", borderColor: "black" }}
-                onClick={() => exportToWord(record)}
+                onClick={() => exportToWord(record, projects)}
               />
             </Space>
           )}

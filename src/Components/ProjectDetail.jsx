@@ -29,7 +29,7 @@ const ProjectDetail = () => {
     return options
       .filter((option) => ids.includes(option.value))
       .map((option) => option.label)
-      .join(", "); // Join names with a comma
+      .join(", "); // Join names with a command
   };
 
   useEffect(() => {
