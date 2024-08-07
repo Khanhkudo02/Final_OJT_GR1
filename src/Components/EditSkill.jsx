@@ -66,7 +66,7 @@ const EditSkill = () => {
 
     return (
         <div>
-            <h2>{t("EditSkill")}</h2>
+            <h2>{t("editSkill")}</h2>
 
             <div className="form-group">
                 <label>{t("name")}</label>
