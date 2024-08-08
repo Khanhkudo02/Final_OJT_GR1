@@ -3,7 +3,7 @@ import {
   ProjectOutlined,
   TeamOutlined,
   ToolOutlined,
-  UserOutlined
+  UserOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import React, { useState } from "react";
@@ -12,6 +12,7 @@ import { NavLink } from "react-router-dom";
 import "../assets/style/Pages/Sidebar.scss";
 import LanguageSwitcher from "./LanguageSwitcher";
 import LogoutButton from "./LogoutButton";
+import logo from "../../public/images/logo.jpg";
 
 const { Sider } = Layout;
 
@@ -43,24 +44,34 @@ const Sidebar = ({ role }) => {
     {
       key: "3",
       icon: <ProjectOutlined />,
-      label: <NavLink to="/project-management">{t("ProjectManagement")}</NavLink>,
+      label: (
+        <NavLink to="/project-management">{t("ProjectManagement")}</NavLink>
+      ),
     },
     {
       key: "4",
       icon: <TeamOutlined />,
-      label: <NavLink to="/position-management">{t("PositionManagement")}</NavLink>,
+      label: (
+        <NavLink to="/position-management">{t("PositionManagement")}</NavLink>
+      ),
     },
     {
       key: "5",
       icon: <ToolOutlined />,
       label: (
-        <NavLink to="/technology-management">{t("TechnologyManagement")}</NavLink>
+        <NavLink to="/technology-management">
+          {t("TechnologyManagement")}
+        </NavLink>
       ),
     },
     {
       key: "6",
       icon: <CodeOutlined />,
-      label: <NavLink to="/programing-language">{t("ProgrammingLanguageManagement")}</NavLink>,
+      label: (
+        <NavLink to="/programing-language">
+          {t("ProgrammingLanguageManagement")}
+        </NavLink>
+      ),
     },
     {
       key: "7",
@@ -81,7 +92,9 @@ const Sidebar = ({ role }) => {
     {
       key: "2",
       icon: <ProjectOutlined />,
-      label: <NavLink to="/employee-ProjectManagement">{t("ListProject")}</NavLink>,
+      label: (
+        <NavLink to="/employee-ProjectManagement">{t("ListProject")}</NavLink>
+      ),
     },
     {
       key: "3",
@@ -107,11 +120,7 @@ const Sidebar = ({ role }) => {
       width={229}
     >
       <div className="sidebar-header">
-        <img
-          src="/public/images/logo.jpg"
-          alt="Get IT"
-          className="logo-sidebar"
-        />
+        <img src={logo} alt="Get IT" className="logo-sidebar" />
         {!collapsed && <h2 className="sidebar-title">GETIT COMPANY</h2>}
       </div>
       <Menu

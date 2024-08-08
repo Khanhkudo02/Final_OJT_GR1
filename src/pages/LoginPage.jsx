@@ -5,6 +5,7 @@ import { Form, Input, Button, Typography, Alert } from "antd";
 import { loginUser, signUpUser } from "../service/authService.js";
 import styles from "../assets/style/Pages/Login.module.scss"; // Import SCSS file
 import { useTranslation } from "react-i18next";
+import logo from "../../public/images/logo.jpg";
 
 const { Title } = Typography;
 
@@ -62,11 +63,7 @@ function Login({ setUser }) {
           <Title level={2} className={styles["title"]}>
             {isSignUp ? t("SignUp") : t("Login")}
           </Title>
-          <img
-            src="/public/images/logo.jpg"
-            alt="logo"
-            className={styles["logo-header"]}
-          />
+          <img src={logo} alt="logo" className={styles["logo-header"]} />
         </div>
         <Form form={form} onFinish={handleSubmit}>
           {isSignUp && (
