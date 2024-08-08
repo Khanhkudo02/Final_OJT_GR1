@@ -75,7 +75,7 @@ function Login({ setUser }) {
               name="name"
               rules={[{ required: true, message: "Please input your name!" }]}
             >
-              <Input onBlur={() => handleBlur("name")} />
+              <Input className="inp-length" onBlur={() => handleBlur("name")} />
             </Form.Item>
           )}
           <Form.Item
@@ -90,7 +90,7 @@ function Login({ setUser }) {
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <Input.Password onBlur={() => handleBlur("password")} />
+            <Input.Password className="inp-length" onBlur={() => handleBlur("password")} />
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
           {successMessage && (
