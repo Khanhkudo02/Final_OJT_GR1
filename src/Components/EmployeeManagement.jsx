@@ -618,7 +618,7 @@ const EmployeeManagement = () => {
               alt={t("employee")}
               width="50"
               height="50"
-              style={{ objectFit: "cover" }}
+              style={{ objectFit: "cover", borderRadius: "50%"}}
             />
           )}
         />
