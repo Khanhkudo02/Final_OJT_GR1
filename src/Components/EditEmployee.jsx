@@ -268,7 +268,7 @@ const EditEmployee = () => {
           listType="picture"
           showUploadList={false}
         >
-          <Button type="primary" icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
+          <Button className="btn" type="primary" icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
         </Upload>
         {fileList.length > 0 && (
           <div style={{ marginTop: 16 }}>
@@ -278,10 +278,11 @@ const EditEmployee = () => {
       </Form.Item>
 
       <Form.Item>
-        <Button type="primary" htmlType="submit">
+        <Button className="btn" type="primary" htmlType="submit">
           {t("save")}
         </Button>
         <Button
+          className="btn-length"
           style={{ marginLeft: 8 }}
           onClick={() => navigate("/employee-management")}
         >

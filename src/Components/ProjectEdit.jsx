@@ -308,7 +308,7 @@ const ProjectEdit = () => {
   };
 
   if (!project) {
-    return <div>Loading...</div>;
+    return <div>{t("Loading...")}</div>;
   }
 
   return (
@@ -321,6 +321,7 @@ const ProjectEdit = () => {
       }}
     >
       <Button
+        className="btn-length"
         type="default"
         icon={<ArrowLeftOutlined />}
         onClick={() => navigate(`/project/${id}`)}
@@ -504,7 +505,7 @@ const ProjectEdit = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button className="btn" type="primary" htmlType="submit">
             {t("update")}
           </Button>
         </Form.Item>
