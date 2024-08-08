@@ -1,20 +1,17 @@
-import React, { useState } from "react";
-import { Layout, Menu, Button } from "antd";
 import {
-  UserOutlined,
+  CodeOutlined,
   ProjectOutlined,
   TeamOutlined,
   ToolOutlined,
-  CodeOutlined,
-  FileTextOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
+  UserOutlined
 } from "@ant-design/icons";
+import { Layout, Menu } from "antd";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import "../assets/style/Pages/Sidebar.scss";
-import LogoutButton from "./LogoutButton";
-import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
+import LogoutButton from "./LogoutButton";
 
 const { Sider } = Layout;
 
@@ -47,16 +44,6 @@ const Sidebar = ({ role }) => {
       key: "3",
       icon: <ProjectOutlined />,
       label: <NavLink to="/project-management">{t("ProjectManagement")}</NavLink>,
-      children: [
-        {
-          key: "3-1",
-          label: <NavLink to="/new-project">{t("NewProject")}</NavLink>,
-        },
-        {
-          key: "3-2",
-          label: <NavLink to="/project-tracking">{t("ProjectTracking")}</NavLink>,
-        },
-      ],
     },
     {
       key: "4",
@@ -90,21 +77,16 @@ const Sidebar = ({ role }) => {
       key: "1",
       icon: <UserOutlined />,
       label: <NavLink to="/employee">{t("EmployeeAccount")}</NavLink>,
-      children: [
-        {
-          key: "1-1",
-          label: <NavLink to="/account-info">{t("AccountInfo")}</NavLink>,
-        },
-        {
-          key: "1-2",
-          label: <NavLink to="/change-password">{t("changePassword")}</NavLink>,
-        },
-      ],
+    },
+    {
+      key: "2",
+      icon: <ProjectOutlined />,
+      label: <NavLink to="/employee-ProjectManagement">{t("ListProject")}</NavLink>,
     },
     {
       key: "3",
       icon: <ProjectOutlined />,
-      label: <NavLink to="/employee-ProjectManagement">{t("ListProject")}</NavLink>,
+      label: <NavLink to="/change-password">{t("changePassword")}</NavLink>,
     },
     {
       key: "4",

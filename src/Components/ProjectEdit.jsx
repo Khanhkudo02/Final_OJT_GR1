@@ -14,9 +14,17 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchAllEmployees, updateEmployeeStatusToActive, updateEmployeeStatusToInvolved } from "../service/EmployeeServices";
+import {
+  fetchAllEmployees,
+  updateEmployeeStatusToActive,
+  updateEmployeeStatusToInvolved,
+} from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
-import { fetchAllProjects, putUpdateProject } from "../service/Project";
+import {
+  fetchAllProjects,
+  putUpdateProject,
+  recordHistory,
+} from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Option } = Select;
@@ -140,13 +148,14 @@ const ProjectEdit = () => {
   }, []);
 
   const handleBudgetBlur = () => {
-    form.validateFields(['budget'])
+    form
+      .validateFields(["budget"])
       .then(() => {
         // Handle successful validation if needed
       })
       .catch((error) => {
         // Handle validation errors if needed
-        console.error('Validation error:', error);
+        console.error("Validation error:", error);
       });
   };
   const formatNumberWithCommas = (value) => {
@@ -155,14 +164,14 @@ const ProjectEdit = () => {
     }
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
-  
+
   const handleBudgetChange = (e) => {
     const value = e.target.value;
     // Remove all commas for validation and storage
     const cleanedValue = value.replace(/,/g, "");
     form.setFieldsValue({ budget: formatNumberWithCommas(cleanedValue) });
   };
-  
+
   const validateBudget = (rule, value) => {
     if (!value) {
       return Promise.reject(t("Please input the budget!"));
@@ -207,10 +216,10 @@ const ProjectEdit = () => {
 
     emailjs
     .send(
-      "service_9r2qdij",
-      "template_orarn6c",
+      "service_ncefpgz",
+      "template_kngz6s9",
       templateParams,
-      "RSDnD2F8I4qw38cFd"
+      "lb5ycQksDnRX-2uqk"
     )
       .then((response) => {
         console.log("Email sent successfully:", response.status, response.text);
@@ -255,33 +264,36 @@ const ProjectEdit = () => {
             (member) => !currentTeamMembers.includes(member)
           );
 
-          // Gửi email thông báo cho các thành viên mới
+          // Ghi lịch sử và gửi email cho các thành viên mới
           for (const member of addedMembers) {
             const memberData = employees.find((emp) => emp.value === member);
             if (memberData) {
+              await recordHistory(id, "added", member);
               sendNotificationEmail(memberData.email, values.name, "added");
 
               // Cập nhật trạng thái của nhân viên mới thành "involved"
-            await updateEmployeeStatusToInvolved(member);
+              await updateEmployeeStatusToInvolved(member);
             }
           }
 
-          // Gửi email thông báo cho các thành viên bị xóa
+          // Ghi lịch sử và gửi email cho các thành viên bị xóa
           for (const member of removedMembers) {
             const memberData = employees.find((emp) => emp.value === member);
             if (memberData) {
+              await recordHistory(id, "removed", member);
               sendNotificationEmail(memberData.email, values.name, "removed");
-            // Cập nhật trạng thái của nhân viên thành "active" nếu không còn thuộc dự án nào
-            const allProjects = await fetchAllProjects();
-            const isInAnyProject = allProjects.some((project) =>
-              project.teamMembers.includes(member)
-            );
 
-            if (!isInAnyProject) {
-              await updateEmployeeStatusToActive(member);
+              // Cập nhật trạng thái của nhân viên thành "active" nếu không còn thuộc dự án nào
+              const allProjects = await fetchAllProjects();
+              const isInAnyProject = allProjects.some((project) =>
+                project.teamMembers.includes(member)
+              );
+
+              if (!isInAnyProject) {
+                await updateEmployeeStatusToActive(member);
+              }
             }
           }
-        }
 
           navigate(`/project/${id}`);
         } catch (error) {

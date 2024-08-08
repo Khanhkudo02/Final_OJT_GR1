@@ -2,7 +2,7 @@ import { Button, Modal, message } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { deleteProjectPermanently, fetchAllProjects } from "../service/Project";
@@ -208,6 +208,9 @@ const ProjectDetail = () => {
       <p>
         <strong>{t("ProgrammingLanguageUsed")}:</strong> {displayedLanguages}
       </p>
+      <Link to={`/project-tracking/${project.key}`}>
+        <Button type="primary">View History</Button>
+      </Link>
     </div>
   );
 };

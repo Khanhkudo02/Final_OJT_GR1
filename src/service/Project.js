@@ -207,6 +207,22 @@ const restoreProject = async (id) => {
   }
 };
 
+const recordHistory = async (projectId, action, employeeId) => {
+  try {
+    const historyRef = ref(db, `projectHistory/${projectId}`);
+    const newHistoryRef = push(historyRef);
+    const timestamp = new Date().toISOString();
+
+    await set(newHistoryRef, {
+      action,
+      employeeId,
+      timestamp,
+    });
+  } catch (error) {
+    console.error("Failed to record history:", error);
+    throw error;
+  }
+};
 
 export {
   fetchAllProjects,
@@ -217,4 +233,5 @@ export {
   deleteProjectPermanently,
   restoreProject,
   fetchEmployeeProjects,
+  recordHistory, // Add this line
 };
