@@ -160,7 +160,7 @@ const LanguageManagement = () => {
           dataIndex="description"
           key="description"
           render={(text) => formatDescription(text)}
-        /> 
+        />
         <Column
           title={t("status")}
           dataIndex="status"
@@ -179,7 +179,7 @@ const LanguageManagement = () => {
               <span className={className}>
                 {translatedText
                   ? translatedText.charAt(0).toUpperCase() +
-                    translatedText.slice(1)
+                  translatedText.slice(1)
                   : ""}
               </span>
             );
@@ -190,13 +190,6 @@ const LanguageManagement = () => {
           key="actions"
           render={(text, record) => (
             <Space>
-              <Button
-                icon={<EyeOutlined />}
-                style={{ color: "green", borderColor: "green" }}
-                onClick={() =>
-                  navigate(`/programing-language/view/${record.key}`)
-                }
-              />
               <Button
                 icon={<EditOutlined />}
                 style={{ color: "blue", borderColor: "blue" }}
