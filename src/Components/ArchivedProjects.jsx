@@ -20,7 +20,7 @@ const ArchivedProjects = () => {
         const projects = await fetchArchivedProjects();
         setData(projects);
       } catch (error) {
-        message.error('Failed to fetch archived projects');
+        message.error(t("Failed to fetch archived projects"));
         console.error('Failed to fetch archived projects:', error);
       }
     };
@@ -33,14 +33,14 @@ const ArchivedProjects = () => {
 
   const handleDelete = (key) => {
     Modal.confirm({
-      title: 'Are you sure you want to permanently delete this project?',
+      title: t("Are you sure you want to permanently delete this project?"),
       onOk: async () => {
         try {
           await deleteProjectPermanently(key);
           setData(prevData => prevData.filter(item => item.key !== key));
-          message.success('Project permanently deleted');
+          message.success(t("Project permanently deleted"));
         } catch (error) {
-          message.error('Failed to delete project');
+          message.error(t("Failed to delete project"));
           console.error('Failed to delete project:', error);
         }
       }
@@ -62,15 +62,15 @@ const ArchivedProjects = () => {
 
   const handleRestore = (key) => {
     Modal.confirm({
-      title: 'Are you sure you want to restore this project?',
+      title: t("Are you sure you want to restore this project?"),
       onOk: async () => {
         try {
           await restoreProject(key);
           setData(prevData => prevData.filter(item => item.key !== key));
-          message.success('Project restored successfully');
+          message.success(t("Project restored successfully"));
           navigate("/project-management"); // Navigate to project management page after restoring
         } catch (error) {
-          message.error('Failed to restore project');
+          message.error(t("Failed to restore project"));
           console.error('Failed to restore project:', error);
         }
       }

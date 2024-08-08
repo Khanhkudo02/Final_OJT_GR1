@@ -14,9 +14,17 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchAllEmployees, updateEmployeeStatusToActive, updateEmployeeStatusToInvolved } from "../service/EmployeeServices";
+import {
+  fetchAllEmployees,
+  updateEmployeeStatusToActive,
+  updateEmployeeStatusToInvolved,
+} from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
-import { fetchAllProjects, putUpdateProject } from "../service/Project";
+import {
+  fetchAllProjects,
+  putUpdateProject,
+  recordHistory,
+} from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Option } = Select;
@@ -63,12 +71,12 @@ const ProjectEdit = () => {
 
           updateStatusOptions(projectData.status);
         } else {
-          message.error("Project not found");
+          message.error(t("Project not found"));
           navigate("/project-management");
         }
       } catch (error) {
         console.error("Error fetching project:", error);
-        message.error("Error fetching project data");
+        message.error(t("Error fetching project data"));
         navigate("/project-management");
       }
     };
@@ -86,7 +94,7 @@ const ProjectEdit = () => {
         }));
         setTechnologies(techOptions);
       } catch (err) {
-        setError("Failed to fetch technologies");
+        setError(t("Failed to fetch technologies"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -106,7 +114,7 @@ const ProjectEdit = () => {
         }));
         setLanguages(languageOptions);
       } catch (err) {
-        setError("Failed to fetch languages");
+        setError(t("Failed to fetch languages"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -130,7 +138,7 @@ const ProjectEdit = () => {
           }));
         setEmployees(employeeOptions);
       } catch (err) {
-        setError("Failed to fetch employees");
+        setError(t("Failed to fetch employees"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -140,13 +148,14 @@ const ProjectEdit = () => {
   }, []);
 
   const handleBudgetBlur = () => {
-    form.validateFields(['budget'])
+    form
+      .validateFields(["budget"])
       .then(() => {
         // Handle successful validation if needed
       })
       .catch((error) => {
         // Handle validation errors if needed
-        console.error('Validation error:', error);
+        console.error("Validation error:", error);
       });
   };
   const formatNumberWithCommas = (value) => {
@@ -155,23 +164,23 @@ const ProjectEdit = () => {
     }
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
-  
+
   const handleBudgetChange = (e) => {
     const value = e.target.value;
     // Remove all commas for validation and storage
     const cleanedValue = value.replace(/,/g, "");
     form.setFieldsValue({ budget: formatNumberWithCommas(cleanedValue) });
   };
-  
+
   const validateBudget = (rule, value) => {
     if (!value) {
-      return Promise.reject("Please input the budget!");
+      return Promise.reject(t("Please input the budget!"));
     }
     // Remove commas for validation
     const cleanedValue = value.replace(/,/g, "");
     const regex = /^\d+(\.\d{1,2})?\s?(VND|USD)?$/;
     if (!regex.test(cleanedValue)) {
-      return Promise.reject("Invalid budget format. Use 'amount currency' format.");
+      return Promise.reject(t("Invalid budget format. Use 'amount currency' format."));
     }
     return Promise.resolve();
   };
@@ -207,10 +216,10 @@ const ProjectEdit = () => {
 
     emailjs
     .send(
-      "service_9r2qdij",
-      "template_orarn6c",
+      "service_ncefpgz",
+      "template_kngz6s9",
       templateParams,
-      "RSDnD2F8I4qw38cFd"
+      "lb5ycQksDnRX-2uqk"
     )
       .then((response) => {
         console.log("Email sent successfully:", response.status, response.text);
@@ -222,10 +231,10 @@ const ProjectEdit = () => {
 
   const onFinish = async (values) => {
     Modal.confirm({
-      title: "Confirm Changes",
-      content: "Do you agree with the changes you have made?",
-      okText: "Yes",
-      cancelText: "No",
+      title: t("Confirm Changes"),
+      content: t("Do you agree with the changes you have made?"),
+      okText: t("Yes"),
+      cancelText: t("No"),
       onOk: async () => {
         try {
           const projectData = {
@@ -243,7 +252,7 @@ const ProjectEdit = () => {
             fileList.length > 0 ? fileList[0].originFileObj : null
           );
 
-          message.success("Project updated successfully");
+          message.success(t("Project updated successfully"));
           // Xác định các thành viên mới và cũ
           const currentTeamMembers = values.teamMembers || [];
           const previousTeamMembers = project.teamMembers || [];
@@ -255,37 +264,40 @@ const ProjectEdit = () => {
             (member) => !currentTeamMembers.includes(member)
           );
 
-          // Gửi email thông báo cho các thành viên mới
+          // Ghi lịch sử và gửi email cho các thành viên mới
           for (const member of addedMembers) {
             const memberData = employees.find((emp) => emp.value === member);
             if (memberData) {
+              await recordHistory(id, "added", member);
               sendNotificationEmail(memberData.email, values.name, "added");
 
               // Cập nhật trạng thái của nhân viên mới thành "involved"
-            await updateEmployeeStatusToInvolved(member);
+              await updateEmployeeStatusToInvolved(member);
             }
           }
 
-          // Gửi email thông báo cho các thành viên bị xóa
+          // Ghi lịch sử và gửi email cho các thành viên bị xóa
           for (const member of removedMembers) {
             const memberData = employees.find((emp) => emp.value === member);
             if (memberData) {
+              await recordHistory(id, "removed", member);
               sendNotificationEmail(memberData.email, values.name, "removed");
-            // Cập nhật trạng thái của nhân viên thành "active" nếu không còn thuộc dự án nào
-            const allProjects = await fetchAllProjects();
-            const isInAnyProject = allProjects.some((project) =>
-              project.teamMembers.includes(member)
-            );
 
-            if (!isInAnyProject) {
-              await updateEmployeeStatusToActive(member);
+              // Cập nhật trạng thái của nhân viên thành "active" nếu không còn thuộc dự án nào
+              const allProjects = await fetchAllProjects();
+              const isInAnyProject = allProjects.some((project) =>
+                project.teamMembers.includes(member)
+              );
+
+              if (!isInAnyProject) {
+                await updateEmployeeStatusToActive(member);
+              }
             }
           }
-        }
 
           navigate(`/project/${id}`);
         } catch (error) {
-          message.error("Failed to update project");
+          message.error(t("Failed to update project"));
         }
       },
     });
@@ -321,10 +333,10 @@ const ProjectEdit = () => {
           label={t("ProjectName")}
           name="name"
           rules={[
-            { required: true, message: "Please input the project name!" },
+            { required: true, message: t("Please input the project name!") },
           ]}
         >
-          <Input placeholder="Enter project name"/>
+          <Input placeholder={t("Enter project name")}/>
         </Form.Item>
 
         <Form.Item
@@ -333,56 +345,56 @@ const ProjectEdit = () => {
           rules={[
             {
               required: true,
-              message: "Please input the project description!",
+              message: t("Please input the project description!"),
             },
           ]}
         >
-          <TextArea rows={4} placeholder="Enter project description"/>
+          <TextArea rows={4} placeholder={t("Enter project description")}/>
         </Form.Item>
 
         <Form.Item
           label={t("StartDate")}
           name="startDate"
-          rules={[{ required: true, message: "Please select the start date!" }]}
+          rules={[{ required: true, message: t("Please select the start date!") }]}
         >
-          <DatePicker format="YYYY-MM-DD" placeholder="Select start date"/>
+          <DatePicker format="YYYY-MM-DD" placeholder={t("Select start date")}/>
         </Form.Item>
 
         <Form.Item
           label={t("EndDate")}
           name="endDate"
-          rules={[{ required: true, message: "Please select the end date!" }]}
+          rules={[{ required: true, message: t("Please select the end date!") }]}
         >
-          <DatePicker format="YYYY-MM-DD" placeholder="Select end date"/>
+          <DatePicker format="YYYY-MM-DD" placeholder={t("Select end date")}/>
         </Form.Item>
 
         <Form.Item
           label={t("ClientName")}
           name="clientName"
-          rules={[{ required: true, message: "Please input the client name!" }]}
+          rules={[{ required: true, message: t("Please input the client name!") }]}
         >
-          <Input placeholder="Enter client name"/>
+          <Input placeholder={t("Enter client name")}/>
         </Form.Item>
 
         <Form.Item
           label={t("ClientEmail")}
           name="clientEmail"
           rules={[
-            { required: true, message: "Please input the client email!" },
-            { type: "email", message: "Please enter a valid email!" },
+            { required: true, message: t("Please input the client email!") },
+            { type: "email", message: t("Please enter a valid email!") },
           ]}
         >
-          <Input placeholder="example@gmail.com" />
+          <Input placeholder={t("example@gmail.com")} />
         </Form.Item>
 
         <Form.Item
           label={t("phoneNumber")}
           name="phoneNumber"
           rules={[
-            { required: true, message: "Please input the phone number!" },
+            { required: true, message: t("Please input the phone number!") },
             {
               pattern: /^[0-9]{10}$/,
-              message: "Please enter a valid 10-digit phone number!",
+              message: t("Please enter a valid 10-digit phone number!"),
             },
           ]}
         >
@@ -393,20 +405,20 @@ const ProjectEdit = () => {
           label={t("ProjectManager")}
           name="projectManager"
           rules={[
-            { required: true, message: "Please input the project manager!" },
+            { required: true, message: t("Please input the project manager!") },
           ]}
         >
-          <Input placeholder="Enter project manager"/>
+          <Input placeholder={t("Enter project manager")}/>
         </Form.Item>
 
         <Form.Item
           label={t("TeamMember")}
           name="teamMembers"
           rules={[
-            { required: true, message: "Please select the team members!" },
+            { required: true, message: t("Please select the team members!") },
           ]}
         >
-          <Select mode="multiple" placeholder="Select team members">
+          <Select mode="multiple" placeholder={t("Select team members")}>
             {employees.map((emp) => (
               <Option key={emp.value} value={emp.value}>
                 {emp.label}
@@ -421,7 +433,7 @@ const ProjectEdit = () => {
           rules={[{ required: true, validator: validateBudget }]}
         >
           <Input
-            placeholder="Enter budget (e.g., 1,000,000 VND or 500 USD)"
+            placeholder={t("Enter budget (e.g., 1,000,000 VND or 500 USD)")}
             onChange={handleBudgetChange}
             onBlur={handleBudgetBlur}
             maxLength={50} // Optional: to limit input length
@@ -432,7 +444,7 @@ const ProjectEdit = () => {
           label={t("Status")}
           name="status"
           rules={[
-            { required: true, message: "Please select the project status!" },
+            { required: true, message: t("Please select the project status!") },
           ]}
         >
           <Select>
@@ -448,19 +460,19 @@ const ProjectEdit = () => {
           label={t("Priority")}
           name="priority"
           rules={[
-            { required: true, message: "Please select the project priority!" },
+            { required: true, message: t("Please select the project priority!") },
           ]}
         >
-          <Select placeholder="Select the project priority">
-            <Option value="HIGH">High</Option>
-            <Option value="MEDIUM">Medium</Option>
-            <Option value="LOW">Low</Option>
+          <Select placeholder={t("Select the project priority")}>
+            <Option value="HIGH">{t("High")}</Option>
+            <Option value="MEDIUM">{t("Medium")}</Option>
+            <Option value="LOW">{t("Low")}</Option>
           </Select>
         </Form.Item>
 
         {/* Select technologies */}
         <Form.Item label={t("TechnologiesUsed")} name="technologies">
-          <Select mode="multiple" placeholder="Select technologies">
+          <Select mode="multiple" placeholder={t("Select technologies")}>
             {technologies.map((tech) => (
               <Option key={tech.value} value={tech.value}>
                 {tech.label}
@@ -471,7 +483,7 @@ const ProjectEdit = () => {
 
         {/* Select programming languages */}
         <Form.Item label={t("ProgrammingLanguageUsed")} name="languages">
-          <Select mode="multiple" placeholder="Select languages">
+          <Select mode="multiple" placeholder={t("Select languages")}>
             {languages.map((lang) => (
               <Option key={lang.value} value={lang.value}>
                 {lang.label}

@@ -34,10 +34,10 @@ const EditPosition = () => {
           setDepartment(position.department || "");
           setStatus(position.status || "");
         } else {
-          toast.error("Position not found.");
+          toast.error(t("Position not found."));
         }
       } catch (error) {
-        toast.error("Failed to fetch position data.");
+        toast.error(t("Failed to fetch position data."));
       }
     };
 
@@ -46,7 +46,7 @@ const EditPosition = () => {
 
   const handleUpdatePosition = async () => {
     if (!name || !description || !department || !status) {
-      toast.error("Please fill in all fields.");
+      toast.error(t("Please fill in all fields."));
       return;
     }
 
@@ -59,10 +59,10 @@ const EditPosition = () => {
         status,
         imageFile
       );
-      toast.success("Position updated successfully!");
+      toast.success(t("Position updated successfully!"));
       navigate("/position-management");
     } catch (error) {
-      toast.error("Failed to update position.");
+      toast.error(t("Failed to update position."));
       console.error("Error details:", error);
     }
   };

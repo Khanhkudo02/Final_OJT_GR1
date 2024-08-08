@@ -43,7 +43,7 @@ const SkillManagement = () => {
 
         const skillAdded = localStorage.getItem("skillAdded");
         if (skillAdded === "true") {
-            message.success("Skill added successfully!");
+            message.success(t("Skill added successfully!"));
             localStorage.removeItem("skillAdded"); // Xóa thông báo sau khi đã hiển thị
         }
     }, []);
@@ -64,19 +64,19 @@ const SkillManagement = () => {
 
     const handleDelete = (record) => {
         if (record.status !== "inactive") {
-            message.error("Only inactive skills can be deleted.");
+            message.error(t("Only inactive skills can be deleted."));
             return;
         }
 
         confirm({
-            title: "Are you sure you want to delete this skill?",
+            title: t("Are you sure you want to delete this skill?"),
             onOk: async () => {
                 try {
                     await deleteSkillById(record.key);
-                    message.success("Skill deleted successfully!");
+                    message.success(t("Skill deleted successfully!"));
                     loadSkills();
                 } catch (error) {
-                    message.error("Failed to delete skill.");
+                    message.error(t("Failed to delete skill."));
                 }
             },
             onCancel() {

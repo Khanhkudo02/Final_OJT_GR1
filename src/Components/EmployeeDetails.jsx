@@ -52,7 +52,7 @@ const EmployeeDetails = () => {
           skillsData.map((skill) => ({ key: skill.key, name: skill.label }))
         );
       } catch (error) {
-        message.error("Failed to fetch skills");
+        message.error(t("Failed to fetch skills"));
       }
     };
 
@@ -79,7 +79,7 @@ const EmployeeDetails = () => {
 
   const getSkillNameById = (skillId, skills) => {
     const skill = skills.find((sk) => sk.key === skillId);
-    return skill ? skill.name : "Unknown Skill";
+    return skill ? skill.name : t("Unknown Skill");
   };
 
   if (loading) return <Spin size="large" />;

@@ -32,10 +32,10 @@ const EditSkill = () => {
                     setDescription(skill.description || "");
                     setStatus(skill.status || "");
                 } else {
-                    toast.error("Skill not found.");
+                    toast.error(t("Skill not found."));
                 }
             } catch (error) {
-                toast.error("Failed to fetch skill data.");
+                toast.error(t("Failed to fetch skill data."));
             }
         };
 
@@ -44,7 +44,7 @@ const EditSkill = () => {
 
     const handleUpdateSkill = async () => {
         if (!name || !description || !status) {
-            toast.error("Please fill in all fields.");
+            toast.error(t("Please fill in all fields."));
             return;
         }
 
@@ -56,10 +56,10 @@ const EditSkill = () => {
                 status,
                 imageFile
             );
-            toast.success("Skill updated successfully!");
+            toast.success(t("Skill updated successfully!"));
             navigate("/position-management");
         } catch (error) {
-            toast.error("Failed to update skill.");
+            toast.error(t("Failed to update skill."));
             console.error("Error details:", error);
         }
     };
@@ -71,7 +71,7 @@ const EditSkill = () => {
             <div className="form-group">
                 <label>{t("name")}</label>
                 <Input
-                    placeholder="Name"
+                    placeholder={t("name")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                 />
@@ -79,7 +79,7 @@ const EditSkill = () => {
             <div className="form-group">
                 <label>{t("Description")}</label>
                 <Input.TextArea
-                    placeholder="Description"
+                    placeholder={t("Description")}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
@@ -87,7 +87,7 @@ const EditSkill = () => {
             <div className="form-group">
                 <label>{t("Status")}</label>
                 <Select
-                    placeholder="Select Status"
+                    placeholder={t("Select Status")}
                     value={status}
                     onChange={(value) => setStatus(value)}
                 >

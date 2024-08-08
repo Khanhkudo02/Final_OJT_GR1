@@ -19,7 +19,7 @@ const LanguageDetails = () => {
         setLanguage(data);
         setLoading(false);
       } catch (error) {
-        message.error("Failed to fetch language details.");
+        message.error(t("Failed to fetch language details."));
         setLoading(false);
       }
     };
@@ -61,7 +61,7 @@ const LanguageDetails = () => {
           </Button>
         </div>
       ) : (
-        <p>Language not found.</p>
+        <p>{t("Language not found.")}</p>
       )}
     </div>
   );
