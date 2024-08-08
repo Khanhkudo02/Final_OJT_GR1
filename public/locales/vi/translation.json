@@ -291,5 +291,6 @@
   "Project archived successfully": "Dự án được lưu trữ thành công",
   "Failed to archive project": "Không thể lưu trữ dự án",
   "projects":"Những dự án được tham gia",
-  "searchbyemail":"Tìm kiếm bằng email"
+  "searchbyemail":"Tìm kiếm bằng email",
+  "passwordRequired": "Mật khẩu là bắt buộc"
 }

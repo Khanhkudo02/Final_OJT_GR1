@@ -291,5 +291,6 @@
   "Project archived successfully": "Project archived successfully",
   "Failed to archive project": "Failed to archive project",
   "projects":"Projects Involved",
-  "searchbyemail":"Search by email"
+  "searchbyemail":"Search by email",
+  "passwordRequired": "Password is required"
 }
