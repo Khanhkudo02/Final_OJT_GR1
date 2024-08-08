@@ -5,12 +5,14 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/AccountInfo.scss";
 import "../assets/style/Global.scss";
+import { fetchAllSkills } from "../service/SkillServices";
 
 function AccountInfo() {
   const { t } = useTranslation();
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [allSkills, setAllSkills] = useState([]); // State để lưu trữ tất cả kỹ năng
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -27,17 +29,21 @@ function AccountInfo() {
         const data = snapshot.val();
         setUserData(data);
 
-         // Lấy thông tin dự án liên quan đến nhân viên
+        // Lấy thông tin dự án liên quan đến nhân viên
         const projectsRef = ref(db, `projects`);
         const projectsSnapshot = await get(projectsRef);
         const allProjects = projectsSnapshot.val();
-        
+
         // Lọc các dự án mà nhân viên đang tham gia
-        const userProjects = Object.values(allProjects).filter(project =>
+        const userProjects = Object.values(allProjects).filter((project) =>
           project.teamMembers.includes(userId)
         );
-        
+
         setProjects(userProjects || []);
+
+        // Lấy tất cả các kỹ năng
+        const skills = await fetchAllSkills();
+        setAllSkills(skills);
       } catch (error) {
         message.error(t("errorFetchingUserData"));
       }
@@ -52,12 +58,12 @@ function AccountInfo() {
 
   // Hàm để viết hoa chữ cái đầu tiên của mỗi từ
   const capitalizeWords = (text) => {
-    if (typeof text !== 'string') return text; // Kiểm tra loại dữ liệu
+    if (typeof text !== "string") return text; // Kiểm tra loại dữ liệu
     return text
       .toLowerCase()
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   // Hàm định dạng ngày theo dạng "dd/mm/yyyy"
@@ -69,6 +75,14 @@ function AccountInfo() {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
+  // Tạo danh sách kỹ năng từ tất cả kỹ năng và kỹ năng của người dùng
+  const userSkills = userData.skills
+    ? userData.skills.map((skillId) => {
+        const skill = allSkills.find((s) => s.key === skillId);
+        return skill ? skill.name : skillId;
+      })
+    : [];
 
   return (
     <div className="account-info-container">
@@ -116,11 +130,9 @@ function AccountInfo() {
               {capitalizeWords(userData.phoneNumber)}
             </Descriptions.Item>
           )}
-          {userData.skills && userData.skills.length > 0 && (
+          {userSkills.length > 0 && (
             <Descriptions.Item label={t("skills")}>
-              {userData.skills.map(skill => capitalizeWords(t(`skill${skill.charAt(0).toUpperCase() + skill.slice(1)}`, {
-                defaultValue: skill.replace(/_/g, " "),
-              }))).join(", ")}
+              {userSkills.map((skill) => capitalizeWords(skill)).join(", ")}
             </Descriptions.Item>
           )}
           {userData.department && (
@@ -130,17 +142,8 @@ function AccountInfo() {
           )}
           {/* Hiển thị thông tin dự án */}
           {projects.length > 0 && (
-            <Descriptions.Item label={t("projects")}>
-              {projects.map(project => (
-                <div key={project.id}>
-                  <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
-                  <p><strong>{t("Description")}:</strong> {project.description}</p>
-                  <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
-                  <p><strong>{t("Budget")}:</strong> {project.budget}</p>
-                  <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
-                  <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
-                </div>
-              ))}
+            <Descriptions.Item label={t("ListProject")}>
+              {projects.map((project) => project.name).join(", ")}
             </Descriptions.Item>
           )}
         </Descriptions>

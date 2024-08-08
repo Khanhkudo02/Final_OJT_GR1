@@ -33,7 +33,7 @@ const EmployeeDetails = () => {
         const allProjects = projectsSnapshot.val();
 
         // Lọc các dự án mà nhân viên đang tham gia
-        const userProjects = Object.values(allProjects).filter(project =>
+        const userProjects = Object.values(allProjects).filter((project) =>
           project.teamMembers.includes(id)
         );
 
@@ -91,12 +91,6 @@ const EmployeeDetails = () => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
 
-  const formattedSkills = Array.isArray(employee.skills)
-    ? employee.skills.map(formatSkill).join(", ")
-    : employee.skills
-      ? formatSkill(employee.skills)
-      : t("noSkills");
-
   const formatDepartment = (department) => {
     if (typeof department === "string") {
       return department
@@ -113,7 +107,6 @@ const EmployeeDetails = () => {
         <div>
           {employee.imageUrl && (
             <div>
-              <strong>{t("image")}:</strong>
               <img
                 src={employee.imageUrl}
                 alt={t("employeeImage")}
@@ -147,7 +140,7 @@ const EmployeeDetails = () => {
             {getPositionNameById(employee.position, positions)}
           </p>
           <p>
-            <strong>{t("status")}:</strong>
+            <strong>{t("status")}: </strong>
             <span
               className={
                 employee.status === "active"
@@ -164,14 +157,28 @@ const EmployeeDetails = () => {
             </span>
           </p>
           <div className="project-detail">
-            {projects.map(project => (
+            {projects.map((project) => (
               <div className="project-detail-item" key={project.id}>
-                <p><strong>{t("ProjectName")}:</strong> {project.name}</p>
-                <p><strong>{t("Description")}:</strong> {project.description}</p>
-                <p><strong>{t("ClientName")}:</strong> {project.clientName}</p>
-                <p><strong>{t("Budget")}:</strong> {project.budget}</p>
-                <p><strong>{t("StartDate")}:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
-                <p><strong>{t("EndDate")}:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
+                <p>
+                  <strong>{t("ProjectName")}:</strong> {project.name}
+                </p>
+                <p>
+                  <strong>{t("Description")}:</strong> {project.description}
+                </p>
+                <p>
+                  <strong>{t("ClientName")}:</strong> {project.clientName}
+                </p>
+                <p>
+                  <strong>{t("Budget")}:</strong> {project.budget}
+                </p>
+                <p>
+                  <strong>{t("StartDate")}:</strong>{" "}
+                  {new Date(project.startDate).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>{t("EndDate")}:</strong>{" "}
+                  {new Date(project.endDate).toLocaleDateString()}
+                </p>
               </div>
             ))}
           </div>

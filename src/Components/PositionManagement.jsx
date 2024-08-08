@@ -6,6 +6,7 @@ import {
 } from "@ant-design/icons";
 import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/PositionManagement.scss";
@@ -13,7 +14,6 @@ import {
   deletePositionById,
   fetchAllPositions,
 } from "../service/PositionServices";
-import { useTranslation } from "react-i18next";
 import SkillManagement from "./SkillManagement";
 
 const { Column } = Table;
@@ -130,7 +130,7 @@ const PositionManagement = () => {
         {t("Add New Position")}
       </Button>
       <Input
-        placeholder={t("search")}
+        placeholder={t("searchbyname")}
         value={searchTerm}
         onChange={handleSearchChange}
         style={{ width: "250px", marginBottom: 16 }}
@@ -159,7 +159,7 @@ const PositionManagement = () => {
           dataIndex="description"
           key="description"
           render={(text) => formatDescription(text)}
-        /> 
+        />
         <Column title={t("Department")} dataIndex="department" key="department" />
         <Column
           title={t("Status")}

@@ -232,6 +232,8 @@ const ProjectEdit = () => {
             ...values,
             startDate: values.startDate.format("YYYY-MM-DD"),
             endDate: values.endDate.format("YYYY-MM-DD"),
+            technologies: values.technologies || [], // Initialize to empty array if undefined
+            languages: values.languages || [], // Initialize to empty array if undefined
             imageUrl:
               fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
           };
@@ -457,9 +459,7 @@ const ProjectEdit = () => {
         </Form.Item>
 
         {/* Select technologies */}
-        <Form.Item label={t("TechnologiesUsed")} name="technologies"  rules={[
-            { required: true, message: "Please select technologies used!" },
-          ]}>
+        <Form.Item label={t("TechnologiesUsed")} name="technologies">
           <Select mode="multiple" placeholder="Select technologies">
             {technologies.map((tech) => (
               <Option key={tech.value} value={tech.value}>
@@ -470,9 +470,7 @@ const ProjectEdit = () => {
         </Form.Item>
 
         {/* Select programming languages */}
-        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages"  rules={[
-            { required: true, message: "Please select programming language used!" },
-          ]}>
+        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages">
           <Select mode="multiple" placeholder="Select languages">
             {languages.map((lang) => (
               <Option key={lang.value} value={lang.value}>
