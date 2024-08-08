@@ -159,7 +159,7 @@ const PositionManagement = () => {
           dataIndex="description"
           key="description"
           render={(text) => formatDescription(text)}
-        /> 
+        />
         <Column title={t("Department")} dataIndex="department" key="department" />
         <Column
           title={t("Status")}
