@@ -285,7 +285,7 @@ const NewProject = () => {
             placeholder={t("Select start date")}
             onChange={(date) => setStartDate(date)}
             disabledDate={disabledStartDate}
-            // onBlur={() => handleFieldBlur("startDate")}
+            onBlur={() => handleFieldBlur("startDate")}
           />
         </Form.Item>
 
@@ -301,7 +301,7 @@ const NewProject = () => {
             placeholder={t("Select end date")}
             onChange={(date) => setEndDate(date)}
             disabledDate={disabledEndDate}
-           
+            onBlur={() => handleFieldBlur("endDate")}
           />
         </Form.Item>
 
