@@ -7,8 +7,10 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
+import { format } from "date-fns";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
+import { get, getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,8 +22,6 @@ import {
   fetchAllEmployees,
   fetchAllSkills,
 } from "../service/EmployeeServices";
-import { get, getDatabase, ref, onValue } from "firebase/database";
-import { format } from "date-fns";
 import { fetchAllLanguages2 } from "../service/LanguageServices";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 
@@ -573,7 +573,7 @@ const EmployeeManagement = () => {
         {t("exportToExcel")}
       </Button>
       <Search
-        placeholder={t("search")}
+        placeholder={t("searchbyemailorphonenumber")}
         onChange={(e) => setSearchTerm(e.target.value)}
         style={{ width: 250 }}
         prefix={<SearchOutlined />}

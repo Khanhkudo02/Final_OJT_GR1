@@ -386,5 +386,6 @@
   "Project deleted successfully": "Dự án đã được xóa thành công",
   "Are you sure you want to delete this project?": "Bạn có chắc muốn xóa dự án này không?",
   "This action cannot be undone": "Hành động này không thể được hoàn tác",
-  "Loading...": "Đang tải..."
+  "Loading...": "Đang tải...",
+  "searchbyemailorphonenumber":"Tìm kiếm bằng Email hoặc Số điện thoại"
 }
