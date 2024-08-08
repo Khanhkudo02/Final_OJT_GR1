@@ -60,7 +60,7 @@ function Login({ setUser }) {
       <div className={styles["login-form"]}>
         <div className={styles["header-form"]}>
           <Title level={2} className={styles["title"]}>
-            {isSignUp ? "Sign Up" : "Login"}
+            {isSignUp ? t("SignUp") : t("Login")}
           </Title>
           <img
             src="/public/images/logo.jpg"

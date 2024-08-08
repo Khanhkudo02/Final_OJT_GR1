@@ -322,7 +322,7 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: employee.name || "Name not available",
+                    text: employee.name || t("Name not available"),
                     bold: true,
                     size: 32, // Tùy chọn: Điều chỉnh kích thước phông chữ
                   }),
@@ -331,12 +331,12 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Address: ",
+                    text: t("Address: "),
                     bold: true,
                     size: 24,
                   }),
                   new TextRun({
-                    text: employee.address || "Address not available",
+                    text: employee.address || t("Address not available"),
                     size: 24,
                   }),
                 ],
@@ -344,12 +344,12 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Email: ",
+                    text: t("Email: "),
                     bold: true,
                     size: 24,
                   }),
                   new TextRun({
-                    text: employee.email || "Email not available",
+                    text: employee.email || t("Email not available"),
                     size: 24,
                   }),
                 ],
@@ -357,13 +357,13 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Department: ",
+                    text: t("Department: "),
                     bold: true,
                     size: 24,
                   }),
                   new TextRun({
                     text:
-                      formatDepartment(employee.department) || "Not provided",
+                      formatDepartment(employee.department) || t("Not provided"),
                     size: 24,
                   }),
                 ],
@@ -376,7 +376,7 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "WORKING EXPERIENCE",
+                    text: t("WORKING EXPERIENCE"),
                     bold: true,
                     size: 24,
                   }),
@@ -385,7 +385,7 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Skills: ",
+                    text: t("Skills: "),
                     bold: true,
                     size: 24,
                   }),
@@ -398,7 +398,7 @@ const EmployeeManagement = () => {
                           .join(", ")
                       : employee.skills
                       ? getSkillNameById(employee.skills, skillsList)
-                      : "Not provided",
+                      : t("Not provided"),
                     size: 24,
                   }),
                 ],
@@ -411,7 +411,7 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "TYPICAL PROJECTS",
+                    text: t("TYPICAL PROJECTS"),
                     bold: true,
                     size: 24,
                   }),
@@ -422,12 +422,12 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Project name: ",
+                          text: t("Project name: "),
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.name || "Not provided",
+                          text: project.name || t("Not provided"),
                           size: 24,
                         }),
                       ],
@@ -435,7 +435,7 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Project Duration: ",
+                          text: t("Project Duration: "),
                           bold: true,
                           size: 24,
                         }),
@@ -447,7 +447,7 @@ const EmployeeManagement = () => {
                             )} - ${format(
                               new Date(project.endDate),
                               "dd/MM/yyyy"
-                            )}` || "Dates not provided",
+                            )}` || t("Dates not provided"),
                           size: 24,
                         }),
                       ],
@@ -455,14 +455,14 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Description: ",
+                          text: t("Description: "),
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
                           text:
                             formatDescription(project.description) ||
-                            "Not provided",
+                            t("Not provided"),
                           size: 24,
                         }),
                       ],
@@ -470,25 +470,10 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Programming languages: ",
+                          text: t("Programming languages: "),
                           bold: true,
                           size: 24,
                         }),
-                        // new TextRun({
-                        //   text: Array.isArray(project.languages)
-                        //     ? project.languages
-                        //         .map((langId) =>
-                        //           getLanguageNameById(langId, languagesList)
-                        //         )
-                        //         .join(", ")
-                        //     : project.languages
-                        //     ? getLanguageNameById(
-                        //         project.languages,
-                        //         languagesList
-                        //       )
-                        //     : "Không được cung cấp",
-                        //   size: 24,
-                        // }),
                         new TextRun({
                           text: Array.isArray(project.languages)
                             ? project.languages
@@ -504,7 +489,7 @@ const EmployeeManagement = () => {
                                 project.languages,
                                 languagesList
                               )
-                            : "Không được cung cấp",
+                            : t("Not provided"),
                           size: 24,
                         }),
                       ],
@@ -512,7 +497,7 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Technologies: ",
+                          text: t("Technologies: "),
                           bold: true,
                           size: 24,
                         }),
@@ -531,7 +516,7 @@ const EmployeeManagement = () => {
                                 project.technologies,
                                 technologiesList
                               )
-                            : "Không được cung cấp",
+                            : t("Not provided"),
                           size: 24,
                         }),
                       ],
@@ -543,7 +528,7 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Not yet joined the project",
+                          text: t("Not yet joined the project"),
                           size: 24,
                           italics: true,
                         }),
@@ -557,11 +542,11 @@ const EmployeeManagement = () => {
 
       // Lưu tài liệu dưới dạng tệp .docx
       Packer.toBlob(doc).then((blob) => {
-        saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
+        saveAs(blob, `${employee.name || t("Employee")}_CV.docx`);
       });
     } catch (error) {
       console.error("Error exporting to Word:", error);
-      message.error("Unable to export to Word. Please try again.");
+      message.error(t("Unable to export to Word. Please try again."));
     }
   };
 
