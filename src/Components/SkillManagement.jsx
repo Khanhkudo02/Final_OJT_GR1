@@ -106,6 +106,11 @@ const SkillManagement = () => {
         currentPage * pageSize
     );
 
+    const formatDescription = (description) => {
+        const translatedDescription = t(description);
+        return translatedDescription ? translatedDescription.charAt(0).toUpperCase() + translatedDescription.slice(1) : null;
+    };
+
     const tabItems = [
         { key: "All Skills", label: t("All Skills") },
         { key: "active", label: t("active") },
@@ -148,7 +153,12 @@ const SkillManagement = () => {
                 }}
             >
                 <Column title={t("name")} dataIndex="name" key="name" />
-                <Column title={t("Description")} dataIndex="description" key="description" />
+                <Column
+                    title={t("Description")}
+                    dataIndex="description"
+                    key="description"
+                    render={(text) => formatDescription(text)}
+                />
                 <Column
                     title={t("Status")}
                     dataIndex="status"
