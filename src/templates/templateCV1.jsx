@@ -1,7 +1,7 @@
 import "jspdf-autotable";
 import React from "react";
 import avt from "../../public/images/avatar.jpg";
-import "../assets/style/template/templateCV1.scss";
+import "../assets/style/template/TemplateCV1.scss";
 
 const generatePDF = (doc) => {
   // Add background color to the left section

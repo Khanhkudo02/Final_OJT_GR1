@@ -107,7 +107,6 @@ const EmployeeDetails = () => {
         <div>
           {employee.imageUrl && (
             <div>
-              <strong>{t("image")}:</strong>
               <img
                 src={employee.imageUrl}
                 alt={t("employeeImage")}
@@ -141,19 +140,19 @@ const EmployeeDetails = () => {
             {getPositionNameById(employee.position, positions)}
           </p>
           <p>
-            <strong>{t("status")}:</strong>
+            <strong>{t("status")}: </strong>
             <span
               className={
                 employee.status === "active"
                   ? "status-active"
                   : employee.status === "involved"
-                  ? "status-involved"
-                  : "status-inactive"
+                    ? "status-involved"
+                    : "status-inactive"
               }
             >
               {employee.status
                 ? employee.status.charAt(0).toUpperCase() +
-                  employee.status.slice(1)
+                employee.status.slice(1)
                 : ""}
             </span>
           </p>
