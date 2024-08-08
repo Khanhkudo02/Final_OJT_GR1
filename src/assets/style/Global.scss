@@ -31,12 +31,44 @@ body {
   margin-right: 5px;
 }
 
+.btn-length {
+  font-weight: 500;
+  color: black;
+  margin-right: 5px;
+}
+
 .mb-3 {
   margin-bottom: 10px;
 }
 
+.title {
+  font-weight: 700;
+}
+
 .form-group {
   margin-bottom: 10px;
+}
+
+.inp-length {
+  width: 100%;
+}
+
+.ant-input-affix-wrapper {
+  margin-left: 5px;
+}
+
+.ant-input-group-addon {
+  display: none !important;
+}
+
+.ant-select-arrow {
+  display: block !important;
+}
+
+
+.ant-form-item-label {
+  width: 210px;
+  text-align: left !important;
 }
 
 .status-active {
@@ -49,8 +81,29 @@ body {
   font-weight: 700;
 }
 
+.status-involved {
+  color: blue;
+  font-weight: 700;
+}
+
 .ant-table-cell {
   text-align: center !important;
+}
+
+.ant-select {
+  width: 100%;
+}
+
+.length-cell {
+  width: 25%;
+}
+
+.project-detail {
+  display: flex;
+}
+
+.project-detail-item {
+  width: 250px;
 }
 
 .detail-button {

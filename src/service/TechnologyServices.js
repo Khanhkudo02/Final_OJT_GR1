@@ -1,36 +1,54 @@
-import { ref as dbRef, set, push, update, get, remove } from "firebase/database";
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { database, storage } from "../firebaseConfig";
+import { get, push, ref, remove, set, update } from "firebase/database";
+import { database } from "../firebaseConfig";
 
-// Create new technology
-const postCreateTechnology = async (name, description, status, imageUrls) => {
+// Function to create a technology
+const postCreateTechnology = async (
+  name,
+  description,
+  status,
+  imageUrl
+) => {
   try {
-    const newTechnologyRef = push(dbRef(database, "technologies"));
-
-    // Save the technology data along with image URLs (if available)
-    await set(newTechnologyRef, {
+    const newTechRef = push(ref(database, "technologies"));
+    await set(newTechRef, {
       name,
       description,
       status,
-      imageURLs: imageUrls, // Store image URLs as an array
-      createdAt: Date.now(),
+      imageUrl,
     });
-
-    return newTechnologyRef.key;
+    return newTechRef.key;
   } catch (error) {
-    console.error("Failed to create technology:", error);
+    console.error("Error creating technology:", error);
     throw error;
   }
 };
 
-// Fetch all technologies
+// Function to fetch a technology by ID
+const fetchTechnologyById = async (id) => {
+  try {
+    const technologyRef = ref(database, `technologies/${id}`);
+    const snapshot = await get(technologyRef);
+
+    if (!snapshot.exists()) {
+      throw new Error("Technology not found.");
+    }
+
+    console.log("Technology data fetched:", snapshot.val());
+    return snapshot.val();
+  } catch (error) {
+    console.error("Error fetching technology:", error);
+    throw error;
+  }
+};
+
+// Function to fetch all technologies
 const fetchAllTechnology = async () => {
   try {
-    const technologiesRef = dbRef(database, "technologies");
-    const snapshot = await get(technologiesRef);
+    const techRef = ref(database, 'technologies');
+    const snapshot = await get(techRef);
     const data = snapshot.val();
     return data
-      ? Object.entries(data).map(([key, value]) => ({ key, ...value }))
+      ? Object.entries(data).map(([key, value]) => ({ id: key, ...value }))
       : [];
   } catch (error) {
     console.error("Failed to fetch technologies:", error);
@@ -38,62 +56,37 @@ const fetchAllTechnology = async () => {
   }
 };
 
-// Update existing technology
-const putUpdateTechnology = async (id, name, description, status, imageURLs, oldImageURLs) => {
+// Function to update a technology
+const putUpdateTechnology = async (
+  id,
+  name,
+  description,
+  status,
+  imageUrl
+) => {
   try {
-    const technologyRef = dbRef(database, `technologies/${id}`);
-
-    // Update technology data
-    await update(technologyRef, {
+    const techRef = ref(database, `technologies/${id}`);
+    await update(techRef, {
       name,
       description,
       status,
-      imageURLs,
+      imageUrl,
     });
-
-    // Delete old images from Firebase Storage if needed
-    const imagesToDelete = oldImageURLs.filter(url => !imageURLs.includes(url));
-    await Promise.all(imagesToDelete.map(async (url) => {
-      const oldImagePath = url.split("/o/")[1].split("?")[0];
-      const decodedOldImagePath = decodeURIComponent(oldImagePath);
-      const oldImageRef = storageRef(storage, decodedOldImagePath);
-      await deleteObject(oldImageRef);
-    }));
-
-    return id;
   } catch (error) {
-    console.error("Failed to update technology:", error);
+    console.error("Error updating technology:", error);
     throw error;
   }
 };
 
-// Delete technology
+// Function to delete a technology
 const deleteTechnology = async (id) => {
   try {
-    const technologyRef = dbRef(database, `technologies/${id}`);
-    const technologySnapshot = await get(technologyRef);
-
-    if (!technologySnapshot.exists()) {
-      throw new Error("Technology not found");
-    }
-
-    // Delete images from Firebase Storage
-    const imageUrls = technologySnapshot.val().imageURLs;
-    if (imageUrls) {
-      await Promise.all(imageUrls.map(async (url) => {
-        const imagePath = url.split("/o/")[1].split("?")[0];
-        const decodedImagePath = decodeURIComponent(imagePath);
-        const imageStorageRef = storageRef(storage, decodedImagePath);
-        await deleteObject(imageStorageRef);
-      }));
-    }
-
-    // Delete technology from Realtime Database
-    await remove(technologyRef);
+    const techRef = ref(database, `technologies/${id}`);
+    await remove(techRef);
   } catch (error) {
-    console.error("Failed to delete technology:", error);
+    console.error("Error deleting technology:", error);
     throw error;
   }
 };
 
-export { fetchAllTechnology, postCreateTechnology, putUpdateTechnology, deleteTechnology };
+export { postCreateTechnology, fetchTechnologyById, fetchAllTechnology, putUpdateTechnology, deleteTechnology }

@@ -1,10 +1,10 @@
-
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Alert } from "antd";
 import { loginUser, signUpUser } from "../service/authService.js";
 import styles from "../assets/style/Pages/Login.module.scss"; // Import SCSS file
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
@@ -14,7 +14,7 @@ function Login({ setUser }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  
+  const { t } = useTranslation();
 
   const handleSubmit = async (values) => {
     const { email, password, name } = values;
@@ -60,7 +60,7 @@ function Login({ setUser }) {
       <div className={styles["login-form"]}>
         <div className={styles["header-form"]}>
           <Title level={2} className={styles["title"]}>
-            {isSignUp ? "Sign Up" : "Login"}
+            {isSignUp ? t("SignUp") : t("Login")}
           </Title>
           <img
             src="/public/images/logo.jpg"
@@ -71,26 +71,26 @@ function Login({ setUser }) {
         <Form form={form} onFinish={handleSubmit}>
           {isSignUp && (
             <Form.Item
-              label="Name"
+              label={t("name")}
               name="name"
               rules={[{ required: true, message: "Please input your name!" }]}
             >
-              <Input onBlur={() => handleBlur("name")} />
+              <Input className="inp-length" onBlur={() => handleBlur("name")} />
             </Form.Item>
           )}
           <Form.Item
-            label="Email"
+            label={t("Email")}
             name="email"
             rules={[{ required: true, message: "Please input your email!" }]}
           >
             <Input type="email" onBlur={() => handleBlur("email")} />
           </Form.Item>
           <Form.Item
-            label="Password"
+            label={t("Password")}
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <Input.Password onBlur={() => handleBlur("password")} />
+            <Input.Password className="inp-length" onBlur={() => handleBlur("password")} />
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
           {successMessage && (
@@ -105,14 +105,14 @@ function Login({ setUser }) {
               htmlType="submit"
               block
             >
-              {isSignUp ? "Sign Up" : "Login"}
+              {isSignUp ? t("SignUp") : t("Login")}
             </Button>
             <Button
               type="link"
               onClick={forgetPassword}
               className={styles["link-forget"]}
             >
-              Forgot Password
+              {t("ForgotPassword")}
             </Button>
           </Form.Item>
         </Form>
@@ -123,8 +123,8 @@ function Login({ setUser }) {
           block
         >
           {isSignUp
-            ? "Already have an account? Login"
-            : "Need an account? Sign Up"}
+            ? t("Already have an account? Login")
+            : t("Need an account? Sign Up")}
         </Button>
       </div>
     </div>

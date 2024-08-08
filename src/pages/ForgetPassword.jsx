@@ -1,9 +1,10 @@
-import { Alert, Button, Form, Input, Typography } from "antd";
+import { Alert, Button, Form, Input, message, Typography } from "antd";
 import emailjs from "emailjs-com";
 import { get, getDatabase, ref } from "firebase/database";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Pages/ForgetPassword.scss";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
@@ -12,6 +13,7 @@ function ForgetPassword() {
   const [successMessage, setSuccessMessage] = useState("");
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleForgetPassword = async (values) => {
     const { email } = values;
@@ -32,23 +34,23 @@ function ForgetPassword() {
         const resetLink = `http://localhost:5173/reset-password?userId=${encodeURIComponent(userId)}`; 
 
         const response = await emailjs.send(
-          'service_38z8rf8',      // Service ID của bạn
-          'template_yh7totx',     // Template ID của bạn
+          'service_ncefpgz',      // Service ID của bạn
+          'template_v0kukci',     // Template ID của bạn
           { 
             user_email: email,    // Tên biến khớp với template
             reset_link: resetLink 
           },  
-          'BLOiZZ22_oSBTDilA'     // User ID của bạn
+          'lb5ycQksDnRX-2uqk'     // User ID của bạn
         );
-        console.log("Email sent successfully:", response);
-        setSuccessMessage("Password reset instructions sent to your email.");
+        console.log(t("Email sent successfully:"), response);
+        message.setSuccessMessage(t("Password reset instructions sent to your email."));
         form.resetFields(); // Reset form fields after success
       } else {
-        setError("User does not exist.");
+        message.setError("User does not exist.");
       }
     } catch (error) {
       console.error("Failed to send email:", error);
-      setError("Failed to send password reset instructions.");
+      message.setError(t("Failed to send password reset instructions."));
     }
   };
 
@@ -62,21 +64,21 @@ function ForgetPassword() {
     <div className="reset-password-container">
       <div className="reset-password-form">
         <Title level={2} className="title">
-          Reset Password
+          {t("changePassword")}
         </Title>
         <Form form={form} onFinish={handleForgetPassword}>
           <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, message: "Please input your email!" }]}
+            rules={[{ required: true, message: t("pleaseEnterEmail") }]}
           >
-            <Input type="email" placeholder="Enter your email address"/>
+            <Input type="email" placeholder= {t("Enter your email address")}/>
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
           {successMessage && <Alert message={successMessage} type="success" showIcon />}
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Send Email
+            <Button className="btn" type="primary" htmlType="submit" block>
+              {t("SendEmail")}
             </Button>
           </Form.Item>
         </Form>
@@ -86,8 +88,8 @@ function ForgetPassword() {
           layout="vertical"
         >
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Back
+            <Button className="btn" type="primary" htmlType="submit" block>
+              {t("Back")}
             </Button>
           </Form.Item>
         </Form>

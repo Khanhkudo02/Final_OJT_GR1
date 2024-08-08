@@ -1,21 +1,32 @@
-import React, { useEffect, useState } from "react";
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import {
+  Button,
+  DatePicker,
   Form,
   Input,
-  Button,
-  Select,
-  DatePicker,
-  InputNumber,
   message,
-  Upload,
   Modal,
-} from 'antd';
-import dayjs from 'dayjs';
+  Select,
+  Upload,
+} from "antd";
+import emailjs from "emailjs-com";
+// import moment from "moment";
+import dayjs from "dayjs";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchAllProjects, putUpdateProject } from "../service/Project";
-import { UploadOutlined } from "@ant-design/icons";
-import { fetchAllTechnology } from "../service/TechnologyServices";
+import {
+  fetchAllEmployees,
+  updateEmployeeStatusToActive,
+  updateEmployeeStatusToInvolved,
+} from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
+import {
+  fetchAllProjects,
+  putUpdateProject,
+  recordHistory,
+} from "../service/Project";
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -28,8 +39,11 @@ const ProjectEdit = () => {
   const [fileList, setFileList] = useState([]);
   const [technologies, setTechnologies] = useState([]);
   const [languages, setLanguages] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [statusOptions, setStatusOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -55,13 +69,15 @@ const ProjectEdit = () => {
               },
             ]);
           }
+
+          updateStatusOptions(projectData.status);
         } else {
-          message.error("Project not found");
+          message.error(t("Project not found"));
           navigate("/project-management");
         }
       } catch (error) {
         console.error("Error fetching project:", error);
-        message.error("Error fetching project data");
+        message.error(t("Error fetching project data"));
         navigate("/project-management");
       }
     };
@@ -73,14 +89,13 @@ const ProjectEdit = () => {
     const loadTechnologies = async () => {
       try {
         const data = await fetchAllTechnology();
-        // Convert data from Firebase to format for Select
         const techOptions = data.map((tech) => ({
           label: tech.name,
-          value: tech.key, // Use key as value for Option
+          value: tech.id, // Use key as value for Option
         }));
         setTechnologies(techOptions);
       } catch (err) {
-        setError("Failed to fetch technologies");
+        setError(t("Failed to fetch technologies"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -94,14 +109,13 @@ const ProjectEdit = () => {
     const loadLanguages = async () => {
       try {
         const data = await fetchAllLanguages();
-        // Convert data from Firebase to format for Select
         const languageOptions = data.map((lang) => ({
           label: lang.name,
           value: lang.key, // Use key as value for Option
         }));
         setLanguages(languageOptions);
       } catch (err) {
-        setError("Failed to fetch languages");
+        setError(t("Failed to fetch languages"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -111,42 +125,125 @@ const ProjectEdit = () => {
     loadLanguages();
   }, []);
 
-  // const onFinish = async (values) => {
-  //   Modal.confirm({
-  //     title: "Confirm Changes",
-  //     content: "Do you agree with the changes you have made?",
-  //     okText: "Yes",
-  //     cancelText: "No",
-  //     onOk: async () => {
-  //       try {
-  //         const projectData = {
-  //           ...values,
-  //           startDate: values.startDate.format('YYYY-MM-DD'),
-  //           endDate: values.endDate.format('YYYY-MM-DD'),
-  //           imageUrl: fileList.length > 0 ? fileList[0].url : project.imageUrl,
-  //         };
-  //         await putUpdateProject(id, projectData, fileList.length > 0 ? fileList[0].originFileObj : null);
-  //         message.success('Project updated successfully');
-  //         navigate(`/project/${id}`);
-  //       } catch (error) {
-  //         message.error('Failed to update project');
-  //       }
-  //     },
-  //   });
-  // };
+  // Load employees
+  useEffect(() => {
+    const loadEmployees = async () => {
+      try {
+        const data = await fetchAllEmployees();
+        const employeeOptions = data
+          .filter((emp) => emp.role === "employee")
+          .map((emp) => ({
+            label: emp.name,
+            value: emp.key, // Use key as value for Option
+            email: emp.email,
+          }));
+        setEmployees(employeeOptions);
+      } catch (err) {
+        setError(t("Failed to fetch employees"));
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEmployees();
+  }, []);
+
+  const handleBudgetBlur = () => {
+    form
+      .validateFields(["budget"])
+      .then(() => {
+        // Handle successful validation if needed
+      })
+      .catch((error) => {
+        // Handle validation errors if needed
+        console.error("Validation error:", error);
+      });
+  };
+  const formatNumberWithCommas = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "";
+    }
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handleBudgetChange = (e) => {
+    const value = e.target.value;
+    // Remove all commas for validation and storage
+    const cleanedValue = value.replace(/,/g, "");
+    form.setFieldsValue({ budget: formatNumberWithCommas(cleanedValue) });
+  };
+
+  const validateBudget = (rule, value) => {
+    if (!value) {
+      return Promise.reject(t("Please input the budget!"));
+    }
+    // Remove commas for validation
+    const cleanedValue = value.replace(/,/g, "");
+    const regex = /^\d+(\.\d{1,2})?\s?(VND|USD)?$/;
+    if (!regex.test(cleanedValue)) {
+      return Promise.reject(t("Invalid budget format. Use 'amount currency' format."));
+    }
+    return Promise.resolve();
+  };
+
+  const updateStatusOptions = (currentStatus) => {
+    let options = [];
+    switch (currentStatus) {
+      case "ONGOING":
+        options = ["PENDING", "COMPLETED"];
+        break;
+      case "PENDING":
+        options = ["ONGOING"];
+        break;
+      case "COMPLETED":
+        options = ["ONGOING"];
+        break;
+      case "NOT STARTED":
+        options = ["ONGOING", "PENDING"];
+        break;
+      default:
+        options = ["NOT STARTED", "ONGOING", "COMPLETED", "PENDING"];
+        break;
+    }
+    setStatusOptions(options);
+  };
+
+  const sendNotificationEmail = (memberEmail, projectName, action) => {
+    const templateParams = {
+      user_email: memberEmail,
+      projectName: projectName,
+      action: action, // Thêm hành động (added/removed)
+    };
+
+    emailjs
+    .send(
+      "service_ncefpgz",
+      "template_kngz6s9",
+      templateParams,
+      "lb5ycQksDnRX-2uqk"
+    )
+      .then((response) => {
+        console.log("Email sent successfully:", response.status, response.text);
+      })
+      .catch((err) => {
+        console.error("Failed to send email:", err);
+      });
+  };
 
   const onFinish = async (values) => {
     Modal.confirm({
-      title: "Confirm Changes",
-      content: "Do you agree with the changes you have made?",
-      okText: "Yes",
-      cancelText: "No",
+      title: t("Confirm Changes"),
+      content: t("Do you agree with the changes you have made?"),
+      okText: t("Yes"),
+      cancelText: t("No"),
       onOk: async () => {
         try {
           const projectData = {
             ...values,
-            startDate: values.startDate.format("DD-MM-YYYY"),
-            endDate: values.endDate.format("DD-MM-YYYY"),
+            startDate: values.startDate.format("YYYY-MM-DD"),
+            endDate: values.endDate.format("YYYY-MM-DD"),
+            technologies: values.technologies || [], // Initialize to empty array if undefined
+            languages: values.languages || [], // Initialize to empty array if undefined
             imageUrl:
               fileList.length > 0 ? fileList[0].url : project.imageUrl || null, // Ensure imageUrl is not undefined
           };
@@ -155,10 +252,53 @@ const ProjectEdit = () => {
             projectData,
             fileList.length > 0 ? fileList[0].originFileObj : null
           );
-          message.success("Project updated successfully");
+
+          message.success(t("Project updated successfully"));
+          // Xác định các thành viên mới và cũ
+          const currentTeamMembers = values.teamMembers || [];
+          const previousTeamMembers = project.teamMembers || [];
+
+          const addedMembers = currentTeamMembers.filter(
+            (member) => !previousTeamMembers.includes(member)
+          );
+          const removedMembers = previousTeamMembers.filter(
+            (member) => !currentTeamMembers.includes(member)
+          );
+
+          // Ghi lịch sử và gửi email cho các thành viên mới
+          for (const member of addedMembers) {
+            const memberData = employees.find((emp) => emp.value === member);
+            if (memberData) {
+              await recordHistory(id, t("added"), member);
+              sendNotificationEmail(memberData.email, values.name, t("added"));
+
+              // Cập nhật trạng thái của nhân viên mới thành "involved"
+              await updateEmployeeStatusToInvolved(member);
+            }
+          }
+
+          // Ghi lịch sử và gửi email cho các thành viên bị xóa
+          for (const member of removedMembers) {
+            const memberData = employees.find((emp) => emp.value === member);
+            if (memberData) {
+              await recordHistory(id, t("removed"), member);
+              sendNotificationEmail(memberData.email, values.name, t("removed"));
+
+              // Cập nhật trạng thái của nhân viên thành "active" nếu không còn thuộc dự án nào
+              const allProjects = await fetchAllProjects();
+              const isInAnyProject = allProjects.some((project) =>
+                project.teamMembers.includes(member)
+              );
+
+              if (!isInAnyProject) {
+                await updateEmployeeStatusToActive(member);
+              }
+            }
+          }
+
           navigate(`/project/${id}`);
         } catch (error) {
-          message.error("Failed to update project");
+          message.error(t("Failed to update project"));
         }
       },
     });
@@ -169,7 +309,7 @@ const ProjectEdit = () => {
   };
 
   if (!project) {
-    return <div>Loading...</div>;
+    return <div>{t("Loading...")}</div>;
   }
 
   return (
@@ -181,144 +321,160 @@ const ProjectEdit = () => {
         margin: "auto",
       }}
     >
-      <Button type="default" onClick={() => navigate(`/project/${id}`)}>
-        Back
+      <Button
+        className="btn-length"
+        type="default"
+        icon={<ArrowLeftOutlined />}
+        onClick={() => navigate(`/project/${id}`)}
+      >
+        {t("Back")}
       </Button>
-      <h2>Edit Project</h2>
+      <h2>{t("EditProject")}</h2>
       <Form form={form} onFinish={onFinish}>
         <Form.Item
-          label="Project Name"
+          label={t("ProjectName")}
           name="name"
           rules={[
-            { required: true, message: "Please input the project name!" },
+            { required: true, message: t("Please input the project name!") },
           ]}
         >
-          <Input />
+          <Input placeholder={t("Enter project name")}/>
         </Form.Item>
 
         <Form.Item
-          label="Description"
+          label={t("Description")}
           name="description"
           rules={[
             {
               required: true,
-              message: "Please input the project description!",
+              message: t("Please input the project description!"),
             },
           ]}
         >
-          <TextArea rows={4} />
+          <TextArea rows={4} placeholder={t("Enter project description")}/>
         </Form.Item>
 
         <Form.Item
-          label="Start Date"
+          label={t("StartDate")}
           name="startDate"
-          rules={[{ required: true, message: "Please select the start date!" }]}
+          rules={[{ required: true, message: t("Please select the start date!") }]}
         >
-          <DatePicker format="DD/MM/YYYY"/>
+          <DatePicker format="DD/MM/YYYY" placeholder={t("Select start date")}/>
         </Form.Item>
 
         <Form.Item
-          label="End Date"
+          label={t("EndDate")}
           name="endDate"
-          rules={[{ required: true, message: "Please select the end date!" }]}
+          rules={[{ required: true, message: t("Please select the end date!") }]}
         >
-          <DatePicker format="DD/MM/YYYY"/>
+          <DatePicker format="DD/MM/YYYY" placeholder={t("Select end date")}/>
         </Form.Item>
 
         <Form.Item
-          label="Client Name"
+          label={t("ClientName")}
           name="clientName"
-          rules={[{ required: true, message: "Please input the client name!" }]}
+          rules={[{ required: true, message: t("Please input the client name!") }]}
         >
-          <Input />
+          <Input placeholder={t("Enter client name")}/>
         </Form.Item>
 
         <Form.Item
-          label="Client Contact"
-          name="clientContact"
+          label={t("ClientEmail")}
+          name="clientEmail"
           rules={[
+            { required: true, message: t("Please input the client email!") },
+            { type: "email", message: t("Please enter a valid email!") },
+          ]}
+        >
+          <Input placeholder={t("example@gmail.com")} />
+        </Form.Item>
+
+        <Form.Item
+          label={t("phoneNumber")}
+          name="phoneNumber"
+          rules={[
+            { required: true, message: t("Please input the phone number!") },
             {
-              required: true,
-              message: "Please input the client contact information!",
+              pattern: /^[0-9]{10}$/,
+              message: t("Please enter a valid 10-digit phone number!"),
             },
           ]}
         >
-          <Input />
+          <Input placeholder="0123456789" />
         </Form.Item>
 
         <Form.Item
-          label="Project Manager"
+          label={t("ProjectManager")}
           name="projectManager"
           rules={[
-            { required: true, message: "Please input the project manager!" },
+            { required: true, message: t("Please input the project manager!") },
           ]}
         >
-          <Input />
+          <Input placeholder={t("Enter project manager")}/>
         </Form.Item>
 
         <Form.Item
-          label="Team Members"
+          label={t("TeamMember")}
           name="teamMembers"
-          rules={[{ required: true, message: "Please list the team members!" }]}
-        >
-          <TextArea rows={2} />
-        </Form.Item>
-
-        <Form.Item
-          label="Budget"
-          name="budget"
           rules={[
-            { required: true, message: "Please input the project budget!" },
+            { required: true, message: t("Please select the team members!") },
           ]}
         >
-          <InputNumber min={0} style={{ width: "100%" }} />
+          <Select mode="multiple" placeholder={t("Select team members")}>
+            {employees.map((emp) => (
+              <Option key={emp.value} value={emp.value}>
+                {emp.label}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
-          label="Status"
+          label={t("Budget")}
+          name="budget"
+          rules={[{ required: true, validator: validateBudget }]}
+        >
+          <Input
+            placeholder={t("Enter budget (e.g., 1,000,000 VND or 500 USD)")}
+            onChange={handleBudgetChange}
+            onBlur={handleBudgetBlur}
+            maxLength={50} // Optional: to limit input length
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={t("Status")}
           name="status"
           rules={[
-            { required: true, message: "Please select the project status!" },
+            { required: true, message: t("Please select the project status!") },
           ]}
         >
           <Select>
-            <Option value="NOT STARTED">Not Started</Option>
-            <Option value="ONGOING">Ongoing</Option>
-            <Option value="COMPLETED">Completed</Option>
+            {statusOptions.map((status) => (
+              <Option key={status} value={status}>
+                {status}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 
         <Form.Item
-          label="Priority"
+          label={t("Priority")}
           name="priority"
           rules={[
-            { required: true, message: "Please select the project priority!" },
+            { required: true, message: t("Please select the project priority!") },
           ]}
         >
-          <Select>
-            <Option value="HIGH">High</Option>
-            <Option value="MEDIUM">Medium</Option>
-            <Option value="LOW">Low</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          label="Category"
-          name="category"
-          rules={[
-            { required: true, message: "Please select the project category!" },
-          ]}
-        >
-          <Select mode="multiple" placeholder="Select categories">
-            <Option value="WEB DESIGN">Web Design</Option>
-            <Option value="MOBILE APP">Mobile App Development</Option>
-            <Option value="UI/UX">UI/UX</Option>
+          <Select placeholder={t("Select the project priority")}>
+            <Option value="HIGH">{t("High")}</Option>
+            <Option value="MEDIUM">{t("Medium")}</Option>
+            <Option value="LOW">{t("Low")}</Option>
           </Select>
         </Form.Item>
 
         {/* Select technologies */}
-        <Form.Item label="Technologies Used" name="technologies">
-          <Select mode="multiple" placeholder="Select technologies">
+        <Form.Item label={t("TechnologiesUsed")} name="technologies">
+          <Select mode="multiple" placeholder={t("Select technologies")}>
             {technologies.map((tech) => (
               <Option key={tech.value} value={tech.value}>
                 {tech.label}
@@ -328,8 +484,8 @@ const ProjectEdit = () => {
         </Form.Item>
 
         {/* Select programming languages */}
-        <Form.Item label="Programming Languages Used" name="languages">
-          <Select mode="multiple" placeholder="Select languages">
+        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages">
+          <Select mode="multiple" placeholder={t("Select languages")}>
             {languages.map((lang) => (
               <Option key={lang.value} value={lang.value}>
                 {lang.label}
@@ -338,20 +494,20 @@ const ProjectEdit = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Attachments" name="attachments">
+        <Form.Item label={t("Attachments")} name="attachments">
           <Upload
             fileList={fileList}
             beforeUpload={() => false}
             onChange={handleImageChange}
             listType="picture"
           >
-            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+            <Button icon={<UploadOutlined />}>{t("Click to Upload")}</Button>
           </Upload>
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Update
+          <Button className="btn" type="primary" htmlType="submit">
+            {t("update")}
           </Button>
         </Form.Item>
       </Form>

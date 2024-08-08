@@ -1,19 +1,15 @@
 import { UploadOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Checkbox,
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  message,
-  Select,
-  Upload
-} from "antd";
+import { Button, DatePicker, Form, Input, message, Select, Upload } from "antd";
+import emailjs from "emailjs-com";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import {
+  fetchAllEmployees,
+  updateEmployeeStatus,
+} from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
-import { postCreateProject } from "../service/Project";
+import { postCreateProject, recordHistory } from "../service/Project";
 import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Option } = Select;
@@ -22,33 +18,79 @@ const { TextArea } = Input;
 const NewProject = () => {
   const [technologies, setTechnologies] = useState([]);
   const [languages, setLanguages] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [form] = Form.useForm();
-  const [agreement, setAgreement] = useState(false);
+
   const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
   const [fileList, setFileList] = useState([]);
+  const [startDate, setStartDate] = useState(null); // State to store selected start date
+  const [endDate, setEndDate] = useState(null); // State to store selected end date
+  const { t } = useTranslation();
 
   const onFinish = async (values) => {
     try {
       const projectData = {
         ...values,
-        startDate: values.startDate.format("DD-MM-YYYY"),
-        endDate: values.endDate.format("DD-MM-YYYY"),
-        technologies: values.technologies,
-        languages: values.languages,
+        startDate: values.startDate.format("YYYY-MM-DD"),
+        endDate: values.endDate.format("YYYY-MM-DD"),
+        technologies: values.technologies || [],
+        languages: values.languages || [],
+        budget: values.budget.replace(/,/g, ""),
       };
-      await postCreateProject(projectData, imageFile);
-      message.success("Project added successfully");
+      const newProjectKey = await postCreateProject(projectData, imageFile);
+
+      // Ghi lịch sử thêm nhân viên mới
+      const teamMembers = values.teamMembers || [];
+      await Promise.all(
+        teamMembers.map((memberId) => {
+          updateEmployeeStatus(memberId, "involved");
+          return recordHistory(newProjectKey, "added", memberId);
+        })
+      );
+
+      const memberEmails = employees
+        .filter((emp) => teamMembers.includes(emp.value))
+        .map((emp) => emp.email);
+
+      sendNotificationEmail(memberEmails, values.name, "added");
+
+      message.success(t("Project added successfully"));
       navigate("/project-management");
     } catch (error) {
-      message.error("Failed to add project");
+      console.error("Failed to create project:", error);
+      message.error(t("Failed to add project"));
     }
   };
 
-  const handleAgreementChange = (e) => {
-    setAgreement(e.target.checked);
+  const sendNotificationEmail = (memberEmails, projectName, action) => {
+    memberEmails.forEach((memberEmail) => {
+      const templateParams = {
+        user_email: memberEmail,
+        projectName: projectName,
+        action: action,
+      };
+
+      emailjs
+        .send(
+          "service_ncefpgz",
+          "template_kngz6s9",
+          templateParams,
+          "lb5ycQksDnRX-2uqk"
+        )
+        .then((response) => {
+          console.log(
+            "Email sent successfully:",
+            response.status,
+            response.text
+          );
+        })
+        .catch((err) => {
+          console.error("Failed to send email:", err);
+        });
+    });
   };
 
   const handleImageChange = ({ fileList }) => {
@@ -65,14 +107,13 @@ const NewProject = () => {
     const loadTechnologies = async () => {
       try {
         const data = await fetchAllTechnology();
-        // Convert data from Firebase to format for Select
         const techOptions = data.map((tech) => ({
           label: tech.name,
-          value: tech.key, // Use key as value for Option
+          value: tech.id, // Use key as value for Option
         }));
         setTechnologies(techOptions);
       } catch (err) {
-        setError("Failed to fetch technologies");
+        setError(t("Failed to fetch technologies"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -86,7 +127,6 @@ const NewProject = () => {
     const loadLanguages = async () => {
       try {
         const data = await fetchAllLanguages();
-        // Convert data from Firebase to format for Select
         const languageOptions = data.map((lang) => ({
           label: lang.name,
           value: lang.key, // Use key as value for Option
@@ -99,9 +139,94 @@ const NewProject = () => {
         setLoading(false);
       }
     };
-
     loadLanguages();
   }, []);
+
+  // Load employees
+  useEffect(() => {
+    const loadEmployees = async () => {
+      try {
+        const data = await fetchAllEmployees();
+        const employeeOptions = data
+          .filter((emp) => emp.role === "employee")
+          .map((emp) => ({
+            label: emp.name,
+            value: emp.key, // Use key as value for Option
+            email: emp.email,
+          }));
+        setEmployees(employeeOptions);
+      } catch (err) {
+        setError(t("Failed to fetch employees"));
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEmployees();
+  }, []);
+
+  const disabledStartDate = (startDate) => {
+    if (!endDate) {
+      return false;
+    }
+    return startDate && startDate.isAfter(endDate, "day");
+  };
+
+  const disabledEndDate = (endDate) => {
+    if (!startDate) {
+      return false;
+    }
+    return endDate && endDate.isBefore(startDate, "day");
+  };
+
+  const handleFieldBlur = async (fieldName) => {
+    try {
+      await form.validateFields([fieldName]);
+    } catch (error) {
+      console.error(`Validation failed for ${fieldName}:`, error);
+    }
+  };
+
+  const handleBudgetBlur = () => {
+    form
+      .validateFields(["budget"])
+      .then(() => {
+        // Handle successful validation if needed
+      })
+      .catch((error) => {
+        // Handle validation errors if needed
+        console.error("Validation error:", error);
+      });
+  };
+
+  const formatNumberWithCommas = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "";
+    }
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handleBudgetChange = (e) => {
+    const value = e.target.value;
+    // Remove all commas for validation and storage
+    const cleanedValue = value.replace(/,/g, "");
+    form.setFieldsValue({ budget: formatNumberWithCommas(cleanedValue) });
+  };
+
+  const validateBudget = (rule, value) => {
+    if (!value) {
+      return Promise.reject(t("Please input the budget!"));
+    }
+    // Remove commas for validation
+    const cleanedValue = value.replace(/,/g, "");
+    const regex = /^\d+(\.\d{1,2})?\s?(VND|USD)?$/;
+    if (!regex.test(cleanedValue)) {
+      return Promise.reject(
+        t("Invalid budget format. Use 'amount currency' format.")
+      );
+    }
+    return Promise.resolve();
+  };
 
   return (
     <div
@@ -112,141 +237,202 @@ const NewProject = () => {
         margin: "auto",
       }}
     >
-      <h2>New Project</h2>
-      <Form form={form} onFinish={onFinish}>
+      <h2>{t("NewProject")}</h2>
+      <Form
+        form={form}
+        onFinish={onFinish}
+        initialValues={{ status: "NOT STARTED" }}
+      >
         <Form.Item
-          label="Project Name"
+          label={t("ProjectName")}
           name="name"
           rules={[
-            { required: true, message: "Please input the project name!" },
+            { required: true, message: t("Please input the project name!") },
           ]}
         >
-          <Input />
+          <Input
+            placeholder={t("Enter project name")}
+            onBlur={() => handleFieldBlur("name")}
+          />
         </Form.Item>
 
         <Form.Item
-          label="Description"
+          label={t("Description")}
           name="description"
           rules={[
             {
               required: true,
-              message: "Please input the project description!",
+              message: t("Please input the project description!"),
             },
           ]}
         >
-          <TextArea rows={4} />
+          <TextArea
+            rows={4}
+            placeholder={t("Enter project description")}
+            onBlur={() => handleFieldBlur("description")}
+          />
         </Form.Item>
 
         <Form.Item
-          label="Start Date"
+          label={t("StartDate")}
           name="startDate"
-          rules={[{ required: true, message: "Please select the start date!" }]}
-        >
-          <DatePicker format="DD/MM/YYYY" />
-        </Form.Item>
-
-        <Form.Item
-          label="End Date"
-          name="endDate"
-          rules={[{ required: true, message: "Please select the end date!" }]}
-        >
-          <DatePicker format="DD/MM/YYYY" />
-        </Form.Item>
-
-        <Form.Item
-          label="Client Name"
-          name="clientName"
-          rules={[{ required: true, message: "Please input the client name!" }]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="Client Contact"
-          name="clientContact"
           rules={[
+            { required: true, message: t("Please select the start date!") },
+          ]}
+        >
+          <DatePicker
+            format="DD/MM/YYYY"
+            placeholder={t("Select start date")}
+            onChange={(date) => setStartDate(date)}
+            disabledDate={disabledStartDate}
+            onBlur={() => handleFieldBlur("startDate")}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={t("EndDate")}
+          name="endDate"
+          rules={[
+            { required: true, message: t("Please select the end date!") },
+          ]}
+        >
+          <DatePicker
+            format="DD/MM/YYYY"
+            placeholder={t("Select end date")}
+            onChange={(date) => setEndDate(date)}
+            disabledDate={disabledEndDate}
+            onBlur={() => handleFieldBlur("endDate")}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={t("clientName")}
+          name="clientName"
+          rules={[
+            { required: true, message: t("Please input the client name!") },
+          ]}
+        >
+          <Input
+            placeholder={t("Enter client name")}
+            onBlur={() => handleFieldBlur("clientName")}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={t("clientEmail")}
+          name="clientEmail"
+          rules={[
+            { required: true, message: t("Please input the client email!") },
+            { type: "email", message: t("Please enter a valid email!") },
+          ]}
+        >
+          <Input placeholder="example@gmail.com" />
+        </Form.Item>
+
+        <Form.Item
+          label={t("phoneNumber")}
+          name="phoneNumber"
+          rules={[
+            { required: true, message: t("Please input the phone number!") },
             {
-              required: true,
-              message: "Please input the client contact information!",
+              pattern: /^[0-9]{10}$/,
+              message: t("Please enter a valid 10-digit phone number!"),
             },
           ]}
         >
-          <Input />
+          <Input
+            placeholder="0123456789"
+            onBlur={() => handleFieldBlur("phoneNumber")}
+          />
         </Form.Item>
 
         <Form.Item
-          label="Project Manager"
+          label={t("ProjectManager")}
           name="projectManager"
           rules={[
-            { required: true, message: "Please input the project manager!" },
+            { required: true, message: t("Please input the project manager!") },
           ]}
         >
-          <Input />
+          <Input
+            placeholder={t("Enter project manager")}
+            onBlur={() => handleFieldBlur("projectManager")}
+          />
         </Form.Item>
 
         <Form.Item
-          label="Team Members"
+          label={t("TeamMember")}
           name="teamMembers"
-          rules={[{ required: true, message: "Please list the team members!" }]}
-        >
-          <TextArea rows={2} />
-        </Form.Item>
-
-        <Form.Item
-          label="Budget"
-          name="budget"
           rules={[
-            { required: true, message: "Please input the project budget!" },
+            { required: true, message: t("Please select the team members!") },
           ]}
         >
-          <InputNumber min={0} style={{ width: "100%" }} />
-        </Form.Item>
-
-        <Form.Item
-          label="Status"
-          name="status"
-          rules={[
-            { required: true, message: "Please select the project status!" },
-          ]}
-        >
-          <Select>
-            <Option value="NOT STARTED">Not Started</Option>
-            <Option value="ONGOING">Ongoing</Option>
-            <Option value="COMPLETED">Completed</Option>
+          <Select
+            mode="multiple"
+            placeholder={t("Select team members")}
+            onBlur={() => handleFieldBlur("teamMembers")}
+          >
+            {employees.map((emp) => (
+              <Option key={emp.value} value={emp.value}>
+                {emp.label}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 
         <Form.Item
-          label="Priority"
+          label={t("Budget")}
+          name="budget"
+          rules={[{ required: true, validator: validateBudget }]}
+        >
+          <Input
+            placeholder={t("Enter budget (e.g., 1,000,000 VND or 500 USD)")}
+            onChange={handleBudgetChange}
+            onBlur={handleBudgetBlur}
+            maxLength={50} // Optional: to limit input length
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={t("Status")}
+          name="status"
+          rules={[
+            { required: true, message: t("Please select the project status!") },
+          ]}
+          style={{ display: "none" }} // Ẩn trường
+        >
+          <Select placeholder={t("Select project status")}>
+            <Option value="NOT STARTED">{t("NotStarted")}</Option>
+            <Option value="COMPLETED">{t("Completed")}</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          label={t("Priority")}
           name="priority"
           rules={[
-            { required: true, message: "Please select the project priority!" },
+            {
+              required: true,
+              message: t("Please select the project priority!"),
+            },
           ]}
         >
-          <Select>
+          <Select
+            onBlur={() => handleFieldBlur("priority")}
+            placeholder={t("Select the project priority")}
+          >
             <Option value="HIGH">High</Option>
             <Option value="MEDIUM">Medium</Option>
             <Option value="LOW">Low</Option>
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="Category"
-          name="category"
-          rules={[
-            { required: true, message: "Please select the project category!" },
-          ]}
-        >
-          <Select mode="multiple" placeholder="Select categories">
-            <Option value="WEB DESIGN">Web Design</Option>
-            <Option value="MOBILE APP">Mobile App Development</Option>
-            <Option value="UI/UX">UI/UX</Option>
-          </Select>
-        </Form.Item>
-
         {/* Select technologies */}
-        <Form.Item label="Technologies Used" name="technologies">
-          <Select mode="multiple" placeholder="Select technologies">
+        <Form.Item label={t("TechnologiesUsed")} name="technologies">
+          <Select
+            mode="multiple"
+            placeholder={t("Select technologies")}
+            onBlur={() => handleFieldBlur("technologies")}
+          >
             {technologies.map((tech) => (
               <Option key={tech.value} value={tech.value}>
                 {tech.label}
@@ -256,8 +442,12 @@ const NewProject = () => {
         </Form.Item>
 
         {/* Select programming languages */}
-        <Form.Item label="Programming Languages Used" name="languages">
-          <Select mode="multiple" placeholder="Select languages">
+        <Form.Item label={t("ProgrammingLanguageUsed")} name="languages">
+          <Select
+            mode="multiple"
+            placeholder={t("Select languages")}
+            onBlur={() => handleFieldBlur("languages")}
+          >
             {languages.map((lang) => (
               <Option key={lang.value} value={lang.value}>
                 {lang.label}
@@ -266,28 +456,20 @@ const NewProject = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Attachments" name="attachments">
+        <Form.Item label={t("Attachments")} name="attachments">
           <Upload
             fileList={fileList}
             beforeUpload={() => false}
             onChange={handleImageChange}
+            onBlur={() => handleFieldBlur("attachments")}
           >
-            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+            <Button icon={<UploadOutlined />}>{t("Click to Upload")}</Button>
           </Upload>
         </Form.Item>
 
         <Form.Item>
-          <Checkbox checked={agreement} onChange={handleAgreementChange}>
-            I have read the agreement
-          </Checkbox>
-          {!agreement && (
-            <div style={{ color: "red" }}>Should accept agreement</div>
-          )}
-        </Form.Item>
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit" disabled={!agreement}>
-            Register
+          <Button className="btn" type="primary" htmlType="submit">
+            {t("Register")}
           </Button>
         </Form.Item>
       </Form>

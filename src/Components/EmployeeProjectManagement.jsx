@@ -1,31 +1,22 @@
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  InboxOutlined,
-  PlusOutlined,
-  SearchOutlined,
-  RestOutlined,
-} from "@ant-design/icons";
+import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import {
   Avatar,
   Button,
   Input,
-  Modal,
   Pagination,
   Space,
   Table,
   Tabs,
   Tag,
-  message,
 } from "antd";
-import moment from "moment"; // Thêm moment.js để xử lý định dạng ngày tháng
+import { onValue, ref } from "firebase/database"; // Import ref và onValue từ Firebase Database
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/ProjectManagement.scss";
-import { fetchAllProjects, moveToArchive } from "../service/Project";
+import { database } from "../firebaseConfig"; // Import cấu hình Firebase
 
 const statusColors = {
   COMPLETED: "green",
@@ -34,7 +25,7 @@ const statusColors = {
   PENDING: "yellow",
 };
 
-const ProjectManagement = () => {
+const EmployeeProjectManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredStatus, setFilteredStatus] = useState("All Projects");
   const [data, setData] = useState([]);
@@ -43,13 +34,30 @@ const ProjectManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
+  // Lấy userId của employee đăng nhập từ localStorage
+  const userId = localStorage.getItem("userId");
+
   useEffect(() => {
     const fetchData = async () => {
-      const projects = await fetchAllProjects();
-      setData(projects.reverse());
+      const projectsRef = ref(database, "projects");
+      onValue(projectsRef, (snapshot) => {
+        const projectsData = snapshot.val();
+        const projects = [];
+        for (const key in projectsData) {
+          projects.push({ key, ...projectsData[key] });
+        }
+        // Kiểm tra xem dự án có mảng teamMembers chứa userId của employee đăng nhập không
+        const employeeProjects = projects.filter((project) => {
+          if (project.teamMembers && Array.isArray(project.teamMembers)) {
+            return project.teamMembers.includes(userId); // So sánh với userId
+          }
+          return false;
+        });
+        setData(employeeProjects.reverse());
+      });
     };
     fetchData();
-  }, []);
+  }, [userId]); // Thay đổi phụ thuộc vào userId
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -82,10 +90,11 @@ const ProjectManagement = () => {
   );
 
   const getInitials = (name) => {
-    if (!name) return ""; // Handle undefined or null name
-    const parts = name.split(" ");
-    if (parts.length < 2) return name.charAt(0).toUpperCase();
-    return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   const getRandomColor = () => {
@@ -106,48 +115,21 @@ const ProjectManagement = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
-  const handleDelete = (key) => {
-    Modal.confirm({
-      title: t("Are you sure you want to archive this project?"),
-      onOk: async () => {
-        try {
-          await moveToArchive(key);
-          setData((prevData) => prevData.filter((item) => item.key !== key));
-          message.success(t("Project archived successfully"));
-        } catch (error) {
-          message.error(t("Failed to archive project"));
-        }
-      },
-    });
-  };
-
   const formatBudget = (value) => {
-    // Chuyển đổi value thành chuỗi nếu nó không phải là chuỗi
     if (typeof value !== "string") {
       value = String(value);
     }
-
-    // Kiểm tra nếu value không tồn tại hoặc là một chuỗi trống
     if (!value) return "";
-
-    // Check if the value has "$" or "VND"
-    const hasUSD = value.endsWith("USD");
+    const hasDollarSign = value.startsWith("$");
     const hasVND = value.endsWith("VND");
-
-    // Remove "$" and "VND" for formatting
     let numericValue = value.replace(/[^\d]/g, "");
-
-    // Format the number with commas
     numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-    // Add "$" or "VND" back
-    if (hasUSD) {
-      numericValue = `${numericValue} USD`;
+    if (hasDollarSign) {
+      numericValue = `$${numericValue}`;
     }
     if (hasVND) {
-      numericValue = `${numericValue} VND`;
+      numericValue = `${numericValue}VND`;
     }
-
     return numericValue;
   };
 
@@ -156,7 +138,6 @@ const ProjectManagement = () => {
       title: t("ProjectName"),
       dataIndex: "name",
       key: "name",
-      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: t("StartDate"),
@@ -169,12 +150,6 @@ const ProjectManagement = () => {
           ? dateObj.format("DD/MM/YYYY")
           : "Invalid Date";
       },
-      sorter: (a, b) => {
-        // Chuyển đổi ngày tháng thành đối tượng moment và so sánh
-        const dateA = moment(a.startDate, "YYYY-MM-DD");
-        const dateB = moment(b.startDate, "YYYY-MM-DD");
-        return dateA - dateB;
-      },
     },
     {
       title: t("EndDate"),
@@ -186,12 +161,6 @@ const ProjectManagement = () => {
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
           : "Invalid Date";
-      },
-      sorter: (a, b) => {
-        // Chuyển đổi ngày tháng thành đối tượng moment và so sánh
-        const dateA = moment(a.startDate, "YYYY-MM-DD");
-        const dateB = moment(b.startDate, "YYYY-MM-DD");
-        return dateA - dateB;
       },
     },
     {
@@ -209,21 +178,12 @@ const ProjectManagement = () => {
           </Space>
         </div>
       ),
-      sorter: (a, b) => {
-        return a.projectManager.localeCompare(b.projectManager);
-      },
     },
     {
-      title: t("Budget"),
+      title:  t("Budget"),
       dataIndex: "budget",
       key: "budget",
       render: formatBudget,
-      sorter: (a, b) => {
-        // Chuyển đổi giá trị budget từ chuỗi tiền tệ sang số thực để sắp xếp chính xác
-        const budgetA = parseFloat(a.budget.replace(/[^0-9.-]+/g, ""));
-        const budgetB = parseFloat(b.budget.replace(/[^0-9.-]+/g, ""));
-        return budgetA - budgetB;
-      },
     },
     {
       title: t("status"),
@@ -239,32 +199,17 @@ const ProjectManagement = () => {
       title: t("actions"),
       key: "actions",
       render: (text, record) => (
-        <div className="actions-container">
-          <Space size="middle">
-            <Button
-              icon={<EyeOutlined />}
-              style={{ color: "green", borderColor: "green" }}
-              onClick={() => navigate(`/project/${record.key}`)}
-            />
-            <Button
-              icon={<EditOutlined />}
-              style={{ color: "blue", borderColor: "blue" }}
-              onClick={() => navigate(`/edit-project/${record.key}`)}
-            />
-            {record.status !== "ONGOING" && (
-              <Button
-                icon={<DeleteOutlined />}
-                style={{ color: "red", borderColor: "red" }}
-                onClick={() => handleDelete(record.key)}
-              />
-            )}
-          </Space>
-        </div>
+        <Space size="middle">
+          <Button
+            icon={<EyeOutlined />}
+            style={{ color: "green", borderColor: "green" }}
+            onClick={() => navigate(`/project/${record.key}`)}
+          />
+        </Space>
       ),
     },
   ];
 
-  // Tabs items
   const tabItems = [
     { key: "All Projects", label: t("AllProject") },
     { key: "Ongoing", label: t("Ongoing") },
@@ -276,23 +221,6 @@ const ProjectManagement = () => {
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
       <div className="project-management-header">
-        <Button
-          className="btn"
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate("/new-project")}
-        >
-          {t("Add New Project")}
-        </Button>
-        <Button
-          className="btn"
-          type="primary"
-          icon={<RestOutlined />}
-          onClick={() => navigate("/archived-projects")}
-          style={{ marginLeft: "auto" }}
-        >
-          {t("Archived Projects")}
-        </Button>
         <Input
           placeholder={t("searchbynameproject")}
           value={searchTerm}
@@ -320,4 +248,4 @@ const ProjectManagement = () => {
   );
 };
 
-export default ProjectManagement;
+export default EmployeeProjectManagement;

@@ -11,6 +11,29 @@ import { database, storage } from "../firebaseConfig";
 const db = database;
 const storageInstance = storage;
 
+const formatBudget = (value) => {
+  if (typeof value !== "string") {
+    value = String(value);
+  }
+
+  if (!value) return "";
+
+  const hasUSD = value.endsWith("USD");
+  const hasVND = value.endsWith("VND");
+
+  let numericValue = value.replace(/[^\d]/g, "");
+  numericValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  if (hasUSD) {
+    numericValue = `${numericValue} USD`;
+  }
+  if (hasVND) {
+    numericValue = `${numericValue} VND`;
+  }
+
+  return numericValue;
+};
+
 const postCreateProject = async (projectData, imageFile) => {
   try {
     const newProjectRef = push(ref(db, "projects"));
@@ -24,6 +47,8 @@ const postCreateProject = async (projectData, imageFile) => {
       const snapshot = await uploadBytes(imageRef, imageFile);
       imageUrl = await getDownloadURL(snapshot.ref);
     }
+
+    projectData.budget = formatBudget(projectData.budget);
 
     await set(newProjectRef, {
       ...projectData,
@@ -47,6 +72,24 @@ const fetchAllProjects = async () => {
       : [];
   } catch (error) {
     console.error("Failed to fetch projects:", error);
+    throw error;
+  }
+};
+
+const fetchEmployeeProjects = async (employeeId) => {
+  try {
+    const projectsRef = ref(db, "projects");
+    const snapshot = await get(projectsRef);
+    const data = snapshot.val();
+    if (!data) return [];
+
+    const employeeProjects = Object.entries(data)
+      .map(([key, value]) => ({ key, ...value }))
+      .filter((project) => project.teamMembers.includes(employeeId));
+
+    return employeeProjects;
+  } catch (error) {
+    console.error("Failed to fetch employee projects", error);
     throw error;
   }
 };
@@ -78,6 +121,8 @@ const putUpdateProject = async (id, projectData, imageFile) => {
       const snapshot = await uploadBytes(imageRef, imageFile);
       imageUrl = await getDownloadURL(snapshot.ref);
     }
+
+    projectData.budget = formatBudget(projectData.budget);
 
     await update(projectRef, {
       ...projectData,
@@ -148,13 +193,33 @@ const restoreProject = async (id) => {
 
     if (projectData) {
       const projectRef = ref(db, `projects/${id}`);
-      await set(projectRef, projectData);
+      await set(projectRef, {
+        ...projectData,
+        status: "NOT STARTED", // Set status to "Not Started"
+      });
       await remove(archivedProjectRef);
     } else {
       throw new Error("Project not found");
     }
   } catch (error) {
     console.error("Failed to restore project:", error);
+    throw error;
+  }
+};
+
+const recordHistory = async (projectId, action, employeeId) => {
+  try {
+    const historyRef = ref(db, `projectHistory/${projectId}`);
+    const newHistoryRef = push(historyRef);
+    const timestamp = new Date().toISOString();
+
+    await set(newHistoryRef, {
+      action,
+      employeeId,
+      timestamp,
+    });
+  } catch (error) {
+    console.error("Failed to record history:", error);
     throw error;
   }
 };
@@ -167,4 +232,6 @@ export {
   fetchArchivedProjects,
   deleteProjectPermanently,
   restoreProject,
+  fetchEmployeeProjects,
+  recordHistory, // Add this line
 };

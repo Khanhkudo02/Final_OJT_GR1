@@ -7,6 +7,7 @@ import {
   fetchPositionById,
 } from "../service/PositionServices";
 import { PlusOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { Header } = Layout;
@@ -14,7 +15,7 @@ const { Header } = Layout;
 const EditPosition = () => {
   const { id } = useParams(); // Lấy ID từ URL
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [department, setDepartment] = useState("");
@@ -33,10 +34,10 @@ const EditPosition = () => {
           setDepartment(position.department || "");
           setStatus(position.status || "");
         } else {
-          toast.error("Position not found.");
+          toast.error(t("Position not found."));
         }
       } catch (error) {
-        toast.error("Failed to fetch position data.");
+        toast.error(t("Failed to fetch position data."));
       }
     };
 
@@ -45,7 +46,7 @@ const EditPosition = () => {
 
   const handleUpdatePosition = async () => {
     if (!name || !description || !department || !status) {
-      toast.error("Please fill in all fields.");
+      toast.error(t("Please fill in all fields."));
       return;
     }
 
@@ -58,21 +59,14 @@ const EditPosition = () => {
         status,
         imageFile
       );
-      toast.success("Position updated successfully!");
+      toast.success(t("Position updated successfully!"));
       navigate("/position-management");
     } catch (error) {
-      toast.error("Failed to update position.");
+      toast.error(t("Failed to update position."));
       console.error("Error details:", error);
     }
   };
 
-  const handleImageChange = ({ file }) => {
-    if (file.type === "image/png" || file.type === "image/svg+xml") {
-      setImageFile(file.originFileObj);
-    } else {
-      toast.error("Only PNG and SVG images are allowed.");
-    }
-  };
 
   const beforeUpload = (file) => {
     handleImageChange({ file });
@@ -81,10 +75,10 @@ const EditPosition = () => {
 
   return (
     <div>
-      <h2>Edit Position</h2>
+      <h2>{t("EditPosition")}</h2>
 
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
           placeholder="Name"
           value={name}
@@ -92,7 +86,7 @@ const EditPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Description</label>
+        <label>{t("Description")}</label>
         <Input.TextArea
           placeholder="Description"
           value={description}
@@ -100,7 +94,7 @@ const EditPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Department</label>
+        <label>{t("Department")}</label>
         <Input
           placeholder="Department"
           value={department}
@@ -108,40 +102,30 @@ const EditPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("Status")}</label>
         <Select
           placeholder="Select Status"
           value={status}
           onChange={(value) => setStatus(value)}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
+          <Option value="active">{t("active")}</Option>
+          <Option value="inactive">{t("inactive")}</Option>
         </Select>
       </div>
-      <div className="form-group">
-        <label>Upload Image (PNG or SVG only)</label>
-        <Upload
-          name="image"
-          listType="picture"
-          showUploadList={false}
-          beforeUpload={beforeUpload}
-          onChange={handleImageChange}
-        >
-          <Button icon={<PlusOutlined />}>Upload</Button>
-        </Upload>
-      </div>
       <Button
+        className="btn"
         type="primary"
         onClick={handleUpdatePosition}
         disabled={!name || !description || !department || !status}
       >
-        Save
+        {t("save")}
       </Button>
       <Button
+        className="btn-length"
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/position-management")}
       >
-        Back to Position Management
+        {t("BacktoPositionManagement")}
       </Button>
     </div>
   );

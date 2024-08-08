@@ -1,13 +1,12 @@
-import React from "react";
+import { Button, Modal } from "antd";
 import PropTypes from "prop-types";
-import { Modal, Button } from "antd";
-import { deleteTechnology } from "../service/TechnologyServices";
+import React from "react";
 import { toast } from "react-toastify";
+import { deleteTechnology } from "../service/TechnologyServices";
 
 const ModalDeleteTechnology = ({ open, handleClose, technologyIdToDelete }) => {
   const handleDeleteTechnology = async () => {
     try {
-      // Use the prop 'technologyIdToDelete'
       await deleteTechnology(technologyIdToDelete);
       handleClose();
       toast.success("Technology deleted successfully!");
@@ -44,7 +43,7 @@ const ModalDeleteTechnology = ({ open, handleClose, technologyIdToDelete }) => {
 ModalDeleteTechnology.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
-  technologyIdToDelete: PropTypes.string.isRequired, // Ensure this prop is marked as required
+  technologyIdToDelete: PropTypes.string.isRequired,
 };
 
 export default ModalDeleteTechnology;

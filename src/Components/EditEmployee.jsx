@@ -1,271 +1,295 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Upload } from "antd";
+import { Button, Form, Input, message, Select, Upload } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import {
   fetchEmployeeById,
+  fetchAllPositions, // Ensure this function is imported
   putUpdateEmployee,
+  fetchAllSkills,
 } from "../service/EmployeeServices";
 
 const { Option } = Select;
 
-// Define department options
-const departmentOptions = [
-  { value: "accounting", label: "accounting" },
-  { value: "audit", label: "audit" },
-  { value: "sales", label: "sales" },
-  { value: "administration", label: "administration" },
-  { value: "hr", label: "hr" },
-  { value: "customer_service", label: "customer_service" },
-];
-
-// Define skill options
-const skillOptions = [
-  { value: "active_listening", label: "active_listening" },
-  { value: "communication", label: "communication" },
-  { value: "computer", label: "computer" },
-  { value: "customer_service", label: "customer_service" },
-  { value: "interpersonal", label: "interpersonal" },
-  { value: "leadership", label: "leadership" },
-  { value: "management", label: "management" },
-  { value: "problem_solving", label: "problem_solving" },
-  { value: "time_management", label: "time_management" },
-  { value: "transferable", label: "transferable" },
-];
-
 const EditEmployee = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useTranslation(); // useTranslation hook
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [department, setDepartment] = useState([]);
-  const [status, setStatus] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [address, setAddress] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [skills, setSkills] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const { t } = useTranslation();
+  const [form] = Form.useForm();
+  const [fileList, setFileList] = useState([]);
   const [oldImageUrl, setOldImageUrl] = useState("");
+  const [positions, setPositions] = useState([]); // State for positions
+  const [skillsList, setSkillsList] = useState([]);
+
+  // Các tùy chọn được chuyển ngữ
+  const departmentOptions = [
+    { value: "accounting", label: t("departmentAccounting") },
+    { value: "audit", label: t("departmentAudit") },
+    { value: "sales", label: t("departmentSales") },
+    { value: "administration", label: t("departmentAdministration") },
+    { value: "human_resources", label: t("departmentHumanResources") },
+    { value: "customer_service", label: t("departmentCustomerService") },
+  ];
 
   useEffect(() => {
     const loadEmployee = async () => {
       try {
         const employee = await fetchEmployeeById(id);
         if (employee) {
-          setName(employee.name || "");
-          setEmail(employee.email || "");
-          setDepartment(employee.department || []);
-          setStatus(employee.status || "");
-          setDateOfBirth(employee.dateOfBirth || "");
-          setAddress(employee.address || "");
-          setPhoneNumber(employee.phoneNumber || "");
-          setSkills(employee.skills || []);
-          setOldImageUrl(employee.imageUrl || ""); // Set old image URL
+          form.setFieldsValue({
+            name: employee.name || "",
+            email: employee.email || "",
+            department: employee.department || [],
+            status: employee.status || "",
+            dateOfBirth: employee.dateOfBirth
+              ? moment(employee.dateOfBirth)
+              : "",
+            address: employee.address || "",
+            phoneNumber: employee.phoneNumber || "",
+            skills: employee.skills || [],
+            position: employee.position || "", // Set position value
+          });
+
+          setOldImageUrl(employee.imageUrl || "");
+
+          if (employee.imageUrl) {
+            setFileList([
+              {
+                uid: "-1",
+                name: "attachment",
+                status: "done",
+                url: employee.imageUrl,
+              },
+            ]);
+          }
         } else {
-          toast.error(t("employeeNotFound"));
+          message.error(t("employeeNotFound"));
         }
       } catch (error) {
-        toast.error(t("failedToFetchEmployeeData"));
+        message.error(t("failedToFetchEmployee"));
+      }
+    };
+
+    const loadPositions = async () => {
+      try {
+        const positionsData = await fetchAllPositions();
+        setPositions(
+          positionsData.map((pos) => ({ key: pos.key, name: pos.label }))
+        ); // Adjust based on your data structure
+      } catch (error) {
+        message.error(t("failed To Fetch Positions"));
+      }
+    };
+
+    const loadSkills = async () => {
+      try {
+        const skillsData = await fetchAllSkills();
+        setSkillsList(
+          skillsData.map((skill) => ({ key: skill.key, name: skill.label }))
+        );
+      } catch (error) {
+        message.error("Failed to fetch skills");
       }
     };
 
     loadEmployee();
-  }, [id, t]);
+    loadPositions();
+    loadSkills();
+  }, [id, form, t]);
 
   const handlePhoneNumberChange = (e) => {
-    const value = e.target.value;
-    // Remove all non-numeric characters
-    const numericValue = value.replace(/\D/g, "");
-    // Limit to 10 digits
-    if (numericValue.length <= 10) {
-      setPhoneNumber(numericValue);
+    const value = e.target.value.replace(/\D/g, "");
+    if (value.length <= 10) {
+      form.setFieldsValue({ phoneNumber: value });
     }
   };
 
-  const handleUpdateEmployee = async () => {
-    if (
-      !name ||
-      !email ||
-      department.length === 0 ||
-      !status ||
-      !dateOfBirth ||
-      !address ||
-      !phoneNumber ||
-      skills.length === 0
-    ) {
-      toast.error(t("pleaseFillAllFields"));
-      return;
-    }
-
+  const handleUpdateEmployee = async (values) => {
     try {
+      const formattedDateOfBirth = values.dateOfBirth
+        ? moment.isMoment(values.dateOfBirth)
+          ? values.dateOfBirth.format("YYYY-MM-DD")
+          : values.dateOfBirth
+        : null;
+
       await putUpdateEmployee(
         id,
-        name,
-        email,
-        dateOfBirth,
-        address,
-        phoneNumber,
-        skills,
-        status,
-        department,
-        imageFile,
-        oldImageUrl // Pass old image URL for deletion
+        values.name,
+        values.email,
+        formattedDateOfBirth,
+        values.address,
+        values.phoneNumber,
+        values.skills || [],
+        values.status,
+        values.department,
+        values.position, // Pass position value
+        fileList.length > 0 ? fileList[0].originFileObj : null,
+        oldImageUrl
       );
-      toast.success(t("employeeUpdatedSuccessfully"));
+
+      message.success(t("employee Updated Successfully"));
       navigate("/employee-management");
     } catch (error) {
-      toast.error(t("failedToUpdateEmployee"));
+      message.error(t("failed To Update Employee"));
       console.error("Error details:", error);
     }
   };
 
-  const handleImageChange = ({ target }) => {
-    const file = target.files[0];
-    if (file) {
-      // Generate image preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-      setImageFile(file);
-    }
+  const handleImageChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
   const beforeUpload = (file) => {
-    handleImageChange({ target: { files: [file] } });
-    return false; // Prevent automatic upload
+    handleImageChange({ fileList: [file] });
+    return false;
   };
 
   return (
-    <div>
+    <Form
+      form={form}
+      onFinish={handleUpdateEmployee}
+      layout="vertical"
+      initialValues={{
+        department: [],
+        skills: [],
+        position: "", // Initial value for position
+      }}
+    >
       <h2>{t("editEmployee")}</h2>
 
-      <div className="form-group">
-        <label>{t("name")}</label>
-        <Input
-          placeholder={t("name")}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
-      <div className="form-group">
-        <label>{t("email")}</label>
-        <Input
-          placeholder={t("email")}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled
-        />
-      </div>
-      <div className="form-group">
-        <label>{t("department")}</label>
-        <Select
-          mode="multiple"
-          placeholder={t("department")}
-          value={department}
-          onChange={(value) => setDepartment(value)}
-        >
+      <Form.Item
+        label={t("name")}
+        name="name"
+        rules={[{ required: true, message: t("nameRequired") }]}
+      >
+        <Input placeholder={t("name")} />
+      </Form.Item>
+
+      <Form.Item
+        label={t("email")}
+        name="email"
+        rules={[{ type: 'email', message: t("invalidEmail") }, { required: true, message: t("email Required") }]}
+      >
+        <Input placeholder={t("email")} disabled />
+      </Form.Item>
+
+      <Form.Item
+        label={t("department")}
+        name="department"
+        rules={[{ required: true, message: t("departmentRequired") }]}
+      >
+        <Select placeholder={t("department")}>
           {departmentOptions.map((dept) => (
             <Option key={dept.value} value={dept.value}>
-              {t(dept.label)}
+              {dept.label}
             </Option>
           ))}
         </Select>
-      </div>
-      <div className="form-group">
-        <label>{t("status")}</label>
-        <Select
-          placeholder={t("status")}
-          value={status}
-          onChange={(value) => setStatus(value)}
-        >
+      </Form.Item>
+
+      <Form.Item
+        label={t("skills")}
+        name="skills"
+        rules={[{ required: true, message: t("skillsRequired") }]}
+      >
+        <Select placeholder={t("skills")} mode="multiple">
+          {skillsList.map((skill) => (
+            <Option key={skill.key} value={skill.key}>
+              {skill.name}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+
+      <Form.Item
+        label={t("status")}
+        name="status"
+        rules={[{ required: true, message: t("statusRequired") }]}
+      >
+        <Select placeholder={t("status")}>
           <Option value="active">{t("active")}</Option>
           <Option value="inactive">{t("inactive")}</Option>
         </Select>
-      </div>
-      <div className="form-group">
-        <label>{t("dateOfBirth")}</label>
-        <Input
-          type="date"
-          value={moment(dateOfBirth).format("YYYY-MM-DD")}
-          onChange={(e) => setDateOfBirth(e.target.value)}
-        />
-      </div>
-      <div className="form-group">
-        <label>{t("address")}</label>
-        <Input
-          placeholder={t("address")}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-      </div>
-      <div className="form-group">
-        <label>{t("phoneNumber")}</label>
+      </Form.Item>
+
+      <Form.Item
+        label={t("dateOfBirth")}
+        name="dateOfBirth"
+        rules={[{ required: true, message: t("dateOfBirthRequired") }]}
+      >
+        <Input type="date" />
+      </Form.Item>
+
+      <Form.Item
+        label={t("address")}
+        name="address"
+        rules={[{ required: true, message: t("addressRequired") }]}
+      >
+        <Input placeholder={t("address")} />
+      </Form.Item>
+
+      <Form.Item
+        label={t("phoneNumber")}
+        name="phoneNumber"
+        rules={[
+          { required: true, message: t("phoneNumberRequired") },
+          { pattern: /^\d{10}$/, message: t("phoneNumberInvalid") }
+        ]}
+      >
         <Input
           placeholder={t("phoneNumber")}
-          value={phoneNumber}
-          onChange={handlePhoneNumberChange}
           maxLength={10}
+          onChange={handlePhoneNumberChange}
         />
-      </div>
-      <div className="form-group">
-        <label>{t("skills")}</label>
-        <Select
-          mode="multiple"
-          placeholder={t("skills")}
-          value={skills}
-          onChange={(value) => setSkills(value)}
-        >
-          {skillOptions.map((skill) => (
-            <Option key={skill.value} value={skill.value}>
-              {t(skill.label)}
+      </Form.Item>
+
+      <Form.Item
+        label={t("position")}
+        name="position"
+        rules={[{ required: true, message: t("positionRequired") }]} // Add validation for position
+      >
+        <Select placeholder={t("position")}>
+          {positions.map((pos) => (
+            <Option key={pos.key} value={pos.key}>
+              {pos.name}
             </Option>
           ))}
         </Select>
-      </div>
-      <div className="form-group">
-        <label>{t("uploadImage")}</label>
+      </Form.Item>
+
+      <Form.Item>
         <Upload
           accept=".jpg,.jpeg,.png"
           beforeUpload={beforeUpload}
-          listType="picture"
+          fileList={fileList}
+          onChange={handleImageChange}
+          listType="picture"c
           showUploadList={false}
         >
-          <Button icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
+          <Button className="btn" type="primary" icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
         </Upload>
-        {imagePreview && (
+        {fileList.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <img src={imagePreview} alt="Image Preview" width="30%" />
+            <img src={fileList[0].url} alt={t("imagePreview")} width="30%" />
           </div>
         )}
-      </div>
-      <Button
-        type="primary"
-        onClick={handleUpdateEmployee}
-        disabled={
-          !name ||
-          !email ||
-          department.length === 0 ||
-          !status ||
-          !dateOfBirth ||
-          !address ||
-          !phoneNumber ||
-          skills.length === 0
-        }
-      >
-        {t("save")}
-      </Button>
-      <Button
-        style={{ marginLeft: 8 }}
-        onClick={() => navigate("/employee-management")}
-      >
-        {t("backToEmployeeManagement")}
-      </Button>
-    </div>
+      </Form.Item>
+
+      <Form.Item>
+        <Button className="btn" type="primary" htmlType="submit">
+          {t("save")}
+        </Button>
+        <Button
+          className="btn-length"
+          style={{ marginLeft: 8 }}
+          onClick={() => navigate("/employee-management")}
+        >
+          {t("backToEmployeeManagement")}
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

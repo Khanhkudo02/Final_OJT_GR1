@@ -9,7 +9,8 @@ import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-de
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../Components/AddPosition.jsx";
-import "../assets/style/Global.scss"
+import "../assets/style/Global.scss";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { Column } = Table;
@@ -22,6 +23,7 @@ const AddPosition = () => {
   const [positions, setPositions] = useState([]);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState(null);
+  const { t } = useTranslation();
 
   const navigate = useNavigate();
 
@@ -30,7 +32,7 @@ const AddPosition = () => {
       const data = await fetchAllPositions();
       setPositions(data);
     } catch (error) {
-      console.error("Failed to fetch positions:", error);
+      console.error(t("Failed to fetch positions:"), error);
     }
   };
 
@@ -40,7 +42,7 @@ const AddPosition = () => {
 
   const handleAddPosition = async () => {
     if (!name || !description || !department || !status) {
-      toast.error("Please fill in all fields.");
+      toast.error(t("Please fill in all fields."));
       return;
     }
 
@@ -49,7 +51,7 @@ const AddPosition = () => {
       localStorage.setItem("positionAdded", "true");
       navigate("/position-management");
     } catch (error) {
-      toast.error("Failed to add position.");
+      toast.error(t("Failed to add position."));
     }
   };
   const handleViewPosition = (position) => {
@@ -60,18 +62,28 @@ const AddPosition = () => {
   const handleDeletePosition = async (id) => {
     try {
       await deletePositionById(id);
-      toast.success("Position deleted successfully!");
+      toast.success(t("Position deleted successfully!"));
       loadPositions(); // Reload the positions list
     } catch (error) {
-      toast.error("Failed to delete position.");
+      toast.error(t("Failed to delete position."));
     }
+  };
+
+  const formatDescription = (description) => {
+    const translatedDescription = t(description);
+    return translatedDescription ? translatedDescription.charAt(0).toUpperCase() + translatedDescription.slice(1) : null;
+  };
+
+  const formatStatus = (status) => {
+    const translatedStatus = t(status);
+    return translatedStatus ? translatedStatus.charAt(0).toUpperCase() + translatedStatus.slice(1) : "";
   };
 
   return (
     <div className="add-position">
-      <h2>Add New Position</h2>
+      <h2>{t("AddNewPosition")}</h2>
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
           type="text"
           value={name}
@@ -79,7 +91,7 @@ const AddPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Description</label>
+        <label>{t("Description")}</label>
         <Input
           type="text"
           value={description}
@@ -87,7 +99,7 @@ const AddPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Department</label>
+        <label>{t("Department")}</label>
         <Input
           type="text"
           value={department}
@@ -95,51 +107,68 @@ const AddPosition = () => {
         />
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("status")}</label>
         <Select
           value={status}
           onChange={(value) => setStatus(value)}
-          placeholder="Select Status"
+          placeholder={t("selectStatus")}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
+          <Option value="active">{t("active")}</Option>
+          <Option value="inactive">{t("inactive")}</Option>
         </Select>
       </div>
       <Button
+        className="btn"
         type="primary"
         onClick={handleAddPosition}
         disabled={!name || !description || !department || !status}
       >
-        Save
+        {t("Save")}
       </Button>
       <Button
+        className="btn-length"
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/position-management")}
       >
-        Back to Position Management
+        {t("BacktoPositionManagement")}
       </Button>
 
-      <h2>Existing Positions</h2>
+      <h2>{t("ExistingPosition")}</h2>
       <Table dataSource={positions} rowKey="key" pagination={false}>
-        <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Description" dataIndex="description" key="description" />
-        <Column title="Department" dataIndex="department" key="department" />
+        <Column title={t("name")} dataIndex="name" key="name" />
         <Column
-          title="Status"
+          title={t("Description")}
+          dataIndex="description"
+          key="description"
+          render={(text) => formatDescription(text)}
+        /> 
+        <Column title={t("Department")} dataIndex="department" key="department" />
+        <Column
+          title={t("Status")}
           dataIndex="status"
           key="status"
           render={(text) => {
+            // Dịch giá trị của text
+            const translatedText = t(text);
+
+            // Xác định lớp CSS dựa trên giá trị đã dịch
             const className =
-              text === "active" ? "status-active" : "status-inactive";
+              translatedText === t("active")
+                ? "status-active"
+                : "status-inactive";
+
             return (
               <span className={className}>
-                {text ? text.charAt(0).toUpperCase() + text.slice(1) : ""}
+                {translatedText
+                  ? translatedText.charAt(0).toUpperCase() +
+                    translatedText.slice(1)
+                  : ""}
               </span>
             );
           }}
         />
         <Column
-          title="Actions"
+          title={t("actions")}
           key="actions"
           render={(text, record) => (
             <Space>
@@ -158,28 +187,28 @@ const AddPosition = () => {
         />
       </Table>
       <Modal
-        title="View Position"
+        title={t("ViewPosition")}
         open={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>
-            Close
+            {t("close")}
           </Button>,
         ]}
       >
         {selectedPosition && (
           <div>
             <p>
-              <strong>Name:</strong> {selectedPosition.name}
+              <strong>{t("name")}:</strong> {selectedPosition.name}
             </p>
             <p>
-              <strong>Description:</strong> {selectedPosition.description}
+              <strong>{t("Description")}:</strong> {formatDescription(selectedPosition.description)}
             </p>
             <p>
-              <strong>Department:</strong> {selectedPosition.department}
+              <strong>{t("Department")}:</strong> {selectedPosition.department}
             </p>
             <p>
-              <strong>Status:</strong> {selectedPosition.status}
+              <strong>{t("Status")}:</strong> {formatStatus(selectedPosition.status)}
             </p>
           </div>
         )}

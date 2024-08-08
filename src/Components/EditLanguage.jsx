@@ -6,13 +6,14 @@ import {
   putUpdateLanguage,
   fetchLanguageById,
 } from "../service/LanguageServices";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
 const EditLanguage = () => {
   const { id } = useParams(); // Get ID from URL
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
@@ -28,10 +29,10 @@ const EditLanguage = () => {
           setDescription(language.description || "");
           setStatus(language.status || "");
         } else {
-          toast.error("Language not found.");
+          toast.error(t("Language not found."));
         }
       } catch (error) {
-        toast.error("Failed to fetch language data.");
+        toast.error(t("Failed to fetch language data."));
       }
     };
 
@@ -40,63 +41,65 @@ const EditLanguage = () => {
 
   const handleUpdateLanguage = async () => {
     if (!name || !description || !status) {
-      toast.error("Please fill in all fields.");
+      toast.error(t("Please fill in all fields."));
       return;
     }
 
     try {
       await putUpdateLanguage(id, name, description, status);
-      toast.success("Language updated successfully!");
+      toast.success(t("Language updated successfully!"));
       navigate("/programing-language");
     } catch (error) {
-      toast.error("Failed to update language.");
+      toast.error(t("Failed to update language."));
       console.error("Error details:", error);
     }
   };
 
   return (
     <div>
-      <h2>Edit Language</h2>
+      <h2>{t("EditLanguage")}</h2>
 
       <div className="form-group">
-        <label>Name</label>
+        <label>{t("name")}</label>
         <Input
-          placeholder="Name"
+          placeholder={t("name")}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
       <div className="form-group">
-        <label>Description</label>
+        <label>{t("Description")}</label>
         <Input.TextArea
-          placeholder="Description"
+          placeholder={t("Description")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
       </div>
       <div className="form-group">
-        <label>Status</label>
+        <label>{t("Status")}</label>
         <Select
-          placeholder="Select Status"
+          placeholder={t("Select Status")}
           value={status}
           onChange={(value) => setStatus(value)}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
+          <Option value="active">{t("active")}</Option>
+          <Option value="inactive">{t("inactive")}</Option>
         </Select>
       </div>
       <Button
+        className="btn"
         type="primary"
         onClick={handleUpdateLanguage}
         disabled={!name || !description || !status}
       >
-        Save
+        {t("save")}
       </Button>
       <Button
+        className="btn-length"
         style={{ marginLeft: 8 }}
         onClick={() => navigate("/programing-language")}
       >
-        Back to Language Management
+        {t("BacktoLanguageManagement")}
       </Button>
     </div>
   );
