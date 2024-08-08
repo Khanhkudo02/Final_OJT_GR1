@@ -380,5 +380,11 @@
   "Unknown": "Thông tin chưa rõ",
   "Employee Name": "Tên nhân viên",
   "Timestamp": "Mốc thời gian",
-  "Project History": "Lịch sử dự án"
+  "Project History": "Lịch sử dự án",
+  "added": "Được thêm",
+  "removed": "Bị xóa",
+  "Project deleted successfully": "Dự án đã được xóa thành công",
+  "Are you sure you want to delete this project?": "Bạn có chắc muốn xóa dự án này không?",
+  "This action cannot be undone": "Hành động này không thể được hoàn tác",
+  "Loading...": "Đang tải..."
 }

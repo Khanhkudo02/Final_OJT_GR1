@@ -380,5 +380,11 @@
   "Unknown": "Unknown",
   "Employee Name": "Employee Name",
   "Timestamp": "Timestamp",
-  "Project History": "Project History"
+  "Project History": "Project History",
+  "added": "Added",
+  "removed": "Removed",
+  "Project deleted successfully": "Project deleted successfully",
+  "Are you sure you want to delete this project?": "Are you sure you want to delete this project?",
+  "This action cannot be undone": "This action cannot be undone",
+  "Loading...": "Loading..."
 }

@@ -41,10 +41,15 @@ const ProjectTracking = () => {
         const historyRef = ref(database, `projectHistory/${id}`);
         const snapshot = await get(historyRef);
         const data = snapshot.val();
+
+        const capitalizeFirstLetter = (string) => {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+
         const formattedData = data
           ? Object.entries(data).map(([key, value]) => ({
               key,
-              action: value.action,
+              action: capitalizeFirstLetter(t(value.action)),
               employeeName: employeeMapping[value.employeeId] || t("Unknown"), // Thay thế ID bằng tên
               timestamp: value.timestamp,
             }))
@@ -77,6 +82,7 @@ const ProjectTracking = () => {
       title: t("Employee Name"),
       dataIndex: "employeeName",
       key: "employeeName",
+      sorter: (a, b) => a.employeeName.localeCompare(b.employeeName),
     },
     {
       title: t("Timestamp"),

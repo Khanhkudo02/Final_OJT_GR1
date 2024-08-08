@@ -126,7 +126,7 @@ const EmployeeDetails = () => {
             <strong>{t("phoneNumber")}:</strong> {employee.phoneNumber}
           </p>
           <p>
-            <strong>Skills:</strong>{" "}
+            <strong>{t("skills")}:</strong>{" "}
             {employee.skills
               .map((skillId) => getSkillNameById(skillId, skillsList))
               .join(", ")}
@@ -164,12 +164,6 @@ const EmployeeDetails = () => {
                 </p>
                 <p>
                   <strong>{t("Description")}:</strong> {project.description}
-                </p>
-                <p>
-                  <strong>{t("ClientName")}:</strong> {project.clientName}
-                </p>
-                <p>
-                  <strong>{t("Budget")}:</strong> {project.budget}
                 </p>
                 <p>
                   <strong>{t("StartDate")}:</strong>{" "}

@@ -127,7 +127,9 @@ const EmployeeManagement = () => {
     const searchData = employees.filter(
       (employee) =>
         employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+        employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        [employee.name, employee.email, employee.phoneNumber]
+          .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     // Apply tab filter

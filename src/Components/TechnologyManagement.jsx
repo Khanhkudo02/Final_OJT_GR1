@@ -202,7 +202,7 @@ const TechnologyManagement = () => {
           }}
         />
         <Column
-          title={t("Actions")}
+          title={t("actions")}
           key="actions"
           render={(text, record) => (
             <Space>

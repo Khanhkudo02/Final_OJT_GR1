@@ -5,6 +5,7 @@ import {
   InboxOutlined,
   PlusOutlined,
   SearchOutlined,
+  RestOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -155,6 +156,7 @@ const ProjectManagement = () => {
       title: t("ProjectName"),
       dataIndex: "name",
       key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: t("StartDate"),
@@ -167,6 +169,12 @@ const ProjectManagement = () => {
           ? dateObj.format("DD/MM/YYYY")
           : "Invalid Date";
       },
+      sorter: (a, b) => {
+        // Chuyển đổi ngày tháng thành đối tượng moment và so sánh
+        const dateA = moment(a.startDate, "YYYY-MM-DD");
+        const dateB = moment(b.startDate, "YYYY-MM-DD");
+        return dateA - dateB;
+      },
     },
     {
       title: t("EndDate"),
@@ -178,6 +186,12 @@ const ProjectManagement = () => {
         return dateObj.isValid()
           ? dateObj.format("DD/MM/YYYY")
           : "Invalid Date";
+      },
+      sorter: (a, b) => {
+        // Chuyển đổi ngày tháng thành đối tượng moment và so sánh
+        const dateA = moment(a.startDate, "YYYY-MM-DD");
+        const dateB = moment(b.startDate, "YYYY-MM-DD");
+        return dateA - dateB;
       },
     },
     {
@@ -195,12 +209,21 @@ const ProjectManagement = () => {
           </Space>
         </div>
       ),
+      sorter: (a, b) => {
+        return a.projectManager.localeCompare(b.projectManager);
+      },
     },
     {
       title: t("Budget"),
       dataIndex: "budget",
       key: "budget",
       render: formatBudget,
+      sorter: (a, b) => {
+        // Chuyển đổi giá trị budget từ chuỗi tiền tệ sang số thực để sắp xếp chính xác
+        const budgetA = parseFloat(a.budget.replace(/[^0-9.-]+/g, ""));
+        const budgetB = parseFloat(b.budget.replace(/[^0-9.-]+/g, ""));
+        return budgetA - budgetB;
+      },
     },
     {
       title: t("status"),
@@ -262,8 +285,9 @@ const ProjectManagement = () => {
           {t("Add New Project")}
         </Button>
         <Button
+          className="btn"
           type="primary"
-          icon={<InboxOutlined />}
+          icon={<RestOutlined />}
           onClick={() => navigate("/archived-projects")}
           style={{ marginLeft: "auto" }}
         >

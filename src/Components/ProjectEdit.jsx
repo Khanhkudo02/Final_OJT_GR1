@@ -268,8 +268,8 @@ const ProjectEdit = () => {
           for (const member of addedMembers) {
             const memberData = employees.find((emp) => emp.value === member);
             if (memberData) {
-              await recordHistory(id, "added", member);
-              sendNotificationEmail(memberData.email, values.name, "added");
+              await recordHistory(id, t("added"), member);
+              sendNotificationEmail(memberData.email, values.name, t("added"));
 
               // Cập nhật trạng thái của nhân viên mới thành "involved"
               await updateEmployeeStatusToInvolved(member);
@@ -280,8 +280,8 @@ const ProjectEdit = () => {
           for (const member of removedMembers) {
             const memberData = employees.find((emp) => emp.value === member);
             if (memberData) {
-              await recordHistory(id, "removed", member);
-              sendNotificationEmail(memberData.email, values.name, "removed");
+              await recordHistory(id, t("removed"), member);
+              sendNotificationEmail(memberData.email, values.name, t("removed"));
 
               // Cập nhật trạng thái của nhân viên thành "active" nếu không còn thuộc dự án nào
               const allProjects = await fetchAllProjects();
