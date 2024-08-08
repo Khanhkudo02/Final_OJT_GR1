@@ -96,6 +96,7 @@ const EditSkill = () => {
                 </Select>
             </div>
             <Button
+                className="btn"
                 type="primary"
                 onClick={handleUpdateSkill}
                 disabled={!name || !description || !status}
@@ -103,6 +104,7 @@ const EditSkill = () => {
                 {t("save")}
             </Button>
             <Button
+                className="btn-length"
                 style={{ marginLeft: 8 }}
                 onClick={() => navigate("/position-management")}
             >

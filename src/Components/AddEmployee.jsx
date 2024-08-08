@@ -358,7 +358,7 @@ const AddEmployee = () => {
           </div>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={uploading}>
+          <Button className="btn" type="primary" htmlType="submit" loading={uploading}>
             {t("submit")}
           </Button>
         </Form.Item>

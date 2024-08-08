@@ -468,7 +468,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button className="btn" type="primary" htmlType="submit">
             {t("Register")}
           </Button>
         </Form.Item>
