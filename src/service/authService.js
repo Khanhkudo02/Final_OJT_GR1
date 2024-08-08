@@ -1,12 +1,48 @@
+import bcrypt from "bcryptjs";
 import {
-  getDatabase,
-  ref,
-  query,
-  orderByChild,
   equalTo,
   get,
+  getDatabase,
+  orderByChild,
+  query,
+  ref,
   set,
+  update,
 } from "firebase/database";
+import { v4 as uuidv4 } from "uuid";
+
+// Hàm cập nhật mật khẩu đã mã hóa cho tất cả người dùng hiện có
+const updateExistingPasswords = async () => {
+  try {
+    const db = getDatabase();
+    const usersRef = ref(db, "users");
+    const snapshot = await get(usersRef);
+    const usersData = snapshot.val();
+
+    if (usersData) {
+      for (const userId in usersData) {
+        const user = usersData[userId];
+
+        // Kiểm tra nếu mật khẩu chưa được mã hóa
+        if (user.password && !user.password.startsWith("$2a$")) {
+          // Mã hóa mật khẩu
+          const hashedPassword = await bcrypt.hash(user.password, 10);
+
+          // Cập nhật mật khẩu đã mã hóa vào cơ sở dữ liệu
+          await update(ref(db, `users/${userId}`), {
+            password: hashedPassword,
+          });
+
+          console.log(`Updated password for user: ${userId}`);
+        }
+      }
+    } else {
+      console.log("No users found.");
+    }
+  } catch (error) {
+    console.error("Error updating passwords:", error);
+  }
+};
 
 // Hàm đăng nhập người dùng
 export const loginUser = async (
@@ -29,12 +65,18 @@ export const loginUser = async (
       const userId = Object.keys(userData)[0];
       const user = userData[userId];
 
-      if (user.password === password) {
-        localStorage.setItem("userId", JSON.stringify(user)); // Lưu toàn bộ đối tượng người dùng
+      // So sánh mật khẩu đã mã hóa
+      const match = await bcrypt.compare(password, user.password);
+
+      if (match) {
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("user", JSON.stringify(user)); // Save the entire user object
         setUser(user);
 
         // Điều hướng dựa trên vai trò người dùng
-        navigate(user.role === "admin" ? "/admin" : "/employee");
+        navigate(
+          user.role === "admin" ? "/account-management" : "/account-info"
+        );
         return { user, error: null };
       } else {
         return { user: null, error: "Invalid password" };
@@ -52,6 +94,7 @@ export const loginUser = async (
 export const signUpUser = async (
   email,
   password,
+  name,
   setSuccessMessage,
   setError
 ) => {
@@ -68,10 +111,17 @@ export const signUpUser = async (
       return { success: false, error: "Email already in use" };
     }
 
-    const newUserRef = ref(db, `users/${email.replace(".", ",")}`);
+    // Mã hóa mật khẩu
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Tạo ID ngẫu nhiên cho người dùng
+    const userId = uuidv4();
+
+    const newUserRef = ref(db, `users/${userId}`);
     const newUser = {
       email,
-      password,
+      password: hashedPassword,
+      name,
       contact: "",
       cv_list: [
         {
@@ -85,9 +135,21 @@ export const signUpUser = async (
       createdAt: new Date().toISOString(),
       projetcIds: "",
       skill: "",
-      Status: "",
+      status: "active",
     };
     await set(newUserRef, newUser);
+
+    if (newUser.role === "employee") {
+      const employeeRef = ref(db, `employees/${userId}`);
+      await set(employeeRef, {
+        name: newUser.name,
+        email: newUser.email,
+        contact: newUser.contact,
+        cv_list: newUser.cv_list,
+        createdAt: newUser.createdAt,
+        status: newUser.status,
+      });
+    }
 
     console.log("New User Object:", newUser); // Console log the new user object
 
@@ -99,3 +161,6 @@ export const signUpUser = async (
     return { success: false, error: "An error occurred during sign up" };
   }
 };
+
+// Gọi hàm để mã hóa mật khẩu hiện có (nên chỉ chạy một lần khi cần)
+updateExistingPasswords();

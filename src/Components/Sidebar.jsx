@@ -1,118 +1,133 @@
-import React from "react";
-import { Layout, Menu } from "antd";
 import {
-  UserOutlined,
+  CodeOutlined,
   ProjectOutlined,
   TeamOutlined,
   ToolOutlined,
-  CodeOutlined,
-  FileTextOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { Layout, Menu } from "antd";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
+import "../assets/style/Pages/Sidebar.scss";
+import LanguageSwitcher from "./LanguageSwitcher";
+import LogoutButton from "./LogoutButton";
+import logo from "../../public/images/logo.jpg";
 
 const { Sider } = Layout;
 
-const Sidebar = () => {
-  const menuItems = [
+const Sidebar = ({ role }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const { t } = useTranslation();
+
+  const adminMenuItems = [
     {
       key: "1",
       icon: <UserOutlined />,
-      label: <NavLink to="/account-management">Manage Accounts</NavLink>,
+      label: <NavLink to="/account-management">{t("ManageAccounts")}</NavLink>,
       children: [
         {
           key: "1-1",
-          label: <NavLink to="/account-info">Account Info</NavLink>,
+          label: <NavLink to="/account-info">{t("AccountInfo")}</NavLink>,
         },
         {
           key: "1-2",
-          label: <NavLink to="/reset-password">Reset Password</NavLink>,
+          label: <NavLink to="/change-password">{t("changePassword")}</NavLink>,
         },
       ],
     },
     {
       key: "2",
-      icon: <ProjectOutlined />,
-      label: <NavLink to="/project-management">Project Management</NavLink>,
-      children: [
-        {
-          key: "2-1",
-          label: <NavLink to="/project-info">Project Info</NavLink>,
-        },
-        {
-          key: "2-2",
-          label: <NavLink to="/assign-employees">Assign Employees</NavLink>,
-        },
-        {
-          key: "2-3",
-          label: <NavLink to="/project-tracking">Project Tracking</NavLink>,
-        },
-      ],
+      icon: <TeamOutlined />,
+      label: <NavLink to="/employee-management">{t("employee")}</NavLink>,
     },
     {
       key: "3",
-      icon: <TeamOutlined />,
-      label: <NavLink to="/position-management">Position Management</NavLink>,
+      icon: <ProjectOutlined />,
+      label: (
+        <NavLink to="/project-management">{t("ProjectManagement")}</NavLink>
+      ),
     },
     {
       key: "4",
-      icon: <ToolOutlined />,
-      label: <NavLink to="/technology-management">Technology</NavLink>,
+      icon: <TeamOutlined />,
+      label: (
+        <NavLink to="/position-management">{t("PositionManagement")}</NavLink>
+      ),
     },
     {
       key: "5",
-      icon: <TeamOutlined />,
-      label: <NavLink to="/employee-management">Employee</NavLink>,
-      children: [
-        {
-          key: "5-1",
-          label: <NavLink to="/employee-profile">Employee Profile</NavLink>,
-        },
-        {
-          key: "5-2",
-          label: <NavLink to="/assign-project">Assign Project</NavLink>,
-        },
-      ],
+      icon: <ToolOutlined />,
+      label: (
+        <NavLink to="/technology-management">
+          {t("TechnologyManagement")}
+        </NavLink>
+      ),
     },
     {
       key: "6",
       icon: <CodeOutlined />,
-      label: <NavLink to="/programing-language">Languages</NavLink>,
-      children: [
-        {
-          key: "6-1",
-          label: (
-            <NavLink to="/programming-language-info">
-              Programming Language Info
-            </NavLink>
-          ),
-        },
-      ],
+      label: (
+        <NavLink to="/programing-language">
+          {t("ProgrammingLanguageManagement")}
+        </NavLink>
+      ),
     },
     {
       key: "7",
-      icon: <FileTextOutlined />,
-      label: <NavLink to="/cv">CV</NavLink>,
+      label: <LanguageSwitcher collapsed={collapsed} />,
+    },
+    {
+      key: "8",
+      label: <LogoutButton collapsed={collapsed} />,
+    },
+  ];
+
+  const employeeMenuItems = [
+    {
+      key: "1",
+      icon: <UserOutlined />,
+      label: <NavLink to="/employee">{t("EmployeeAccount")}</NavLink>,
+    },
+    {
+      key: "2",
+      icon: <ProjectOutlined />,
+      label: (
+        <NavLink to="/employee-ProjectManagement">{t("ListProject")}</NavLink>
+      ),
+    },
+    {
+      key: "3",
+      icon: <ProjectOutlined />,
+      label: <NavLink to="/change-password">{t("changePassword")}</NavLink>,
+    },
+    {
+      key: "4",
+      label: <LanguageSwitcher collapsed={collapsed} />,
+    },
+    {
+      key: "5",
+      label: <LogoutButton collapsed={collapsed} />,
     },
   ];
 
   return (
     <Sider
-      width={200}
-      style={{
-        overflow: "auto",
-        height: "100vh",
-        position: "fixed",
-        left: 0,
-        top: 0,
-        bottom: 0,
-      }}
+      className="sidebar"
+      collapsible
+      collapsed={collapsed}
+      onCollapse={(collapsed) => setCollapsed(collapsed)}
+      width={229}
     >
-      <div className="logo" />
+      <div className="sidebar-header">
+        <img src={logo} alt="Get IT" className="logo-sidebar" />
+        {!collapsed && <h2 className="sidebar-title">GETIT COMPANY</h2>}
+      </div>
       <Menu
         theme="dark"
         mode="inline"
         defaultSelectedKeys={["1"]}
-        items={menuItems}
+        items={role === "admin" ? adminMenuItems : employeeMenuItems}
       />
     </Sider>
   );
