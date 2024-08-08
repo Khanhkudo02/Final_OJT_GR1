@@ -416,7 +416,7 @@ function AdminPage() {
             </Form.Item>
           )}
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button className="btn" type="primary" htmlType="submit">
               {editMode ? t("updateUser") : t("addUser")}
             </Button>
           </Form.Item>
