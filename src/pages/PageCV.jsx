@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "../assets/style/Pages/PageCV.scss";
-import TemplateCV1 from "../templates/templateCV1";
-import TemplateCV2 from "../templates/templateCV2";
 
 const loadFont = async (url) => {
   const response = await fetch(url);
@@ -18,26 +16,17 @@ function PageCV() {
   const handleTemplateChange = (e) => {
     const template = e.target.value;
     setSelectedTemplate(template);
-
-    // Load the selected template content
-    if (template === "Template1") {
-      setTemplateContent(<TemplateCV1 />);
-    } else if (template === "Template2") {
-      setTemplateContent(<TemplateCV2 />);
-    } else {
-      setTemplateContent(null);
-    }
   };
 
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    if (selectedTemplate === "Template1") {
-      TemplateCV1.generatePDF(doc);
-    } else if (selectedTemplate === "Template2") {
-      TemplateCV2.generatePDF(doc);
-    }
-    doc.save("CV.pdf");
-  };
+  // const exportPDF = () => {
+  //   const doc = new jsPDF();
+  //   if (selectedTemplate === "Template1") {
+  //     TemplateCV1.generatePDF(doc);
+  //   } else if (selectedTemplate === "Template2") {
+  //     TemplateCV2.generatePDF(doc);
+  //   }
+  //   doc.save("CV.pdf");
+  // };
 
   return (
     <div>
