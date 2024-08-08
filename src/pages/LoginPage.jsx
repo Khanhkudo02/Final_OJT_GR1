@@ -90,7 +90,10 @@ function Login({ setUser }) {
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <Input.Password className="inp-length" onBlur={() => handleBlur("password")} />
+            <Input.Password
+              className="inp-length"
+              onBlur={() => handleBlur("password")}
+            />
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
           {successMessage && (
@@ -116,16 +119,6 @@ function Login({ setUser }) {
             </Button>
           </Form.Item>
         </Form>
-        <Button
-          type="link"
-          className={styles["link-button"]}
-          onClick={() => setIsSignUp(!isSignUp)}
-          block
-        >
-          {isSignUp
-            ? t("Already have an account? Login")
-            : t("Need an account? Sign Up")}
-        </Button>
       </div>
     </div>
   );

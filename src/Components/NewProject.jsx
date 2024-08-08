@@ -36,6 +36,8 @@ const NewProject = () => {
         ...values,
         startDate: values.startDate.format("YYYY-MM-DD"),
         endDate: values.endDate.format("YYYY-MM-DD"),
+        startDate: values.startDate.format("YYYY-MM-DD"),
+        endDate: values.endDate.format("YYYY-MM-DD"),
         technologies: values.technologies || [],
         languages: values.languages || [],
         budget: values.budget.replace(/,/g, ""),
@@ -281,7 +283,7 @@ const NewProject = () => {
           ]}
         >
           <DatePicker
-            format="YYYY-MM-DD"
+            format="DD/MM/YYYY"
             placeholder={t("Select start date")}
             onChange={(date) => setStartDate(date)}
             disabledDate={disabledStartDate}
@@ -297,7 +299,7 @@ const NewProject = () => {
           ]}
         >
           <DatePicker
-            format="YYYY-MM-DD"
+            format="DD/MM/YYYY"
             placeholder={t("Select end date")}
             onChange={(date) => setEndDate(date)}
             disabledDate={disabledEndDate}
@@ -468,7 +470,7 @@ const NewProject = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button className="btn" type="primary" htmlType="submit">
             {t("Register")}
           </Button>
         </Form.Item>
