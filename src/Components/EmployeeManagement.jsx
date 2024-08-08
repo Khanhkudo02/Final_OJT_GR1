@@ -128,8 +128,9 @@ const EmployeeManagement = () => {
       (employee) =>
         employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        [employee.name, employee.email, employee.phoneNumber]
-          .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
+        [employee.name, employee.email, employee.phoneNumber].some((field) =>
+          field.toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
 
     // Apply tab filter
@@ -365,7 +366,8 @@ const EmployeeManagement = () => {
                   }),
                   new TextRun({
                     text:
-                      formatDepartment(employee.department) || t("Not provided"),
+                      formatDepartment(employee.department) ||
+                      t("Not provided"),
                     size: 24,
                   }),
                 ],
@@ -480,10 +482,7 @@ const EmployeeManagement = () => {
                           text: Array.isArray(project.languages)
                             ? project.languages
                                 .map((langId) =>
-                                  getLanguageNameById(
-                                    langId,
-                                    languagesList
-                                  )
+                                  getLanguageNameById(langId, languagesList)
                                 )
                                 .join(", ")
                             : project.languages
@@ -618,7 +617,7 @@ const EmployeeManagement = () => {
               alt={t("employee")}
               width="50"
               height="50"
-              style={{ objectFit: "cover" }}
+              style={{ objectFit: "cover", borderRadius: "50%" }}
             />
           )}
         />
