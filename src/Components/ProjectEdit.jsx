@@ -10,7 +10,8 @@ import {
   Upload,
 } from "antd";
 import emailjs from "emailjs-com";
-import moment from "moment";
+// import moment from "moment";
+import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -53,8 +54,8 @@ const ProjectEdit = () => {
           setProject(projectData);
           form.setFieldsValue({
             ...projectData,
-            startDate: moment(projectData.startDate),
-            endDate: moment(projectData.endDate),
+            startDate: dayjs(projectData.startDate),
+            endDate: dayjs(projectData.endDate),
           });
 
           // Set fileList for existing attachments
@@ -358,7 +359,7 @@ const ProjectEdit = () => {
           name="startDate"
           rules={[{ required: true, message: t("Please select the start date!") }]}
         >
-          <DatePicker format="YYYY-MM-DD" placeholder={t("Select start date")}/>
+          <DatePicker format="DD/MM/YYYY" placeholder={t("Select start date")}/>
         </Form.Item>
 
         <Form.Item
@@ -366,7 +367,7 @@ const ProjectEdit = () => {
           name="endDate"
           rules={[{ required: true, message: t("Please select the end date!") }]}
         >
-          <DatePicker format="YYYY-MM-DD" placeholder={t("Select end date")}/>
+          <DatePicker format="DD/MM/YYYY" placeholder={t("Select end date")}/>
         </Form.Item>
 
         <Form.Item

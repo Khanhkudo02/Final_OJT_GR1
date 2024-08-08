@@ -34,8 +34,8 @@ const NewProject = () => {
     try {
       const projectData = {
         ...values,
-        startDate: values.startDate.format("YYYY-MM-DD"),
-        endDate: values.endDate.format("YYYY-MM-DD"),
+        startDate: values.startDate.format("DD/MM/YYYY"),
+        endDate: values.endDate.format("DD/MM/YYYY"),
         technologies: values.technologies || [],
         languages: values.languages || [],
         budget: values.budget.replace(/,/g, ""),
@@ -281,7 +281,7 @@ const NewProject = () => {
           ]}
         >
           <DatePicker
-            format="YYYY-MM-DD"
+            format="DD/MM/YYYY"
             placeholder={t("Select start date")}
             onChange={(date) => setStartDate(date)}
             disabledDate={disabledStartDate}
@@ -297,7 +297,7 @@ const NewProject = () => {
           ]}
         >
           <DatePicker
-            format="YYYY-MM-DD"
+            format="DD/MM/YYYY"
             placeholder={t("Select end date")}
             onChange={(date) => setEndDate(date)}
             disabledDate={disabledEndDate}
