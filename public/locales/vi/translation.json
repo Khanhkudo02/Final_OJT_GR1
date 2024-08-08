@@ -375,5 +375,10 @@
   "Skill added successfully!": "Thêm kỹ năng mới thành công",
   "Only inactive skills can be deleted.": "Chỉ có kĩ năng với trạng thái không hoạt động mới được xóa",
   "Are you sure you want to delete this skill?": "Bnạ có chắc là bạn muốn xóa kỹ năng này không?",
-  "Failed to fetch technology details.": "Lấy chi tiết công nghệ không thành công"
+  "Failed to fetch technology details.": "Lấy chi tiết công nghệ không thành công",
+  "View History": "Xem lịch sử",
+  "Unknown": "Thông tin chưa rõ",
+  "Employee Name": "Tên nhân viên",
+  "Timestamp": "Mốc thời gian",
+  "Project History": "Lịch sử dự án"
 }

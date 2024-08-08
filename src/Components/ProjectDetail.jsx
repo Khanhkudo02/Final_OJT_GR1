@@ -209,7 +209,7 @@ const ProjectDetail = () => {
         <strong>{t("ProgrammingLanguageUsed")}:</strong> {displayedLanguages}
       </p>
       <Link to={`/project-tracking/${project.key}`}>
-        <Button type="primary">View History</Button>
+        <Button type="primary">{t("View History")}</Button>
       </Link>
     </div>
   );

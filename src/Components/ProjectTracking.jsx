@@ -4,12 +4,14 @@ import { get, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { database } from "../firebaseConfig";
+import { useTranslation } from "react-i18next";
 
 const ProjectTracking = () => {
   const { id } = useParams();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [employeeMapping, setEmployeeMapping] = useState({});
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchEmployeeMapping = async () => {
@@ -43,7 +45,7 @@ const ProjectTracking = () => {
           ? Object.entries(data).map(([key, value]) => ({
               key,
               action: value.action,
-              employeeName: employeeMapping[value.employeeId] || "Unknown", // Thay thế ID bằng tên
+              employeeName: employeeMapping[value.employeeId] || t("Unknown"), // Thay thế ID bằng tên
               timestamp: value.timestamp,
             }))
           : [];
@@ -67,17 +69,17 @@ const ProjectTracking = () => {
 
   const columns = [
     {
-      title: "Action",
+      title: t("actions"),
       dataIndex: "action",
       key: "action",
     },
     {
-      title: "Employee Name",
+      title: t("Employee Name"),
       dataIndex: "employeeName",
       key: "employeeName",
     },
     {
-      title: "Timestamp",
+      title: t("Timestamp"),
       dataIndex: "timestamp",
       key: "timestamp",
       render: (timestamp) => dayjs(timestamp).format("DD/MM/YYYY HH:mm:ss"),
@@ -87,7 +89,7 @@ const ProjectTracking = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <h2>Project History</h2>
+      <h2>{t("Project History")}</h2>
       <Table columns={columns} dataSource={history} loading={loading} />
     </div>
   );
