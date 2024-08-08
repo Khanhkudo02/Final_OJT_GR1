@@ -31,19 +31,23 @@ function ForgetPassword() {
 
       if (user) {
         const [userId] = user;
-        const resetLink = `http://localhost:5173/reset-password?userId=${encodeURIComponent(userId)}`; 
+        const resetLink = `https://final-ojt-gr-1-cgcg.vercel.app/forget-password?userId=${encodeURIComponent(
+          userId
+        )}`;
 
         const response = await emailjs.send(
-          'service_ncefpgz',      // Service ID của bạn
-          'template_v0kukci',     // Template ID của bạn
-          { 
-            user_email: email,    // Tên biến khớp với template
-            reset_link: resetLink 
-          },  
-          'lb5ycQksDnRX-2uqk'     // User ID của bạn
+          "service_ncefpgz", // Service ID của bạn
+          "template_v0kukci", // Template ID của bạn
+          {
+            user_email: email, // Tên biến khớp với template
+            reset_link: resetLink,
+          },
+          "lb5ycQksDnRX-2uqk" // User ID của bạn
         );
         console.log(t("Email sent successfully:"), response);
-        message.setSuccessMessage(t("Password reset instructions sent to your email."));
+        message.setSuccessMessage(
+          t("Password reset instructions sent to your email.")
+        );
         form.resetFields(); // Reset form fields after success
       } else {
         message.setError("User does not exist.");
@@ -72,21 +76,19 @@ function ForgetPassword() {
             name="email"
             rules={[{ required: true, message: t("pleaseEnterEmail") }]}
           >
-            <Input type="email" placeholder= {t("Enter your email address")}/>
+            <Input type="email" placeholder={t("Enter your email address")} />
           </Form.Item>
           {error && <Alert message={error} type="error" showIcon />}
-          {successMessage && <Alert message={successMessage} type="success" showIcon />}
+          {successMessage && (
+            <Alert message={successMessage} type="success" showIcon />
+          )}
           <Form.Item>
             <Button className="btn" type="primary" htmlType="submit" block>
               {t("SendEmail")}
             </Button>
           </Form.Item>
         </Form>
-        <Form
-          onFinish={handleLogout}
-          className="logout-form"
-          layout="vertical"
-        >
+        <Form onFinish={handleLogout} className="logout-form" layout="vertical">
           <Form.Item>
             <Button className="btn" type="primary" htmlType="submit" block>
               {t("Back")}
