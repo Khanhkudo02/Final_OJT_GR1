@@ -265,7 +265,7 @@ const EditEmployee = () => {
           beforeUpload={beforeUpload}
           fileList={fileList}
           onChange={handleImageChange}
-          listType="picture"
+          listType="picture"c
           showUploadList={false}
         >
           <Button className="btn" type="primary" icon={<PlusOutlined />}>{t("uploadImageButton")}</Button>
