@@ -34,8 +34,8 @@ const NewProject = () => {
     try {
       const projectData = {
         ...values,
-        startDate: values.startDate.format("DD/MM/YYYY"),
-        endDate: values.endDate.format("DD/MM/YYYY"),
+        startDate: values.startDate.format("YYYY-MM-DD"),
+        endDate: values.endDate.format("YYYY-MM-DD"),
         technologies: values.technologies || [],
         languages: values.languages || [],
         budget: values.budget.replace(/,/g, ""),
