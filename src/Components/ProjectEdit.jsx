@@ -312,6 +312,20 @@ const ProjectEdit = () => {
     return <div>{t("Loading...")}</div>;
   }
 
+  const disabledStartDate = (startDate) => {
+    if (!startDate || !form.getFieldValue('endDate')) {
+      return false;
+    }
+    return startDate.isAfter(form.getFieldValue('endDate'), 'day');
+  };
+  
+  const disabledEndDate = (endDate) => {
+    if (!endDate || !form.getFieldValue('startDate')) {
+      return false;
+    }
+    return endDate.isBefore(form.getFieldValue('startDate'), 'day');
+  };
+
   return (
     <div
       style={{
@@ -359,7 +373,9 @@ const ProjectEdit = () => {
           name="startDate"
           rules={[{ required: true, message: t("Please select the start date!") }]}
         >
-          <DatePicker format="DD/MM/YYYY" placeholder={t("Select start date")}/>
+          <DatePicker format="DD/MM/YYYY" placeholder={t("Select start date")}
+            disabledDate={disabledStartDate}
+          />
         </Form.Item>
 
         <Form.Item
@@ -367,7 +383,9 @@ const ProjectEdit = () => {
           name="endDate"
           rules={[{ required: true, message: t("Please select the end date!") }]}
         >
-          <DatePicker format="DD/MM/YYYY" placeholder={t("Select end date")}/>
+          <DatePicker format="DD/MM/YYYY" placeholder={t("Select end date")}
+            disabledDate={disabledEndDate}
+          />
         </Form.Item>
 
         <Form.Item
