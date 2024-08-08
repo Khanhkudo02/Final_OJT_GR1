@@ -6,6 +6,7 @@ import {
 } from "@ant-design/icons";
 import { Button, Input, message, Modal, Space, Table, Tabs } from "antd";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/PositionManagement.scss";
@@ -13,7 +14,6 @@ import {
   deletePositionById,
   fetchAllPositions,
 } from "../service/PositionServices";
-import { useTranslation } from "react-i18next";
 import SkillManagement from "./SkillManagement";
 
 const { Column } = Table;
@@ -44,7 +44,7 @@ const PositionManagement = () => {
 
     const positionAdded = localStorage.getItem("positionAdded");
     if (positionAdded === "true") {
-      message.success("Position added successfully!");
+      message.success(t("Position added successfully!"));
       localStorage.removeItem("positionAdded"); // Xóa thông báo sau khi đã hiển thị
     }
   }, []);
@@ -65,19 +65,19 @@ const PositionManagement = () => {
 
   const handleDelete = (record) => {
     if (record.status !== "inactive") {
-      message.error("Only inactive positions can be deleted.");
+      message.error(t("Only inactive positions can be deleted."));
       return;
     }
 
     confirm({
-      title: "Are you sure you want to delete this position?",
+      title: t("Are you sure you want to delete this position?"),
       onOk: async () => {
         try {
           await deletePositionById(record.key);
-          message.success("Position deleted successfully!");
+          message.success(t("Position deleted successfully!"));
           loadPositions();
         } catch (error) {
-          message.error("Failed to delete position.");
+          message.error(t("Failed to delete position."));
         }
       },
       onCancel() {
@@ -130,7 +130,7 @@ const PositionManagement = () => {
         {t("Add New Position")}
       </Button>
       <Input
-        placeholder={t("search")}
+        placeholder={t("searchbyname")}
         value={searchTerm}
         onChange={handleSearchChange}
         style={{ width: "250px", marginBottom: 16 }}
@@ -159,7 +159,7 @@ const PositionManagement = () => {
           dataIndex="description"
           key="description"
           render={(text) => formatDescription(text)}
-        /> 
+        />
         <Column title={t("Department")} dataIndex="department" key="department" />
         <Column
           title={t("Status")}

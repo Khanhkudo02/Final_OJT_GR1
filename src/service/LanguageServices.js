@@ -26,6 +26,18 @@ const fetchAllLanguages = async () => {
     }
 };
 
+const fetchAllLanguages2 = async () => {
+    try {
+        const languagesRef = ref(db, 'programmingLanguages');
+        const snapshot = await get(languagesRef);
+        const data = snapshot.val();
+        return data ? Object.entries(data).map(([key, value]) => ({ id:key, ...value })) : [];
+    } catch (error) {
+        console.error("Failed to fetch languages:", error);
+        throw error;
+    }
+};
+
 // Update existing language
 const putUpdateLanguage = async (id, name, description, status) => {
     try {
@@ -70,4 +82,4 @@ const fetchLanguageById = async (id) => {
     }
 };
 
-export { fetchAllLanguages, postCreateLanguage, putUpdateLanguage, deleteLanguageById, fetchLanguageById };
+export { fetchAllLanguages, postCreateLanguage, putUpdateLanguage, deleteLanguageById, fetchLanguageById, fetchAllLanguages2 };

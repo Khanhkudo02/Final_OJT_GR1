@@ -2,7 +2,7 @@ import { Button, Modal, message } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { fetchAllEmployees } from "../service/EmployeeServices";
 import { fetchAllLanguages } from "../service/LanguageServices";
 import { deleteProjectPermanently, fetchAllProjects } from "../service/Project";
@@ -29,7 +29,7 @@ const ProjectDetail = () => {
     return options
       .filter((option) => ids.includes(option.value))
       .map((option) => option.label)
-      .join(", "); // Join names with a comma
+      .join(", "); // Join names with a command
   };
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const ProjectDetail = () => {
         if (projectData) {
           setProject(projectData);
         } else {
-          message.error("Project not found");
+          message.error(t("Project not found"));
           const userRole = JSON.parse(localStorage.getItem("user"))?.role;
           const redirectPath =
             userRole === "admin"
@@ -78,7 +78,7 @@ const ProjectDetail = () => {
         );
       } catch (error) {
         console.error("Error fetching project or related data:", error);
-        message.error("Error fetching project data");
+        message.error(t("Error fetching project data"));
         const userRole = JSON.parse(localStorage.getItem("user"))?.role;
         const redirectPath =
           userRole === "admin"
@@ -95,7 +95,7 @@ const ProjectDetail = () => {
     try {
       if (project && project.key) {
         await deleteProjectPermanently(project.key);
-        message.success("Project deleted successfully");
+        message.success(t("Project deleted successfully"));
         const userRole = JSON.parse(localStorage.getItem("user"))?.role;
         const redirectPath =
           userRole === "admin"
@@ -103,26 +103,26 @@ const ProjectDetail = () => {
             : "/employee-ProjectManagement";
         navigate(redirectPath);
       } else {
-        message.error("Project not found");
+        message.error(t("Project not found"));
       }
     } catch (error) {
-      message.error("Failed to delete project");
+      message.error(t("Failed to delete project"));
     }
   };
 
   const showDeleteConfirm = () => {
     Modal.confirm({
-      title: "Are you sure you want to delete this project?",
-      content: "This action cannot be undone",
-      okText: "Yes",
+      title: t("Are you sure you want to delete this project?"),
+      content: t("This action cannot be undone"),
+      okText: t("Yes"),
       okType: "danger",
-      cancelText: "No",
+      cancelText: t("No"),
       onOk: handleDelete,
     });
   };
 
   if (!project) {
-    return <div>Loading...</div>;
+    return <div>{t("Loading...")}</div>;
   }
 
   const displayedTechnologies = getNamesFromIds(
@@ -149,7 +149,7 @@ const ProjectDetail = () => {
 
   return (
     <div style={{ padding: "24px", background: "#fff" }}>
-      <Button type="default" onClick={handleBack}>
+      <Button className="btn-length" type="default" onClick={handleBack}>
         {t("Back")}
       </Button>
       <h2>{t("ProjectDetail")}</h2>
@@ -173,13 +173,13 @@ const ProjectDetail = () => {
         <strong>{t("Description")}:</strong> {project.description}
       </p>
       <p>
-        <strong>{t("ClientName")}:</strong> {project.clientName}
+        <strong>{t("clientName")}:</strong> {project.clientName}
       </p>
       <p>
         <strong>{t("ProjectManager")}:</strong> {project.projectManager}
       </p>
       <p>
-        <strong>{t("ClientEmail")}:</strong> {project.clientEmail}
+        <strong>{t("clientEmail")}:</strong> {project.clientEmail}
       </p>
       <p>
         <strong>{t("phoneNumber")}:</strong> {project.phoneNumber}
@@ -194,7 +194,7 @@ const ProjectDetail = () => {
         <strong>{t("Status")}:</strong> {project.status}
       </p>
       <p>
-        <strong>{t("Priority")}:</strong> {project.priority}
+        <strong>{t("Priority")}:</strong> {t(project.priority)}
       </p>
       <p>
         <strong>{t("StartDate")}:</strong> {formatDate(project.startDate)}
@@ -208,6 +208,9 @@ const ProjectDetail = () => {
       <p>
         <strong>{t("ProgrammingLanguageUsed")}:</strong> {displayedLanguages}
       </p>
+      <Link to={`/project-tracking/${project.key}`}>
+        <Button className="btn" type="primary">{t("View History")}</Button>
+      </Link>
     </div>
   );
 };

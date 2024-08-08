@@ -32,7 +32,7 @@ const AddPosition = () => {
       const data = await fetchAllPositions();
       setPositions(data);
     } catch (error) {
-      console.error("Failed to fetch positions:", error);
+      console.error(t("Failed to fetch positions:"), error);
     }
   };
 
@@ -42,7 +42,7 @@ const AddPosition = () => {
 
   const handleAddPosition = async () => {
     if (!name || !description || !department || !status) {
-      toast.error("Please fill in all fields.");
+      toast.error(t("Please fill in all fields."));
       return;
     }
 
@@ -51,7 +51,7 @@ const AddPosition = () => {
       localStorage.setItem("positionAdded", "true");
       navigate("/position-management");
     } catch (error) {
-      toast.error("Failed to add position.");
+      toast.error(t("Failed to add position."));
     }
   };
   const handleViewPosition = (position) => {
@@ -62,10 +62,10 @@ const AddPosition = () => {
   const handleDeletePosition = async (id) => {
     try {
       await deletePositionById(id);
-      toast.success("Position deleted successfully!");
+      toast.success(t("Position deleted successfully!"));
       loadPositions(); // Reload the positions list
     } catch (error) {
-      toast.error("Failed to delete position.");
+      toast.error(t("Failed to delete position."));
     }
   };
 

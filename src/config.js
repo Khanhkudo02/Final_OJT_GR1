@@ -1,3 +1,3 @@
-export const EMAILJS_USER_ID = 'XbI9znGx2_ZV3wfBO';
-export const EMAILJS_SERVICE_ID = 'service_kdlrww8';
-export const EMAILJS_TEMPLATE_ID = 'template_yh7totx';
+export const EMAILJS_USER_ID = 'lb5ycQksDnRX-2uqk';
+export const EMAILJS_SERVICE_ID = 'service_ncefpgz';
+export const EMAILJS_TEMPLATE_ID = 'template_kngz6s9';//assign project//template_v0kukci//resetpassword

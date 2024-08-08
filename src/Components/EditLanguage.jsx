@@ -29,10 +29,10 @@ const EditLanguage = () => {
           setDescription(language.description || "");
           setStatus(language.status || "");
         } else {
-          toast.error("Language not found.");
+          toast.error(t("Language not found."));
         }
       } catch (error) {
-        toast.error("Failed to fetch language data.");
+        toast.error(t("Failed to fetch language data."));
       }
     };
 
@@ -41,16 +41,16 @@ const EditLanguage = () => {
 
   const handleUpdateLanguage = async () => {
     if (!name || !description || !status) {
-      toast.error("Please fill in all fields.");
+      toast.error(t("Please fill in all fields."));
       return;
     }
 
     try {
       await putUpdateLanguage(id, name, description, status);
-      toast.success("Language updated successfully!");
+      toast.success(t("Language updated successfully!"));
       navigate("/programing-language");
     } catch (error) {
-      toast.error("Failed to update language.");
+      toast.error(t("Failed to update language."));
       console.error("Error details:", error);
     }
   };
@@ -62,7 +62,7 @@ const EditLanguage = () => {
       <div className="form-group">
         <label>{t("name")}</label>
         <Input
-          placeholder="Name"
+          placeholder={t("name")}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -70,7 +70,7 @@ const EditLanguage = () => {
       <div className="form-group">
         <label>{t("Description")}</label>
         <Input.TextArea
-          placeholder="Description"
+          placeholder={t("Description")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
@@ -78,7 +78,7 @@ const EditLanguage = () => {
       <div className="form-group">
         <label>{t("Status")}</label>
         <Select
-          placeholder="Select Status"
+          placeholder={t("Select Status")}
           value={status}
           onChange={(value) => setStatus(value)}
         >

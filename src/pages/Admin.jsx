@@ -20,7 +20,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import LanguageSwitcher from "../Components/LanguageSwitcher";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/Admin.scss";
 
@@ -270,11 +269,13 @@ function AdminPage() {
       title: t("email"),
       dataIndex: "email",
       key: "email",
+      sorter: (a, b) => a.email.localeCompare(b.email),
     },
     {
       title: t("name"),
       dataIndex: "name",
       key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: t("role"),
@@ -347,7 +348,7 @@ function AdminPage() {
         </Button>
         <Input
           prefix={<SearchOutlined />}
-          placeholder={t("search")}
+          placeholder={t("searchbyemail")}
           value={searchText}
           onChange={handleSearch}
           style={{ width: 250 }}

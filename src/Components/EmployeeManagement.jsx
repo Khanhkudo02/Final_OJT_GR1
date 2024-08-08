@@ -11,7 +11,7 @@ import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
 import "../assets/style/Global.scss";
 import "../assets/style/Pages/EmployeeManagement.scss";
@@ -21,6 +21,9 @@ import {
   fetchAllSkills,
 } from "../service/EmployeeServices";
 import { get, getDatabase, ref, onValue } from "firebase/database";
+import { format } from "date-fns";
+import { fetchAllLanguages2 } from "../service/LanguageServices";
+import { fetchAllTechnology } from "../service/TechnologyServices";
 
 const { Column } = Table;
 const { confirm } = Modal;
@@ -40,6 +43,9 @@ const EmployeeManagement = () => {
   const [userData, setUserData] = useState(null);
   const [data, setData] = useState([]);
   const [skillsList, setSkillsList] = useState([]); // or pass as a prop
+  const { id } = useParams();
+  const [technologies, setTechnologies] = useState([]);
+  const [languages, setLanguages] = useState([]);
 
   const formatSkill = (skill) =>
     skill
@@ -64,13 +70,13 @@ const EmployeeManagement = () => {
         skillsData.map((skill) => ({ key: skill.key, name: skill.label }))
       );
     } catch (error) {
-      message.error("Failed to fetch skills");
+      message.error(t("Failed to fetch skills"));
     }
   };
 
   const getSkillNameById = (skillId, skills) => {
     const skill = skills.find((sk) => sk.key === skillId);
-    return skill ? skill.name : "Unknown Skill";
+    return skill ? skill.name : t("Unknown Skill");
   };
 
   const loadEmployees = async () => {
@@ -121,7 +127,9 @@ const EmployeeManagement = () => {
     const searchData = employees.filter(
       (employee) =>
         employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+        employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        [employee.name, employee.email, employee.phoneNumber]
+          .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     // Apply tab filter
@@ -189,13 +197,15 @@ const EmployeeManagement = () => {
         const userProjects = projectsList.filter((project) =>
           project.teamMembers?.includes(userId)
         );
+        console.log("userProjects", userProjects);
         setProjects(userProjects.reverse());
+        console.log("List projects", projectsData);
       });
     };
 
     if (userId) {
       fetchUserData();
-      fetchProjects();
+      // fetchUserProjects();
     }
   }, [userId]);
 
@@ -215,46 +225,120 @@ const EmployeeManagement = () => {
     currentPage * pageSize
   );
 
-  const exportToWord = async (employee, project) => {
+  const fetchUserProjects = async (userId) => {
     try {
-      // Create a new Document
+      const db = getDatabase();
+      const projectsRef = ref(db, "projects");
+      const snapshot = await get(projectsRef);
+      const projectsData = snapshot.val();
+
+      if (!projectsData) {
+        console.log(t("noProjectsDataFound"));
+        return [];
+      }
+
+      const projectsList = Object.keys(projectsData).map((key) => ({
+        key,
+        ...projectsData[key],
+      }));
+
+      return projectsList.filter((project) =>
+        project.teamMembers?.includes(userId)
+      );
+    } catch (error) {
+      console.error(t("errorFetchingUserProjects"), error);
+      return [];
+    }
+  };
+
+  const formatDescription = (description) => {
+    const translatedDescription = t(description);
+    return translatedDescription
+      ? translatedDescription.charAt(0).toUpperCase() +
+          translatedDescription.slice(1)
+      : null;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [allProjects, allTechnologies, allLanguages, allEmployees] =
+          await Promise.all([
+            fetchAllTechnology(),
+            fetchAllLanguages2(),
+            fetchAllEmployees(),
+          ]);
+
+        setTechnologies(
+          allTechnologies.map((tech) => ({
+            label: tech.name,
+            value: tech.id,
+          }))
+        );
+        setLanguages(
+          allLanguages.map((lang) => ({
+            label: lang.name,
+            value: lang.key,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching project or related data:", error);
+        message.error(t("Error fetching project data"));
+        const userRole = JSON.parse(localStorage.getItem("user"))?.role;
+        const redirectPath =
+          userRole === "admin"
+            ? "/project-management"
+            : "/employee-ProjectManagement";
+        navigate(redirectPath);
+      }
+    };
+
+    fetchData();
+  }, [id, navigate]);
+
+  const getLanguageNameById = (id, languagesList) => {
+    const languages = languagesList.find((lang) => lang.id === id);
+    console.log(languages);
+    return languages ? languages.name : t("No programming language");
+  };
+
+  const getTechnologyNameById = (id, technologiesList) => {
+    const tech = technologiesList.find((tech) => tech.id === id);
+    return tech ? tech.name : t("No technology");
+  };
+  const exportToWord = async (employee) => {
+    try {
+      // Lấy thông tin dự án của nhân viên dựa trên ID
+      const userProjects = await fetchUserProjects(employee.key);
+
+      // Fetch all languages and technologies
+      const languagesList = await fetchAllLanguages2();
+      const technologiesList = await fetchAllTechnology();
+      // Tạo một Tài liệu mới
       const doc = new Document({
         sections: [
           {
             properties: {},
             children: [
-              // Name and Address Section
+              // Phần Tên và Địa chỉ
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: employee.name || "Name not available",
+                    text: employee.name || t("Name not available"),
                     bold: true,
-                    size: 32, // Optional: Adjust font size
+                    size: 32, // Tùy chọn: Điều chỉnh kích thước phông chữ
                   }),
                 ],
               }),
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Address: ",
+                    text: t("Address: "),
                     bold: true,
                     size: 24,
                   }),
                   new TextRun({
-                    text: employee.address || "Address not available",
-                    size: 24,
-                  }),
-                ],
-              }),
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: "Email: ",
-                    bold: true,
-                    size: 24,
-                  }),
-                  new TextRun({
-                    text: employee.email || "Email not available",
+                    text: employee.address || t("Address not available"),
                     size: 24,
                   }),
                 ],
@@ -262,26 +346,39 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Department: ",
+                    text: t("Email: "),
+                    bold: true,
+                    size: 24,
+                  }),
+                  new TextRun({
+                    text: employee.email || t("Email not available"),
+                    size: 24,
+                  }),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: t("Department: "),
                     bold: true,
                     size: 24,
                   }),
                   new TextRun({
                     text:
-                      formatDepartment(employee.department) || "Not provided",
+                      formatDepartment(employee.department) || t("Not provided"),
                     size: 24,
                   }),
                 ],
               }),
 
-              // Add a blank paragraph to create space
+              // Thêm một đoạn trống để tạo không gian
               new Paragraph({}),
 
-              // WORKING EXPERIENCE Section
+              // Phần KINH NGHIỆM LÀM VIỆC
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "WORKING EXPERIENCE",
+                    text: t("WORKING EXPERIENCE"),
                     bold: true,
                     size: 24,
                   }),
@@ -290,46 +387,49 @@ const EmployeeManagement = () => {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "Skill: ",
+                    text: t("Skills: "),
                     bold: true,
                     size: 24,
                   }),
                   new TextRun({
                     text: Array.isArray(employee.skills)
-                      ? employee.skills.map(formatSkill).join(", ")
+                      ? employee.skills
+                          .map((skillId) =>
+                            getSkillNameById(skillId, skillsList)
+                          )
+                          .join(", ")
                       : employee.skills
-                      ? formatSkill(employee.skills)
-                      : "Not provided",
+                      ? getSkillNameById(employee.skills, skillsList)
+                      : t("Not provided"),
                     size: 24,
                   }),
                 ],
               }),
 
-              // Add a blank paragraph to create space
+              // Thêm một đoạn trống để tạo không gian
               new Paragraph({}),
 
-              // TYPICAL PROJECTS Section
+              // Phần DỰ ÁN TIÊU BIỂU
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "TYPICAL PROJECTS",
+                    text: t("TYPICAL PROJECTS"),
                     bold: true,
                     size: 24,
                   }),
                 ],
               }),
-              ...(Array.isArray(employee.projects) &&
-              employee.projects.length > 0
-                ? employee.projects.map((project, index) => [
+              ...(userProjects.length > 0
+                ? userProjects.flatMap((project) => [
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Project name: ",
+                          text: t("Project name: "),
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: project.name || "No name provided",
+                          text: project.name || t("Not provided"),
                           size: 24,
                         }),
                       ],
@@ -337,26 +437,19 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Role: ",
-                          bold: true,
-                          size: 24,
-                        }),
-                        new TextRun({
-                          text: project.role || "No role provided",
-                          size: 24,
-                        }),
-                      ],
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: "Description: ",
+                          text: t("Project Duration: "),
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
                           text:
-                            project.description || "No description provided",
+                            `${format(
+                              new Date(project.startDate),
+                              "dd/MM/yyyy"
+                            )} - ${format(
+                              new Date(project.endDate),
+                              "dd/MM/yyyy"
+                            )}` || t("Dates not provided"),
                           size: 24,
                         }),
                       ],
@@ -364,14 +457,14 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Specification: ",
+                          text: t("Description: "),
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
                           text:
-                            project.specification ||
-                            "No specification provided",
+                            formatDescription(project.description) ||
+                            t("Not provided"),
                           size: 24,
                         }),
                       ],
@@ -379,14 +472,26 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Languages and frameworks: ",
+                          text: t("Programming languages: "),
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
-                          text: Array.isArray(project.languagesAndFrameworks)
-                            ? project.languagesAndFrameworks.join(", ")
-                            : "Not provided",
+                          text: Array.isArray(project.languages)
+                            ? project.languages
+                                .map((langId) =>
+                                  getLanguageNameById(
+                                    langId,
+                                    languagesList
+                                  )
+                                )
+                                .join(", ")
+                            : project.languages
+                            ? getLanguageNameById(
+                                project.languages,
+                                languagesList
+                              )
+                            : t("Not provided"),
                           size: 24,
                         }),
                       ],
@@ -394,26 +499,38 @@ const EmployeeManagement = () => {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Technologies: ",
+                          text: t("Technologies: "),
                           bold: true,
                           size: 24,
                         }),
                         new TextRun({
                           text: Array.isArray(project.technologies)
-                            ? project.technologies.join(", ")
-                            : "Not provided",
+                            ? project.technologies
+                                .map((techId) =>
+                                  getTechnologyNameById(
+                                    techId,
+                                    technologiesList
+                                  )
+                                )
+                                .join(", ")
+                            : project.technologies
+                            ? getTechnologyNameById(
+                                project.technologies,
+                                technologiesList
+                              )
+                            : t("Not provided"),
                           size: 24,
                         }),
                       ],
                     }),
-                    // Add a blank paragraph to create space between projects
+                    // Thêm một đoạn trống để tạo không gian giữa các dự án
                     new Paragraph({}),
                   ])
                 : [
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Not yet joined the project",
+                          text: t("Not yet joined the project"),
                           size: 24,
                           italics: true,
                         }),
@@ -425,12 +542,13 @@ const EmployeeManagement = () => {
         ],
       });
 
-      // Save the document as a .docx file
+      // Lưu tài liệu dưới dạng tệp .docx
       Packer.toBlob(doc).then((blob) => {
-        saveAs(blob, `${employee.name || "Employee"}_CV.docx`);
+        saveAs(blob, `${employee.name || t("Employee")}_CV.docx`);
       });
     } catch (error) {
       console.error("Error exporting to Word:", error);
+      message.error(t("Unable to export to Word. Please try again."));
     }
   };
 
@@ -577,7 +695,7 @@ const EmployeeManagement = () => {
               <Button
                 icon={<ExportOutlined />}
                 style={{ color: "black", borderColor: "black" }}
-                onClick={() => exportToWord(record)}
+                onClick={() => exportToWord(record, projects)}
               />
             </Space>
           )}

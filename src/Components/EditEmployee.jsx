@@ -285,7 +285,7 @@ const EditEmployee = () => {
           style={{ marginLeft: 8 }}
           onClick={() => navigate("/employee-management")}
         >
-          {t("back To Employee Management")}
+          {t("backToEmployeeManagement")}
         </Button>
       </Form.Item>
     </Form>

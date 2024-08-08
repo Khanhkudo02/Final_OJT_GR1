@@ -367,26 +367,6 @@ const AddEmployee = () => {
         <Column title={t("name")} dataIndex="name" key="name" />
         <Column title={t("email")} dataIndex="email" key="email" />
         <Column title={t("phoneNumber")} dataIndex="phoneNumber" key="phoneNumber" />
-        <Column
-          title={t("actions")}
-          key="actions"
-          render={(text, record) => (
-            <Space>
-              <Button
-                icon={<EyeOutlined />}
-                onClick={() => handleViewEmployee(record)}
-              >
-                {t("view")}
-              </Button>
-              <Button
-                icon={<DeleteOutlined />}
-                onClick={() => handleDeleteEmployee(record.id)}
-              >
-                {t("delete")}
-              </Button>
-            </Space>
-          )}
-        />
       </Table>
 
       {selectedEmployee && (

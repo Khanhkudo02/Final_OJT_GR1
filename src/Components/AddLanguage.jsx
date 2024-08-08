@@ -45,7 +45,7 @@ const AddLanguage = () => {
 
   const handleAddLanguage = async () => {
     if (!name || !description || !status) {
-      toast.error("Please fill in all fields.");
+      toast.error(t("Please fill in all fields."));
       return;
     }
 
@@ -54,7 +54,7 @@ const AddLanguage = () => {
       localStorage.setItem("languageAdded", "true");
       navigate("/programing-language");
     } catch (error) {
-      toast.error("Failed to add language.");
+      toast.error(t("Failed to add language."));
     }
   };
 
@@ -66,10 +66,10 @@ const AddLanguage = () => {
   const handleDeleteLanguage = async (id) => {
     try {
       await deleteLanguageById(id);
-      toast.success("Language deleted successfully!");
+      toast.success(t("Language deleted successfully!"));
       loadLanguages(); // Reload the languages list
     } catch (error) {
-      toast.error("Failed to delete language.");
+      toast.error(t("Failed to delete language."));
     }
   };
 

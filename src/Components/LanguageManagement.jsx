@@ -44,7 +44,7 @@ const LanguageManagement = () => {
     loadLanguages();
     const languageAdded = localStorage.getItem("languageAdded");
     if (languageAdded === "true") {
-      message.success("Language added successfully!");
+      message.success(t("Language added successfully!"));
       localStorage.removeItem("languageAdded");
     }
   }, []);
@@ -65,19 +65,19 @@ const LanguageManagement = () => {
 
   const handleDelete = (record) => {
     if (record.status !== "inactive") {
-      message.error("Only inactive languages can be deleted.");
+      message.error(t("Only inactive languages can be deleted."));
       return;
     }
 
     confirm({
-      title: "Are you sure you want to delete this language?",
+      title: t("Are you sure you want to delete this language?"),
       onOk: async () => {
         try {
           await deleteLanguageById(record.key);
-          message.success("Language deleted successfully!");
+          message.success(t("Language deleted successfully!"));
           loadLanguages();
         } catch (error) {
-          message.error("Failed to delete language.");
+          message.error(t("Failed to delete language."));
         }
       },
       onCancel() {
@@ -160,7 +160,7 @@ const LanguageManagement = () => {
           dataIndex="description"
           key="description"
           render={(text) => formatDescription(text)}
-        /> 
+        />
         <Column
           title={t("status")}
           dataIndex="status"
@@ -179,7 +179,7 @@ const LanguageManagement = () => {
               <span className={className}>
                 {translatedText
                   ? translatedText.charAt(0).toUpperCase() +
-                    translatedText.slice(1)
+                  translatedText.slice(1)
                   : ""}
               </span>
             );
@@ -190,13 +190,6 @@ const LanguageManagement = () => {
           key="actions"
           render={(text, record) => (
             <Space>
-              <Button
-                icon={<EyeOutlined />}
-                style={{ color: "green", borderColor: "green" }}
-                onClick={() =>
-                  navigate(`/programing-language/view/${record.key}`)
-                }
-              />
               <Button
                 icon={<EditOutlined />}
                 style={{ color: "blue", borderColor: "blue" }}

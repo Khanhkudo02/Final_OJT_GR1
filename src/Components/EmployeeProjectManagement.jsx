@@ -222,7 +222,7 @@ const EmployeeProjectManagement = () => {
     <div style={{ padding: "24px", background: "#fff" }}>
       <div className="project-management-header">
         <Input
-          placeholder={t("search")}
+          placeholder={t("searchbynameproject")}
           value={searchTerm}
           onChange={handleSearchChange}
           style={{ width: "250px", marginBottom: 16 }}
