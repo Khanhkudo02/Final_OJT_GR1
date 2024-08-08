@@ -1,15 +1,37 @@
-// ProjectTracking.jsx
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { ref, get } from "firebase/database";
-import { database } from "../firebaseConfig";
 import { Table } from "antd";
 import dayjs from "dayjs";
+import { get, ref } from "firebase/database";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { database } from "../firebaseConfig";
 
 const ProjectTracking = () => {
   const { id } = useParams();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [employeeMapping, setEmployeeMapping] = useState({});
+
+  useEffect(() => {
+    const fetchEmployeeMapping = async () => {
+      try {
+        const employeeRef = ref(database, "users"); // Truy vấn từ bảng 'users'
+        const snapshot = await get(employeeRef);
+        const data = snapshot.val();
+        if (data) {
+          const mapping = Object.entries(data).reduce((acc, [key, value]) => {
+            acc[key] = value.name; // Giả sử tên nhân viên được lưu trong trường 'name'
+            return acc;
+          }, {});
+          setEmployeeMapping(mapping);
+          console.log("Employee Mapping:", mapping); // Kiểm tra dữ liệu nhân viên
+        }
+      } catch (error) {
+        console.error("Failed to fetch employees:", error);
+      }
+    };
+
+    fetchEmployeeMapping();
+  }, []); // Dependency array rỗng để chỉ chạy một lần khi component mount
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -18,9 +40,19 @@ const ProjectTracking = () => {
         const snapshot = await get(historyRef);
         const data = snapshot.val();
         const formattedData = data
-          ? Object.entries(data).map(([key, value]) => ({ key, ...value }))
+          ? Object.entries(data).map(([key, value]) => ({
+              key,
+              action: value.action,
+              employeeName: employeeMapping[value.employeeId] || "Unknown", // Thay thế ID bằng tên
+              timestamp: value.timestamp,
+            }))
           : [];
-        setHistory(formattedData);
+          
+        // Sắp xếp theo timestamp từ mới nhất đến cũ nhất
+        const sortedData = formattedData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        setHistory(sortedData);
+        console.log("Sorted History Data:", sortedData); // Kiểm tra dữ liệu lịch sử đã sắp xếp
       } catch (error) {
         console.error("Failed to fetch project history:", error);
       } finally {
@@ -28,8 +60,10 @@ const ProjectTracking = () => {
       }
     };
 
-    fetchHistory();
-  }, [id]);
+    if (Object.keys(employeeMapping).length > 0) {
+      fetchHistory();
+    }
+  }, [id, employeeMapping]); // Chạy lại khi `id` hoặc `employeeMapping` thay đổi
 
   const columns = [
     {
@@ -38,15 +72,16 @@ const ProjectTracking = () => {
       key: "action",
     },
     {
-      title: "Employee ID",
-      dataIndex: "employeeId",
-      key: "employeeId",
+      title: "Employee Name",
+      dataIndex: "employeeName",
+      key: "employeeName",
     },
     {
       title: "Timestamp",
       dataIndex: "timestamp",
       key: "timestamp",
       render: (timestamp) => dayjs(timestamp).format("DD/MM/YYYY HH:mm:ss"),
+      sorter: (a, b) => new Date(b.timestamp) - new Date(a.timestamp), // Sắp xếp theo cột Timestamp
     },
   ];
 
