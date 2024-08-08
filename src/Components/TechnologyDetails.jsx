@@ -3,12 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { fetchTechnologyById } from "../service/TechnologyServices";
 import { Button, Spin, message } from "antd";
 import "../Components/TechnologyDetails.jsx"; // Assuming you have a similar stylesheet
+import { useTranslation } from "react-i18next";
 
 const TechnologyDetails = () => {
   const { id } = useParams();
   const [technology, setTechnology] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadTechnology = async () => {
@@ -17,7 +19,7 @@ const TechnologyDetails = () => {
         setTechnology(data);
         setLoading(false);
       } catch (error) {
-        message.error("Failed to fetch technology details.");
+        message.error(t("Failed to fetch technology details."));
         setLoading(false);
       }
     };

@@ -59,11 +59,11 @@ const NewProject = () => {
 
       sendNotificationEmail(memberEmails, values.name, "added");
 
-      message.success("Project added successfully");
+      message.success(t("Project added successfully"));
       navigate("/project-management");
     } catch (error) {
       console.error("Failed to create project:", error);
-      message.error("Failed to add project");
+      message.error(t("Failed to add project"));
     }
   };
 
@@ -115,7 +115,7 @@ const NewProject = () => {
         }));
         setTechnologies(techOptions);
       } catch (err) {
-        setError("Failed to fetch technologies");
+        setError(t("Failed to fetch technologies"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -158,7 +158,7 @@ const NewProject = () => {
           }));
         setEmployees(employeeOptions);
       } catch (err) {
-        setError("Failed to fetch employees");
+        setError(t("Failed to fetch employees"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -432,9 +432,6 @@ const NewProject = () => {
             <Button icon={<UploadOutlined />}>{t("Click to Upload")}</Button>
           </Upload>
         </Form.Item>
-
-       
-
         <Form.Item>
           <Button type="primary" htmlType="submit" >
             {t("Register")}

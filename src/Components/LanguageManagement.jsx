@@ -44,7 +44,7 @@ const LanguageManagement = () => {
     loadLanguages();
     const languageAdded = localStorage.getItem("languageAdded");
     if (languageAdded === "true") {
-      message.success("Language added successfully!");
+      message.success(t("Language added successfully!"));
       localStorage.removeItem("languageAdded");
     }
   }, []);
@@ -65,19 +65,19 @@ const LanguageManagement = () => {
 
   const handleDelete = (record) => {
     if (record.status !== "inactive") {
-      message.error("Only inactive languages can be deleted.");
+      message.error(t("Only inactive languages can be deleted."));
       return;
     }
 
     confirm({
-      title: "Are you sure you want to delete this language?",
+      title: t("Are you sure you want to delete this language?"),
       onOk: async () => {
         try {
           await deleteLanguageById(record.key);
-          message.success("Language deleted successfully!");
+          message.success(t("Language deleted successfully!"));
           loadLanguages();
         } catch (error) {
-          message.error("Failed to delete language.");
+          message.error(t("Failed to delete language."));
         }
       },
       onCancel() {

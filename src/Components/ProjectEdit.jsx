@@ -63,12 +63,12 @@ const ProjectEdit = () => {
 
           updateStatusOptions(projectData.status);
         } else {
-          message.error("Project not found");
+          message.error(t("Project not found"));
           navigate("/project-management");
         }
       } catch (error) {
         console.error("Error fetching project:", error);
-        message.error("Error fetching project data");
+        message.error(t("Error fetching project data"));
         navigate("/project-management");
       }
     };
@@ -86,7 +86,7 @@ const ProjectEdit = () => {
         }));
         setTechnologies(techOptions);
       } catch (err) {
-        setError("Failed to fetch technologies");
+        setError(t("Failed to fetch technologies"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -106,7 +106,7 @@ const ProjectEdit = () => {
         }));
         setLanguages(languageOptions);
       } catch (err) {
-        setError("Failed to fetch languages");
+        setError(t("Failed to fetch languages"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -130,7 +130,7 @@ const ProjectEdit = () => {
           }));
         setEmployees(employeeOptions);
       } catch (err) {
-        setError("Failed to fetch employees");
+        setError(t("Failed to fetch employees"));
         console.error(err);
       } finally {
         setLoading(false);
@@ -165,13 +165,13 @@ const ProjectEdit = () => {
   
   const validateBudget = (rule, value) => {
     if (!value) {
-      return Promise.reject("Please input the budget!");
+      return Promise.reject(t("Please input the budget!"));
     }
     // Remove commas for validation
     const cleanedValue = value.replace(/,/g, "");
     const regex = /^\d+(\.\d{1,2})?\s?(VND|USD)?$/;
     if (!regex.test(cleanedValue)) {
-      return Promise.reject("Invalid budget format. Use 'amount currency' format.");
+      return Promise.reject(t("Invalid budget format. Use 'amount currency' format."));
     }
     return Promise.resolve();
   };
@@ -222,10 +222,10 @@ const ProjectEdit = () => {
 
   const onFinish = async (values) => {
     Modal.confirm({
-      title: "Confirm Changes",
-      content: "Do you agree with the changes you have made?",
-      okText: "Yes",
-      cancelText: "No",
+      title: t("Confirm Changes"),
+      content: t("Do you agree with the changes you have made?"),
+      okText: t("Yes"),
+      cancelText: t("No"),
       onOk: async () => {
         try {
           const projectData = {
@@ -243,7 +243,7 @@ const ProjectEdit = () => {
             fileList.length > 0 ? fileList[0].originFileObj : null
           );
 
-          message.success("Project updated successfully");
+          message.success(t("Project updated successfully"));
           // Xác định các thành viên mới và cũ
           const currentTeamMembers = values.teamMembers || [];
           const previousTeamMembers = project.teamMembers || [];
@@ -285,7 +285,7 @@ const ProjectEdit = () => {
 
           navigate(`/project/${id}`);
         } catch (error) {
-          message.error("Failed to update project");
+          message.error(t("Failed to update project"));
         }
       },
     });
@@ -321,10 +321,10 @@ const ProjectEdit = () => {
           label={t("ProjectName")}
           name="name"
           rules={[
-            { required: true, message: "Please input the project name!" },
+            { required: true, message: t("Please input the project name!") },
           ]}
         >
-          <Input placeholder="Enter project name"/>
+          <Input placeholder={t("Enter project name")}/>
         </Form.Item>
 
         <Form.Item
@@ -333,56 +333,56 @@ const ProjectEdit = () => {
           rules={[
             {
               required: true,
-              message: "Please input the project description!",
+              message: t("Please input the project description!"),
             },
           ]}
         >
-          <TextArea rows={4} placeholder="Enter project description"/>
+          <TextArea rows={4} placeholder={t("Enter project description")}/>
         </Form.Item>
 
         <Form.Item
           label={t("StartDate")}
           name="startDate"
-          rules={[{ required: true, message: "Please select the start date!" }]}
+          rules={[{ required: true, message: t("Please select the start date!") }]}
         >
-          <DatePicker format="YYYY-MM-DD" placeholder="Select start date"/>
+          <DatePicker format="YYYY-MM-DD" placeholder={t("Select start date")}/>
         </Form.Item>
 
         <Form.Item
           label={t("EndDate")}
           name="endDate"
-          rules={[{ required: true, message: "Please select the end date!" }]}
+          rules={[{ required: true, message: t("Please select the end date!") }]}
         >
-          <DatePicker format="YYYY-MM-DD" placeholder="Select end date"/>
+          <DatePicker format="YYYY-MM-DD" placeholder={t("Select end date")}/>
         </Form.Item>
 
         <Form.Item
           label={t("ClientName")}
           name="clientName"
-          rules={[{ required: true, message: "Please input the client name!" }]}
+          rules={[{ required: true, message: t("Please input the client name!") }]}
         >
-          <Input placeholder="Enter client name"/>
+          <Input placeholder={t("Enter client name")}/>
         </Form.Item>
 
         <Form.Item
           label={t("ClientEmail")}
           name="clientEmail"
           rules={[
-            { required: true, message: "Please input the client email!" },
-            { type: "email", message: "Please enter a valid email!" },
+            { required: true, message: t("Please input the client email!") },
+            { type: "email", message: t("Please enter a valid email!") },
           ]}
         >
-          <Input placeholder="example@gmail.com" />
+          <Input placeholder={t("example@gmail.com")} />
         </Form.Item>
 
         <Form.Item
           label={t("phoneNumber")}
           name="phoneNumber"
           rules={[
-            { required: true, message: "Please input the phone number!" },
+            { required: true, message: t("Please input the phone number!") },
             {
               pattern: /^[0-9]{10}$/,
-              message: "Please enter a valid 10-digit phone number!",
+              message: t("Please enter a valid 10-digit phone number!"),
             },
           ]}
         >
@@ -393,20 +393,20 @@ const ProjectEdit = () => {
           label={t("ProjectManager")}
           name="projectManager"
           rules={[
-            { required: true, message: "Please input the project manager!" },
+            { required: true, message: t("Please input the project manager!") },
           ]}
         >
-          <Input placeholder="Enter project manager"/>
+          <Input placeholder={t("Enter project manager")}/>
         </Form.Item>
 
         <Form.Item
           label={t("TeamMember")}
           name="teamMembers"
           rules={[
-            { required: true, message: "Please select the team members!" },
+            { required: true, message: t("Please select the team members!") },
           ]}
         >
-          <Select mode="multiple" placeholder="Select team members">
+          <Select mode="multiple" placeholder={t("Select team members")}>
             {employees.map((emp) => (
               <Option key={emp.value} value={emp.value}>
                 {emp.label}
@@ -421,7 +421,7 @@ const ProjectEdit = () => {
           rules={[{ required: true, validator: validateBudget }]}
         >
           <Input
-            placeholder="Enter budget (e.g., 1,000,000 VND or 500 USD)"
+            placeholder={t("Enter budget (e.g., 1,000,000 VND or 500 USD)")}
             onChange={handleBudgetChange}
             onBlur={handleBudgetBlur}
             maxLength={50} // Optional: to limit input length
@@ -432,7 +432,7 @@ const ProjectEdit = () => {
           label={t("Status")}
           name="status"
           rules={[
-            { required: true, message: "Please select the project status!" },
+            { required: true, message: t("Please select the project status!") },
           ]}
         >
           <Select>
@@ -448,19 +448,19 @@ const ProjectEdit = () => {
           label={t("Priority")}
           name="priority"
           rules={[
-            { required: true, message: "Please select the project priority!" },
+            { required: true, message: t("Please select the project priority!") },
           ]}
         >
-          <Select placeholder="Select the project priority">
-            <Option value="HIGH">High</Option>
-            <Option value="MEDIUM">Medium</Option>
-            <Option value="LOW">Low</Option>
+          <Select placeholder={t("Select the project priority")}>
+            <Option value="HIGH">{t("High")}</Option>
+            <Option value="MEDIUM">{t("Medium")}</Option>
+            <Option value="LOW">{t("Low")}</Option>
           </Select>
         </Form.Item>
 
         {/* Select technologies */}
         <Form.Item label={t("TechnologiesUsed")} name="technologies">
-          <Select mode="multiple" placeholder="Select technologies">
+          <Select mode="multiple" placeholder={t("Select technologies")}>
             {technologies.map((tech) => (
               <Option key={tech.value} value={tech.value}>
                 {tech.label}
@@ -471,7 +471,7 @@ const ProjectEdit = () => {
 
         {/* Select programming languages */}
         <Form.Item label={t("ProgrammingLanguageUsed")} name="languages">
-          <Select mode="multiple" placeholder="Select languages">
+          <Select mode="multiple" placeholder={t("Select languages")}>
             {languages.map((lang) => (
               <Option key={lang.value} value={lang.value}>
                 {lang.label}

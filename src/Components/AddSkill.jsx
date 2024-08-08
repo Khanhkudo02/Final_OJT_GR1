@@ -41,7 +41,7 @@ const AddSkill = () => {
 
     const handleAddSkill = async () => {
         if (!name || !description || !status) {
-            toast.error("Please fill in all fields.");
+            toast.error(t("Please fill in all fields."));
             return;
         }
 
@@ -50,7 +50,7 @@ const AddSkill = () => {
             localStorage.setItem("skillAdded", "true");
             navigate("/position-management");
         } catch (error) {
-            toast.error("Failed to add skill.");
+            toast.error(t("Failed to add skill."));
         }
     };
 
@@ -62,10 +62,10 @@ const AddSkill = () => {
     const handleDeleteSkill = async (id) => {
         try {
             await deleteSkillById(id);
-            toast.success("Skill deleted successfully!");
+            toast.success(t("Skill deleted successfully!"));
             loadSkills(); // Reload the skills list
         } catch (error) {
-            toast.error("Failed to delete skill.");
+            toast.error(t("Failed to delete skill."));
         }
     };
 

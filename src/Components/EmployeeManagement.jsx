@@ -70,13 +70,13 @@ const EmployeeManagement = () => {
         skillsData.map((skill) => ({ key: skill.key, name: skill.label }))
       );
     } catch (error) {
-      message.error("Failed to fetch skills");
+      message.error(t("Failed to fetch skills"));
     }
   };
 
   const getSkillNameById = (skillId, skills) => {
     const skill = skills.find((sk) => sk.key === skillId);
-    return skill ? skill.name : "Unknown Skill";
+    return skill ? skill.name : t("Unknown Skill");
   };
 
   const loadEmployees = async () => {
@@ -281,7 +281,7 @@ const EmployeeManagement = () => {
         );
       } catch (error) {
         console.error("Error fetching project or related data:", error);
-        message.error("Error fetching project data");
+        message.error(t("Error fetching project data"));
         const userRole = JSON.parse(localStorage.getItem("user"))?.role;
         const redirectPath =
           userRole === "admin"
@@ -297,12 +297,12 @@ const EmployeeManagement = () => {
   const getLanguageNameById = (id, languagesList) => {
     const languages = languagesList.find((lang) => lang.id === id);
     console.log(languages);
-    return languages ? languages.name : "No programming language";
+    return languages ? languages.name : t("No programming language");
   };
 
   const getTechnologyNameById = (id, technologiesList) => {
     const tech = technologiesList.find((tech) => tech.id === id);
-    return tech ? tech.name : "No technology";
+    return tech ? tech.name : t("No technology");
   };
   const exportToWord = async (employee) => {
     try {
