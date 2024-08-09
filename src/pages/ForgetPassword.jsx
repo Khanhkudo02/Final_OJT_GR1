@@ -31,7 +31,8 @@ function ForgetPassword() {
 
       if (user) {
         const [userId] = user;
-        const resetLink = `http://150.95.115.36:1208/forget-password?userId=${encodeURIComponent(
+        // const resetLink = `http://150.95.115.36:1208/forget-password?userId=${encodeURIComponent(
+        const resetLink = `http://150.95.115.36:1208/reset-password?userId=${encodeURIComponent(
           userId
         )}`;
 
