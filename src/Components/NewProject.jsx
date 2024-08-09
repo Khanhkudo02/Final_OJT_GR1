@@ -36,8 +36,6 @@ const NewProject = () => {
         ...values,
         startDate: values.startDate.format("YYYY-MM-DD"),
         endDate: values.endDate.format("YYYY-MM-DD"),
-        startDate: values.startDate.format("YYYY-MM-DD"),
-        endDate: values.endDate.format("YYYY-MM-DD"),
         technologies: values.technologies || [],
         languages: values.languages || [],
         budget: values.budget.replace(/,/g, ""),
@@ -237,21 +235,18 @@ const NewProject = () => {
         background: "#fff",
         maxWidth: "1000px",
         margin: "auto",
-      }}
-    >
+      }}>
       <h2>{t("NewProject")}</h2>
       <Form
         form={form}
         onFinish={onFinish}
-        initialValues={{ status: "NOT STARTED" }}
-      >
+        initialValues={{ status: "NOT STARTED" }}>
         <Form.Item
           label={t("ProjectName")}
           name="name"
           rules={[
             { required: true, message: t("Please input the project name!") },
-          ]}
-        >
+          ]}>
           <Input
             placeholder={t("Enter project name")}
             onBlur={() => handleFieldBlur("name")}
@@ -266,8 +261,7 @@ const NewProject = () => {
               required: true,
               message: t("Please input the project description!"),
             },
-          ]}
-        >
+          ]}>
           <TextArea
             rows={4}
             placeholder={t("Enter project description")}
@@ -280,8 +274,7 @@ const NewProject = () => {
           name="startDate"
           rules={[
             { required: true, message: t("Please select the start date!") },
-          ]}
-        >
+          ]}>
           <DatePicker
             format="DD/MM/YYYY"
             placeholder={t("Select start date")}
@@ -296,8 +289,7 @@ const NewProject = () => {
           name="endDate"
           rules={[
             { required: true, message: t("Please select the end date!") },
-          ]}
-        >
+          ]}>
           <DatePicker
             format="DD/MM/YYYY"
             placeholder={t("Select end date")}
@@ -312,8 +304,7 @@ const NewProject = () => {
           name="clientName"
           rules={[
             { required: true, message: t("Please input the client name!") },
-          ]}
-        >
+          ]}>
           <Input
             placeholder={t("Enter client name")}
             onBlur={() => handleFieldBlur("clientName")}
@@ -326,8 +317,7 @@ const NewProject = () => {
           rules={[
             { required: true, message: t("Please input the client email!") },
             { type: "email", message: t("Please enter a valid email!") },
-          ]}
-        >
+          ]}>
           <Input placeholder="example@gmail.com" />
         </Form.Item>
 
@@ -340,8 +330,7 @@ const NewProject = () => {
               pattern: /^[0-9]{10}$/,
               message: t("Please enter a valid 10-digit phone number!"),
             },
-          ]}
-        >
+          ]}>
           <Input
             placeholder="0123456789"
             onBlur={() => handleFieldBlur("phoneNumber")}
@@ -353,8 +342,7 @@ const NewProject = () => {
           name="projectManager"
           rules={[
             { required: true, message: t("Please input the project manager!") },
-          ]}
-        >
+          ]}>
           <Input
             placeholder={t("Enter project manager")}
             onBlur={() => handleFieldBlur("projectManager")}
@@ -366,13 +354,11 @@ const NewProject = () => {
           name="teamMembers"
           rules={[
             { required: true, message: t("Please select the team members!") },
-          ]}
-        >
+          ]}>
           <Select
             mode="multiple"
             placeholder={t("Select team members")}
-            onBlur={() => handleFieldBlur("teamMembers")}
-          >
+            onBlur={() => handleFieldBlur("teamMembers")}>
             {employees.map((emp) => (
               <Option key={emp.value} value={emp.value}>
                 {emp.label}
@@ -384,8 +370,7 @@ const NewProject = () => {
         <Form.Item
           label={t("Budget")}
           name="budget"
-          rules={[{ required: true, validator: validateBudget }]}
-        >
+          rules={[{ required: true, validator: validateBudget }]}>
           <Input
             placeholder={t("Enter budget (e.g., 1,000,000 VND or 500 USD)")}
             onChange={handleBudgetChange}
@@ -416,12 +401,10 @@ const NewProject = () => {
               required: true,
               message: t("Please select the project priority!"),
             },
-          ]}
-        >
+          ]}>
           <Select
             onBlur={() => handleFieldBlur("priority")}
-            placeholder={t("Select the project priority")}
-          >
+            placeholder={t("Select the project priority")}>
             <Option value="HIGH">High</Option>
             <Option value="MEDIUM">Medium</Option>
             <Option value="LOW">Low</Option>
@@ -433,8 +416,7 @@ const NewProject = () => {
           <Select
             mode="multiple"
             placeholder={t("Select technologies")}
-            onBlur={() => handleFieldBlur("technologies")}
-          >
+            onBlur={() => handleFieldBlur("technologies")}>
             {technologies.map((tech) => (
               <Option key={tech.value} value={tech.value}>
                 {tech.label}
@@ -448,8 +430,7 @@ const NewProject = () => {
           <Select
             mode="multiple"
             placeholder={t("Select languages")}
-            onBlur={() => handleFieldBlur("languages")}
-          >
+            onBlur={() => handleFieldBlur("languages")}>
             {languages.map((lang) => (
               <Option key={lang.value} value={lang.value}>
                 {lang.label}
@@ -463,8 +444,7 @@ const NewProject = () => {
             fileList={fileList}
             beforeUpload={() => false}
             onChange={handleImageChange}
-            onBlur={() => handleFieldBlur("attachments")}
-          >
+            onBlur={() => handleFieldBlur("attachments")}>
             <Button icon={<UploadOutlined />}>{t("Click to Upload")}</Button>
           </Upload>
         </Form.Item>
